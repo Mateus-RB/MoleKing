@@ -63,79 +63,6 @@ void Molecule::getBonds(){
     };
 };
 
-vector<int> Molecule::getBonded(int atomIndex){
-    vector<int> bonded;
-    if (this->bonds.size() == 0){
-        this->getBonds();
-    };
-    for (int i = 0; (int) i < this->bonds.size(); i++){
-        if (atomIndex == this->bonds[i].first[0]){
-            bonded.push_back(this->bonds[i].first[1]);
-        };
-        if (atomIndex == this->bonds[i].first[1]){
-            bonded.push_back(this->bonds[i].first[0]);
-        };
-    };
-    return bonded;
-};
-
-void Molecule::doOPLS(){
-    for (int i = 0 ; i < (int) this->molecule.size(); i++){
-        vector<int> bonded = this->getBonded(i);
-        vector<int> bondedType;
-        for (int j = 0 ; j < bonded.size() ; j++){
-            bondedType.push_back(this->molecule[bonded[j]].getAtomicNumber());
-            sort(bondedType.begin(), bondedType.end());
-        };
-        if (this->molecule[i].getAtomicNumber() == 1){
-            this->molecule[i].setOPLS("opls_140");
-            if (find(bondedType.begin(), bondedType.end(), 8) != bondedType.end()){
-                this->molecule[i].setOPLS("opls_112");
-            };
-        };
-        if (this->molecule[i].getAtomicNumber() == 6){
-            this->molecule[i].setOPLS("opls_001");
-            if (bonded.size() == 2){
-                this->molecule[i].setOPLS("opls_757");
-            };
-            if (bonded.size() == 3){
-                if ((find(bondedType.begin(), bondedType.end(), 7) != bondedType.end()) || (find(bondedType.begin(), bondedType.end(), 8) != bondedType.end())){
-                    if ((bondedType == vector<int> {1, 1, 7}) || (bondedType == vector<int> {1, 1, 8})){
-                        this->molecule[i].setOPLS("opls_145");
-                    };
-                    if (find(bondedType.begin(), bondedType.end(), 6) != bondedType.end()){
-                        ;    
-                    } else{
-                        this->molecule[i].setOPLS("opls_145");
-                    };
-                    
-                };
-                if (find(bondedType.begin(), bondedType.end(), 6) != bondedType.end()){
-                    this->molecule[i].setOPLS("opls_150");
-                    if (find(bondedType.begin(), bondedType.end(), 8) != bondedType.end()){
-                        this->molecule[i].setOPLS("opls_141");
-                    };
-                };
-            };
-        };
-        if (this->molecule[i].getAtomicNumber() == 8){
-            this->molecule[i].setOPLS("opls_002");
-            if (find(bondedType.begin(), bondedType.end(), 1) != bondedType.end()){
-                this->molecule[i].setOPLS("opls_111");
-                if (find(bondedType.begin(), bondedType.end(), 6) != bondedType.end()){
-                    this->molecule[i].setOPLS("opls_023");
-                };
-            };
-        };
-
-        /*
-        for (int j =0; j < bonded.size(); j++){
-            cout << this->molecule[i].getAtomicNumber() << endl;
-        };
-        */
-    };
-};
-
 void Molecule::getAngles(){
     for (int i = 0; i < (int) bonds.size(); i++){
         int atom1 = this->bonds[i].first[0];
@@ -472,8 +399,8 @@ void Molecule::doIRC(){
 vector < vector <int> > Molecule::getIRCBonds(){
     if (this->bonds.size() == 0){
         this->doIRC();
-    }
-    vector < vector <int> > temp(this->bonds.size());
+    }    
+    vector < vector <int> > temp;
     for (int i = 0; i < (int) this->bonds.size(); i++){
         temp.push_back(this->bonds[i].first);
     }
@@ -485,7 +412,7 @@ vector < vector <int> > Molecule::getIRCAngles(){
     if (this->angles.size() == 0){
         this->doIRC();
     }
-    vector < vector <int> > temp(this->angles.size());
+    vector < vector <int> > temp;
     for (int i = 0; i < (int) this->angles.size(); i++){
         temp.push_back(this->angles[i].first);
     }
@@ -497,6 +424,7 @@ vector < vector <int> > Molecule::getIRCDihedrals(){
         this->doIRC();
     }
     vector < vector <int> > temp(this->dihedrals.size());
+    //vector < vector <int> > temp;
     for (int i = 0; i < (int) this->dihedrals.size(); i++){
         temp.push_back(this->dihedrals[i].first);
     }
