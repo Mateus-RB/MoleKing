@@ -239,7 +239,6 @@ PYBIND11_MODULE(MoleKing_util, m) {
         .def("getMolecule", &G16FCHKfile::getMolecule);
 
 };
-*/
 
 /*
 int main(){
@@ -276,6 +275,7 @@ int main(){
     //cout << "Hello" << endl;
     return 0;
 };
+*/
 
 /*
 c++ main.cpp chemicalUnits/AtomicScale.cpp chemicalUnits/PeriodicTable.cpp chemicalUnits/Molecule.cpp chemicalUnits/SupraMolecule.cpp berny/Hessian.cpp math/Geometry.cpp math/MassCenter.cpp math/Matrix.cpp math/Vectors.cpp outputProcess/G16Process.cpp chemicalUnits/OPLSff.cpp
