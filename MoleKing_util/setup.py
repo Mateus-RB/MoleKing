@@ -35,8 +35,14 @@ for directory in subdirs:
 os.makedirs('MoleKing_util')
 
 if OS == 'Linux':
-    flags = '-O3 -Wall -shared -std=c++11 -fPIC `python{} -m pybind11 --includes`'.format(PyVersion[0:3])
-    target = 'MoleKing_util`python{}-config --extension-suffix`'.format(PyVersion[0:3])
+    if len(PyVersion.split('.')[1]) == 1:
+        flags = '-O3 -Wall -shared -std=c++11 -fPIC `python{} -m pybind11 --includes`'.format(PyVersion[0:3])
+        target = 'MoleKing_util`python{}-config --extension-suffix`'.format(PyVersion[0:3])
+    else:
+        flags = '-O3 -Wall -shared -std=c++11 -fPIC `python{} -m pybind11 --includes`'.format(PyVersion[0:4])
+        target = 'MoleKing_util`python{}-config --extension-suffix`'.format(PyVersion[0:4])
+
+        
 elif OS == 'Darwin':
     flags = '-O3 -Wall -shared -std=c++11 -undefined dynamic_lookup `python3 -m pybind11 --includes`'
     target = 'MoleKing_util`python3-config --extension-suffix`'

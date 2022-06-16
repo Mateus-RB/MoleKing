@@ -22,7 +22,7 @@
 #include "outputProcess/G16Process.hpp"
 using namespace std;
 
-/*
+
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include <pybind11/pytypes.h>
@@ -241,6 +241,7 @@ PYBIND11_MODULE(MoleKing_util, m) {
 };
 */
 
+/*
 int main(){
     //string fileN = "/Users/thiagolopes/OneDrive/Pesquisas/VSNS/ONL/pcm_done/pcm_B3LYP_0.log";//
     //string fileN = "/media/mateus/Data/Teste_DicePlayer/OPT/Metanol/metanol.fchk";
