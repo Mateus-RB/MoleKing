@@ -172,7 +172,7 @@ vector <VectorsInt> SupraMolecule::getIRCBonds(){
 };
 
 vector <VectorsInt> SupraMolecule::getIRCAngles(){
-    vector <VectorsInt> irc(this->supraMolecule.size());
+    vector <VectorsInt> irc;
     for (int i = 0; i < (int) this->supraMolecule.size(); i++){
         irc.push_back(this->supraMolecule[i].getIRCAngles());
     }
@@ -180,7 +180,7 @@ vector <VectorsInt> SupraMolecule::getIRCAngles(){
 };
 
 vector <VectorsInt> SupraMolecule::getIRCDihedrals(){
-    vector <VectorsInt> irc(this->supraMolecule.size());
+    vector <VectorsInt> irc;
     for (int i = 0; i < (int) this->supraMolecule.size(); i++){
         irc.push_back(this->supraMolecule[i].getIRCDihedrals());
     }
