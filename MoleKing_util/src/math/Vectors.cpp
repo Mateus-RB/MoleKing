@@ -146,7 +146,7 @@ double Vector3D::axisValue(char unitVector){
 // Quaternion class //
 
 Quaternion::Quaternion(double u, vector <double> vectorA, vector <double> vectorB = {0.0, 0.0, 0.0}){
-    Quaternion q = *this;
+    //Quaternion q = *this;
     this->u = u;
     this->s_i = vectorA[0] - vectorB[0];
     this->s_j = vectorA[0] - vectorB[0];
