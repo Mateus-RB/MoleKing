@@ -208,7 +208,7 @@ void Molecule::setCharge(int charge){
     this->charge = charge;
 };
 
-int Molecule::getCharge(){
+double Molecule::getCharge(){
     return this->charge;
 };
 

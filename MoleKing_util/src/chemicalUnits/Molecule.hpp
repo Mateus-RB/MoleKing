@@ -56,7 +56,7 @@ public:
     Atom getAtomObj(int number);
     ChargePoint getChargePointsObj(int number);
     void setCharge(int charge);
-    int getCharge();
+    double getCharge();
     long getSize();
     vector <Atom> getMoleculeVector();
     void setMultiplicity(int multiplicity);
