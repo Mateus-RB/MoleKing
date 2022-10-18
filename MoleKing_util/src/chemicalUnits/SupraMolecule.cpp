@@ -164,7 +164,7 @@ void SupraMolecule::standardOrientation(int molNumber){
 };
 
 vector <VectorsInt> SupraMolecule::getIRCBonds(){
-    vector <VectorsInt> irc(this->supraMolecule.size());
+    vector <VectorsInt> irc;
     for (int i = 0; i < (int) this->supraMolecule.size(); i++){
         irc.push_back(this->supraMolecule[i].getIRCBonds());
     }
