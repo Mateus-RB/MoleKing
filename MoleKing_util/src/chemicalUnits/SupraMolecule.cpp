@@ -227,3 +227,45 @@ double SupraMolecule::getSupraMolecularMass(){
     };
     return supraMolecularMass;
 };
+
+vector <Molecule> SupraMolecule::moleculeList(){
+    return this->supraMolecule;
+};
+
+SupraMolecule::iterator SupraMolecule::begin(){
+    return this->supraMolecule.begin();
+};
+
+SupraMolecule::iterator SupraMolecule::end(){
+    return this->supraMolecule.end();
+};
+
+bool SupraMolecule::operator==(SupraMolecule sMol){
+    if ((int) this->supraMolecule.size() == (int) sMol.getSize()){
+        for (int i = 0; i < (int) this->supraMolecule.size(); i++){
+            if (this->supraMolecule[i] == sMol.getMolecule(i)){
+                continue;
+            } else {
+                return 0;
+            };
+        };
+    } else{
+        return 0;
+    };
+    return 1;
+};
+
+bool SupraMolecule::operator!=(SupraMolecule sMol){
+    if ((int) this->supraMolecule.size() == (int) sMol.getSize()){
+        for (int i = 0; i < (int) this->supraMolecule.size(); i++){
+            if (this->supraMolecule[i] == sMol.getMolecule(i)){
+                continue;
+            } else {
+                return 1;
+            };
+        };
+    } else{
+        return 1;
+    };
+    return 0;
+};

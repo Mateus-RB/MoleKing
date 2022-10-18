@@ -159,7 +159,11 @@ PYBIND11_MODULE(MoleKing_util, m) {
         .def("removeElement", (void (SupraMolecule::*)(string)) &SupraMolecule::removeElement)
         .def("removeMolecule", (void (SupraMolecule::*)(int)) &SupraMolecule::removeMolecule)
         .def("removeMolecule", (void (SupraMolecule::*)(Molecule)) &SupraMolecule::removeMolecule)
+        .def("__iter__", [](SupraMolecule &sMol) {return py::make_iterator(sMol.begin(), sMol.end());}, py::keep_alive<0, 1>())
+        .def("__eq__", &SupraMolecule::operator==)
+        .def("__ne__", &SupraMolecule::operator!=)
         .def("getSupraMM", &SupraMolecule::getSupraMolecularMass);;
+        
 
     
     py::class_<Point>(m, "Point", "This class creates a point variable type allowing for the usage in python like a primitive type.")

@@ -30,6 +30,9 @@ private:
     void getMoleculeTorsions();
 
 public:
+    typedef MoleculeList::iterator iterator;
+    typedef MoleculeList::const_iterator const_iterator;
+
     SupraMolecule();
     void addMolecule(Molecule molecule);
     void addAtomToMolecule(int molNumber, Atom atom);
@@ -57,6 +60,11 @@ public:
     void removeMolecule(int molNumber);
     void removeMolecule(Molecule molecule);
     double getSupraMolecularMass();
+    vector <Molecule> moleculeList();
+    iterator begin();
+    iterator end();
+    bool operator==(SupraMolecule sMol);
+    bool operator!=(SupraMolecule sMol);
 };
 
 

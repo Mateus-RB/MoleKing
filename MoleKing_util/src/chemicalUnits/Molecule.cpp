@@ -8,7 +8,6 @@
 
 #include "Molecule.hpp"
 
-
 double Molecule::angleToSpinInAref(int ref, char axisName){
     vector <double> cart = this->molecule[ref].getPos();
     if (axisName == 'x'){
