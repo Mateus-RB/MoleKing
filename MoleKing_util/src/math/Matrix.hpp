@@ -23,6 +23,9 @@ class Matrix{
     double det(vector< vector <double> > mat, long n);
 
     public:
+
+    double eigenvalue();
+
     Matrix(vector < vector <double> > matrix);
     Matrix();
     Matrix(int i, int j);

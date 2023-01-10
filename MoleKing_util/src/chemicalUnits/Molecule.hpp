@@ -20,6 +20,7 @@
 #include <iterator>
 #include <algorithm>
 #include <vector>
+#include <eigen3/Eigen/Eigenvalues>
 
 class Molecule{
 
@@ -33,7 +34,7 @@ private:
     vector < pair < vector <int>, Angle > > angles;
     vector < pair < vector <int>, Torsion > > dihedrals;
     int multiplicity, charge;
-    double angleToSpinInAref(int ref, char axisName);
+    double angleToSpinInAref(int ref, char axisName);   
     void getBonds();
     void getAngles();
     void getDihedrals();
@@ -47,6 +48,11 @@ public:
 
     Molecule();
     ~Molecule();
+
+
+    Eigen::Matrix<double, 3, 3> moleculeTensor();
+    void TesteTensor();
+
     void addChargePoints(double xPos, double yPos, double zPos, double charge);
     void addChargePoints(ChargePoint cp);
     void addAtom(string atomSymbol, double xPos, double yPos, double zPos, double atomicCharge = 0.0, bool freezeCode_ = 0);
@@ -92,7 +98,7 @@ public:
     void removeElement(string element);
     Molecule copy();
     double getMolecularMass();
-    void doOPLS();
+    //void doOPLS();
 };
 
 #endif /* Molecule_hh */

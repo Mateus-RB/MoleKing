@@ -7,6 +7,7 @@
 //
 
 #include "Matrix.hpp"
+#include <eigen3/Eigen/Core>
 #include <string>
 
 Matrix::Matrix(vector < vector <double> > matrix){

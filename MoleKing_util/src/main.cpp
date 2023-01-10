@@ -9,6 +9,7 @@
 #include <iostream>
 #include <string>
 #include <math.h>
+#include <eigen3/Eigen/Eigenvalues>
 
 #include "math/MassCenter.hpp"
 #include "chemicalUnits/AtomicScale.hpp"
@@ -21,7 +22,6 @@
 #include "math/Vectors.hpp"
 #include "outputProcess/G16Process.hpp"
 using namespace std;
-
 
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
@@ -121,6 +121,7 @@ PYBIND11_MODULE(MoleKing_util, m) {
         .def("moveMassCenter", &Molecule::moveMassCenter, py::arg("x")=0, py::arg("y")=0, py::arg("z")=0)
         .def("moveTail", &Molecule::moveTail, py::arg("atomNumber"), py::arg("x")=0, py::arg("y")=0, py::arg("z")=0)
         .def("stdOrientation", &Molecule::standardOrientation)
+        .def("TesteTensor", &Molecule::TesteTensor)
         .def("bondLength", &Molecule::bondLength)
         .def("valenceAngle", &Molecule::valenceAngle)
         .def("torsion", &Molecule::torsion)
@@ -163,9 +164,7 @@ PYBIND11_MODULE(MoleKing_util, m) {
         .def("__eq__", &SupraMolecule::operator==)
         .def("__ne__", &SupraMolecule::operator!=)
         .def("getSupraMM", &SupraMolecule::getSupraMolecularMass);;
-        
 
-    
     py::class_<Point>(m, "Point", "This class creates a point variable type allowing for the usage in python like a primitive type.")
         .def(py::init())
         .def(py::init<double, double, double, char>(), py::arg("coord1"), py::arg("coord2"), py::arg("coord3"), py::arg("typeCoord") = 'c')
@@ -245,6 +244,7 @@ PYBIND11_MODULE(MoleKing_util, m) {
 };
 
 /*
+
 int main(){
     //string fileN = "/Users/thiagolopes/OneDrive/Pesquisas/VSNS/ONL/pcm_done/pcm_B3LYP_0.log";//
     //string fileN = "/media/mateus/Data/Teste_DicePlayer/OPT/Metanol/metanol.fchk";
@@ -255,19 +255,19 @@ int main(){
     //G16LOGfile g16 = G16LOGfile(fileN);
     //Matrix Grad = g16.getCartesianGradient();
     //Molecule mol = Molecule();
-    Atom H = Atom(1, 1, 0, 0);
-    Atom O = Atom(8, 0, 0, 0);
-    Atom H2 = Atom(1, -1, 0, 0);
-    //cout << H.toStr() << endl;
-    Molecule M = Molecule(); 
-    M.addAtom(H);
-    M.addAtom(O);
-    M.addAtom(H2);
-    M.doOPLS(); //nao esta funcionando
+    //Atom H = Atom(1, 1, 0, 0);
+    //Atom O = Atom(8, 0, 0, 0);
+    //Atom H2 = Atom(1, -1, 0, 0);
+    ////cout << H.toStr() << endl;
+    //Molecule M = Molecule(); 
+    //M.addAtom(H);
+    //M.addAtom(O);
+    //M.addAtom(H2);
+    //M.doOPLS(); //nao esta funcionando
     //cout << M.getSize() << endl;
-    for (long i = 0; i < M.getSize(); i++){
-        cout << M.getAtomObj(i).getOPLS() << endl;
-    };
+    //for (long i = 0; i < M.getSize(); i++){
+    //    cout << M.getAtomObj(i).getOPLS() << endl;
+    //};
     //cout << M.toStr() << endl;
     //cout << mol.toStr() << endl;
     //mol.addAtom(8, 0, 0, 0);
@@ -277,8 +277,39 @@ int main(){
     //mol.doOPLS();
     //cout << mol.toStr() << endl;
     //cout << "Hello" << endl;
-    return 0;
+
+    Atom C1(6,0.0000, 0.0000 ,   0.0000 );
+    Atom H1(1,0.5288, 0.1610 ,   0.9359);
+    Atom H2(1,0.2051, 0.8240 ,  -0.6786);
+    Atom H3(1,0.3345,-0.9314 ,  -0.4496);
+    Atom H4(1,-1.0685,-0.0537,    0.1921);
+
+    Molecule M = Molecule();
+
+    M.addAtom(C1);
+    M.addAtom(H1);
+    M.addAtom(H2);
+    M.addAtom(H3);
+    M.addAtom(H4);
+
+    cout << "BEFORE" << endl;
+    
+    for (int i = 0; i < M.getSize(); i++){
+        cout << M.getAtomObj(i).toStr() << endl;
+    };
+
+
+    M.TesteTensor();
+
+    cout << "AFTER" << endl;
+
+    for (int i = 0; i < M.getSize(); i++){
+        cout << M.getAtomObj(i).toStr() << endl;
+    };
+
+    return 0;  
 };
+
 */
 
 /*

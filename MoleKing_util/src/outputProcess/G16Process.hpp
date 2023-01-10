@@ -103,7 +103,6 @@ private:
     
 public:
     G16LOGfile(string filePath, bool polarAsw = 0);
-    
     double scfEnergy();
     Molecule getMolecule();
     double getDipole(string name);

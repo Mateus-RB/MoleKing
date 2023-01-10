@@ -7,6 +7,7 @@
 //
 
 #include "Molecule.hpp"
+#include <eigen3/Eigen/Eigenvalues>
 
 double Molecule::angleToSpinInAref(int ref, char axisName){
     vector <double> cart = this->molecule[ref].getPos();
@@ -338,9 +339,123 @@ vector <double> Molecule::standardOrientationPath(){
     return vector <double> {angle1, zspinSpherical[2], angle2};
 };
 
+Eigen::Matrix<double, 3, 3> Molecule::moleculeTensor(){
+    Point centerOfMass = this->getMassCenter();
+    double Ixx = 0.0;
+    double Iyy = 0.0;
+    double Izz = 0.0;
+    double Ixy = 0.0;
+    double Ixz = 0.0;
+    double Iyz = 0.0;
+
+    //double atomMass = this->molecule.at(0).getAtomicMass();
+
+    for (int i = 0; i < (int) this->molecule.size(); i++){
+        double atomMass = this->molecule.at(i).getAtomicMass();        
+        double dx = this->molecule.at(i).getX() - centerOfMass.getCoords('c')[0];
+        double dy = this->molecule.at(i).getY() - centerOfMass.getCoords('c')[1];
+        double dz = this->molecule.at(i).getZ() - centerOfMass.getCoords('c')[2];
+
+        Ixx += atomMass * (dy*dy + dz*dz);
+        Iyy += atomMass * (dx*dx + dz*dz);
+        Izz += atomMass * (dx*dx + dy*dy);
+        Ixy += atomMass * dx*dy * -1;
+        Ixz += atomMass * dx*dz * -1;
+        Iyz += atomMass * dy*dz * -1;
+    };
+
+    Matrix inertiaTensor = Matrix({{Ixx,Ixy,Ixz},
+                                   {Ixy,Iyy,Iyz},
+                                   {Ixz,Iyz,Izz} });
+
+    
+    Eigen::Matrix<double, 3, 3> A;
+
+    Eigen::Matrix<double, 1, 3> Position;
+
+    //Position << -0.280418, 0.000000,-0.000026;
+
+    A << Ixx, Ixy, Ixz,
+         Ixy, Iyy, Iyz,
+         Ixz, Iyz, Izz;
+
+    Eigen::EigenSolver<Eigen::Matrix<double, 3, 3> > s(A); 
+    Eigen::Matrix<double, 3, 3> evecs = s.eigenvectors().real(); //! Eigenvectors are the columns of evecs.
+    
+    //cout << "Position: " << endl << Position << endl;
+    //cout << "\n" << endl;
+    //cout << "Position Transpose: " << endl << Position.transpose() << endl;
+    //cout << "\n" << endl;
+    //cout << "Eigenvalues:" << endl << s.eigenvalues() << endl;
+    //cout << "\n" << endl;
+    //cout << "Eigenvectors: " << endl << evecs << endl;
+    //cout << "\n" << endl;
+    //cout << "Eigenvectors Tranpose" << endl << evecs.transpose() << endl;
+    //cout << "\n" << endl;
+    //cout << "M_Multi w/out Tranpose" << endl << Position*evecs << endl;
+    //cout << "\n" << endl;
+
+    //cout << "\n\n";
+
+    return evecs;
+}
+
+void Molecule::TesteTensor(){
+    Eigen::Matrix<double, 3, 3> evecs = this->moleculeTensor();
+
+    if (float(evecs.determinant()) == float(-1)){
+        evecs(0,2) = evecs(0,2) * -1;
+        evecs(1,2) = evecs(1,2) * -1;
+        evecs(2,2) = evecs(2,2) * -1;
+    }
+
+    else{
+        cout << "Error: could not make a rotation matrix while adopting the standard orientation" << endl;
+    };   
+    
+    this->moveMassCenter(0,0,0);
+
+    for (int i = 0; i < (int) this->molecule.size(); i++ ){
+        Eigen::Matrix<double, 3, 1> temp;
+        temp << 0.0, 
+                0.0, 
+                0.0;
+
+        temp(0,0) = this->molecule.at(i).getX();
+        temp(1,0) = this->molecule.at(i).getY();
+        temp(2,0) = this->molecule.at(i).getZ();
+
+        //cout << "\nTemp \n\n";
+        //cout << temp;      
+        //cout << "\nTemp Transpose\n\n";
+        //cout << temp.transpose();
+        //cout << "\nEvecs Transpose\n\n";
+        //cout<< evecs.transpose();
+        //cout << "\n";
+
+        Eigen::Matrix<double, 1, 3> newPosition = (temp.transpose() * evecs.transpose()).transpose();
+
+        float atomX = newPosition(0,0);
+        float atomY = newPosition(0,1);
+        float atomZ = newPosition(0,2);
+
+        this->molecule.at(i).setX(atomX);
+        this->molecule.at(i).setY(atomY);
+        this->molecule.at(i).setZ(atomZ);        
+//
+        temp(0,0) = 0;
+        temp(1,0) = 0;
+        temp(2,0) = 0;
+    }
+
+    return;
+}
+
 vector <int> Molecule::molecularAxis(){
     int j = 0;
     vector <int> temp;
+    temp.push_back(0);
+    temp.push_back(0);
     double distance = 0;
     while(j < (int) this->molecule.size()){
         for(int i = j+1; i < (int) this->molecule.size(); i++){
@@ -405,7 +520,6 @@ vector < vector <int> > Molecule::getIRCBonds(){
     }
     return temp;
 };
-
 
 vector < vector <int> > Molecule::getIRCAngles(){
     if (this->angles.size() == 0){

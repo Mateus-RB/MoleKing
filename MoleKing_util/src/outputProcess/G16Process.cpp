@@ -33,9 +33,9 @@ vector <string> splitString(string lineSTR, char splitTarget){
 */
 
 G16LOGfile::G16LOGfile(string filePath, bool polarAsw){
-    ifstream arq;
+    ifstream arq (filePath, ifstream::in);
     this->polarAsw = polarAsw;
-    arq.open(filePath, ifstream::in);
+    //arq.open(filePath, ifstream::in);
     string lineSTR;
     regex states_re("(.*)Excitation energies and oscillator strengths:");
     regex done_re(" Normal termination of (.*)");
@@ -68,6 +68,7 @@ G16LOGfile::G16LOGfile(string filePath, bool polarAsw){
         };
     };
     arq.close();
+    
     if (!this->not_stop){
         this->molConstructor(fileLines);
         if (this->polarAsw){
@@ -77,7 +78,9 @@ G16LOGfile::G16LOGfile(string filePath, bool polarAsw){
             this->exSates = ExcStates(this->statesNum(fileLines));
             this->makeStates(fileLines);
         };
-    } else{
+    } 
+    
+    else{
         this->makeGradient(fileLines);
     };
     fileLines.clear();
