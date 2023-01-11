@@ -15,7 +15,7 @@ if sys.argv[1] == 'bin':
         pass
     os.makedirs('bin')
 else:
-    for i in sys.path():
+    for i in sys.path:
         if 'site-packages' in i:
             for j in os.listdir(i):
                 if 'pybind' in j:
