@@ -15,7 +15,13 @@ if sys.argv[1] == 'bin':
         pass
     os.makedirs('bin')
 else:
-    pyPath = input('Type the path for Python3 SitePackages Directory: ')
+    for i in sys.path():
+        if 'site-packages' in i:
+            for j in os.listdir(i):
+                if 'pybind' in j:
+                    pyPath = i
+                    break
+            
 
 os.chdir(pyPath)
 try:
