@@ -1,44 +1,48 @@
-import os, platform, sys, shutil
+from os import getcwd, makedirs, listdir, chdir, popen
+from os import path as ospath
+from shutil import rmtree, move
+from sys import path, argv
+from platform import system, version
 
-OS = platform.system()
-Version = platform.version().split()[0]
-PyVersion = sys.version.split()[0]
-home = os.getcwd()
+OS = system()
+Version = version().split()[0]
+PyVersion = version.split()[0]
+home = getcwd()
 
 print('Runing Setup for MoleKing_util on {} -{}- with python {}:'.format(OS, Version, PyVersion))
 
-if sys.argv[1] == 'bin':
+if argv[1] == 'bin':
     pyPath = 'bin'
     try:
-        shutil.rmtree('bin')
+        rmtree('bin')
     except:
         pass
-    os.makedirs('bin')
+    makedirs('bin')
 else:
-    for i in sys.path:
+    for i in path:
         if 'site-packages' in i:
-            for j in os.listdir(i):
+            for j in listdir(i):
                 if 'pybind' in j:
                     pyPath = i
                     break
             
 
-os.chdir(pyPath)
+chdir(pyPath)
 try:
-    shutil.rmtree('MoleKing_util')
+    rmtree('MoleKing_util')
 except:
     pass
-os.chdir(home)
+chdir(home)
 
 d = '{}/src'.format(home)
 CList = ['{}/main.cpp'.format(d)]
-subdirs = [os.path.join(d, o) for o in os.listdir(d) if os.path.isdir(os.path.join(d,o))]
+subdirs = [ospath.join(d, o) for o in listdir(d) if ospath.isdir(ospath.join(d,o))]
 for directory in subdirs:
-    for arq in os.listdir(directory):
+    for arq in listdir(directory):
         if arq.split('.')[1] == 'cpp':
             CList.append('{}/{}'.format(directory, arq))
 
-os.makedirs('MoleKing_util')
+makedirs('MoleKing_util')
 
 if OS == 'Linux':
     if len(PyVersion.split('.')[1]) == 1:
@@ -56,8 +60,8 @@ else:
     print('MoleKing_util does not work on DOS base systems to this date.')
 
 objs = ' '.join(CList)
-os.chdir('{}/MoleKing_util'.format(home))
-obj = os.popen('c++ {0} {2} -o {1}'.format(flags, target, objs), 'r')
+chdir('{}/MoleKing_util'.format(home))
+obj = popen('c++ {0} {2} -o {1}'.format(flags, target, objs), 'r')
 obj.read()
 
 pyarq = open('__init__.py', 'w')
@@ -75,8 +79,8 @@ pyarq.write('from MoleKing_util.MoleKing_util import G16LOGfile\n')
 pyarq.write('from MoleKing_util.MoleKing_util import G16FCHKfile\n')
 pyarq.close()
 
-os.chdir(home)
-shutil.move(home+"/MoleKing_util", pyPath)
+chdir(home)
+move(home+"/MoleKing_util", pyPath)
 print('Success, MoleKing_util was compiled on {} -{}- with python {}!'.format(OS, Version, PyVersion))
 
 
