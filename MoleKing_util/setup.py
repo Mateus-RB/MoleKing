@@ -1,11 +1,12 @@
 from os import getcwd, makedirs, listdir, chdir, popen
 from os import path as ospath
 from shutil import rmtree, move
-from sys import path, argv
-from platform import system, version
+from sys import path, argv, version
+from platform import system
+from platform import version as platVersion
 
 OS = system()
-Version = version().split()[0]
+Version = platVersion().split()[0]
 PyVersion = version.split()[0]
 home = getcwd()
 
