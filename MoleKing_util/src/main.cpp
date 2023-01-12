@@ -11,18 +11,19 @@
 #include <math.h>
 #include <eigen3/Eigen/Eigenvalues>
 
-#include "math/MassCenter.hpp"
+#include "MoleKing_util.hpp"
+#include "myMath/MassCenter.hpp"
 #include "chemicalUnits/AtomicScale.hpp"
-#include "math/Geometry.hpp"
-#include "math/Matrix.hpp"
+#include "myMath/Geometry.hpp"
+#include "myMath/Matrix.hpp"
 #include "chemicalUnits/Molecule.hpp"
 #include "berny/Hessian.hpp"
 #include "chemicalUnits/SupraMolecule.hpp"
 #include "chemicalUnits/OPLSff.hpp"
-#include "math/Vectors.hpp"
+#include "myMath/Vectors.hpp"
 #include "outputProcess/G16Process.hpp"
 using namespace std;
-
+/*
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include <pybind11/pytypes.h>
@@ -242,75 +243,59 @@ PYBIND11_MODULE(MoleKing_util, m) {
         .def("getMolecule", &G16FCHKfile::getMolecule);
 
 };
+*/
 
-/*
 
 int main(){
-    //string fileN = "/Users/thiagolopes/OneDrive/Pesquisas/VSNS/ONL/pcm_done/pcm_B3LYP_0.log";//
-    //string fileN = "/media/mateus/Data/Teste_DicePlayer/OPT/Metanol/metanol.fchk";
-    //string fileN = "/home/mateus/Desktop/teste.log";
-    //string fileN = "Gau-24967.EFC";
-    //string fileN = "/media/mateus/Data/Teste_DicePlayer/OPT/Metanol/Gaussian_ASEC/sample/Gau-7637.EFC";
-    //G16FCHKfile g16 = G16FCHKfile(fileN);
-    //G16LOGfile g16 = G16LOGfile(fileN);
-    //Matrix Grad = g16.getCartesianGradient();
-    //Molecule mol = Molecule();
-    //Atom H = Atom(1, 1, 0, 0);
-    //Atom O = Atom(8, 0, 0, 0);
-    //Atom H2 = Atom(1, -1, 0, 0);
-    ////cout << H.toStr() << endl;
-    //Molecule M = Molecule(); 
-    //M.addAtom(H);
-    //M.addAtom(O);
-    //M.addAtom(H2);
-    //M.doOPLS(); //nao esta funcionando
-    //cout << M.getSize() << endl;
-    //for (long i = 0; i < M.getSize(); i++){
-    //    cout << M.getAtomObj(i).getOPLS() << endl;
-    //};
-    //cout << M.toStr() << endl;
-    //cout << mol.toStr() << endl;
-    //mol.addAtom(8, 0, 0, 0);
-    //mol.addAtom(1, -1, 0, 0);
-    //mol.addAtom(1, 1, 0, 0);
-    //int N = mol.getSize();
-    //mol.doOPLS();
-    //cout << mol.toStr() << endl;
-    //cout << "Hello" << endl;
+    int AN1, AN2, AN3;
+    double X1, X2, X3, Y1, Y2, Y3, Z1, Z2, Z3;
+    cout<<"Add 3 Atoms" << endl;
+    cout << "----------------" << endl;
+    cout << "Atomic number of first Atom" << endl;
+    cin >> AN1;
+    cout << "X coordinated of first Atom" << endl;
+    cin >> X1;
+    cout << "Y coordinated of first Atom" << endl;
+    cin >> Y1;
+    cout << "Z coordinated of first Atom" << endl;
+    cin >> Z1;
+    cout << "----------------" << endl;
+    cout << "Atomic number of second Atom" << endl;
+    cin >> AN2;
+    cout << "X coordinated of second Atom" << endl;
+    cin >> X2;
+    cout << "Y coordinated of second Atom" << endl;
+    cin >> Y2;
+    cout << "Z coordinated of second Atom" << endl;
+    cin >> Z2;
+    cout << "----------------" << endl;
+    cout << "Atomic number of third Atom" << endl;
+    cin >> AN3;
+    cout << "X coordinated of third Atom" << endl;
+    cin >> X3;
+    cout << "Y coordinated of third Atom" << endl;
+    cin >> Y3;
+    cout << "Z coordinated of third Atom" << endl;
+    cin >> Z3;
 
-    Atom C1(6,0.0000, 0.0000 ,   0.0000 );
-    Atom H1(1,0.5288, 0.1610 ,   0.9359);
-    Atom H2(1,0.2051, 0.8240 ,  -0.6786);
-    Atom H3(1,0.3345,-0.9314 ,  -0.4496);
-    Atom H4(1,-1.0685,-0.0537,    0.1921);
+    Atom A1(AN1, X1, Y1, Z1);
+    Atom A2(AN2, X2, Y2, Z2);
+    Atom A3(AN3, X3, Y3, Z3);
 
     Molecule M = Molecule();
 
-    M.addAtom(C1);
-    M.addAtom(H1);
-    M.addAtom(H2);
-    M.addAtom(H3);
-    M.addAtom(H4);
+    M.addAtom(A1);
+    M.addAtom(A2);
+    M.addAtom(A3);
 
-    cout << "BEFORE" << endl;
+    cout << "The molecule is:" << endl;
+    cout << M.toStr() << endl;
     
-    for (int i = 0; i < M.getSize(); i++){
-        cout << M.getAtomObj(i).toStr() << endl;
-    };
-
-
-    M.TesteTensor();
-
-    cout << "AFTER" << endl;
-
-    for (int i = 0; i < M.getSize(); i++){
-        cout << M.getAtomObj(i).toStr() << endl;
-    };
 
     return 0;  
 };
 
-*/
+
 
 /*
 c++ main.cpp chemicalUnits/AtomicScale.cpp chemicalUnits/PeriodicTable.cpp chemicalUnits/Molecule.cpp chemicalUnits/SupraMolecule.cpp berny/Hessian.cpp math/Geometry.cpp math/MassCenter.cpp math/Matrix.cpp math/Vectors.cpp outputProcess/G16Process.cpp chemicalUnits/OPLSff.cpp

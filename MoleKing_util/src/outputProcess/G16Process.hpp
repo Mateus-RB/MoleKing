@@ -12,8 +12,8 @@
 #include <stdio.h>
 #include <string>
 #include <fstream>
-#include "../math/Vectors.hpp"
-#include "../math/Matrix.hpp"
+#include "../myMath/Vectors.hpp"
+#include "../myMath/Matrix.hpp"
 #include <iostream>
 #include <regex>
 #include "../chemicalUnits/Molecule.hpp"
