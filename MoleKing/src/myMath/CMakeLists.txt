@@ -1,5 +1,5 @@
 #add_definitions(-D_USE_MATH_DEFINES)
-
+set( CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} -Wall -O3 -fPIC" )
 add_library(myMath 
 Geometry.cpp
 MassCenter.cpp
