@@ -10,8 +10,8 @@
 #define Hessian_hpp
 
 #include <stdio.h>
-#include "../math/Matrix.hpp"
-#include "../math/Geometry.hpp"
+#include "../myMath/Matrix.hpp"
+#include "../myMath/Geometry.hpp"
 #include <math.h>
 #include <vector>
 #include "../chemicalUnits/Molecule.hpp"

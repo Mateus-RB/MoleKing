@@ -11,11 +11,11 @@
 
 #include <stdio.h>
 #include <string>
-#include "../math/MassCenter.hpp"
+#include "../myMath/MassCenter.hpp"
 #include "AtomicScale.hpp"
 #include "OPLSff.hpp"
-#include "../math/Geometry.hpp"
-#include "../math/Matrix.hpp"
+#include "../myMath/Geometry.hpp"
+#include "../myMath/Matrix.hpp"
 #include <math.h>
 #include <iterator>
 #include <algorithm>

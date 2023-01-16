@@ -10,7 +10,7 @@
 #define AtomicScale_hpp
 
 #include "PeriodicTable.hpp"
-#include "../math/Geometry.hpp"
+#include "../myMath/Geometry.hpp"
 #include <string>
 
 class Atom{
