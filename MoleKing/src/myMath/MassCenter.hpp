@@ -1,10 +1,17 @@
+//   MoleKing //
 //
-//  MassCenter.hh
-//  MoleKing_util
+//   File:        [MassCenter.hpp]
 //
-//  Created by Thiago Lopes and Mateus Barbosa on 09/01/20.
-//  Copyright © 2020 LMSC. All rights reserved.
-//
+//   Author(s):   ['LEEDMOL Reserch Group']
+//   Site(s):     ['https://www.researchgate.net/lab/LEEDMOL-Heibbe-Cristhians-Research-Group-Heibbe-Cristhian-B-De-Oliveira']
+//   Email(s):    ['heibbe@ufg.br']
+//   Credits:     ['Copyright © 2023 LEEDMOL. All rights reserved.']
+//   Date:        ['17.01.2023']
+//   Version:     ['1.4.2']
+//   Status:      ['Development']
+//   Language:    ['C++','Python']
+//   Description: ['A python module written in C++ for theoretical chemestry']
+
 
 #ifndef MassCenter_hpp
 #define MassCenter_hpp
