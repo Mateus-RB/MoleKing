@@ -6,9 +6,9 @@
 
 
 
-#pybind11_add_module(MoleKing_util main.cpp)
+#pybind11_add_module(MoleKing main.cpp)
 
-#target_link_libraries(MoleKing_util 
+#target_link_libraries(MoleKing 
 #PUBLIC math
 #PUBLIC chemicalUnits
 #PUBLIC outputProcess

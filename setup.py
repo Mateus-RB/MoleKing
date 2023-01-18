@@ -48,7 +48,7 @@ class CMakeBuild(build_ext):
             f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={extdir}{os.sep}",
             f"-DPYTHON_EXECUTABLE={sys.executable}",
             f"-DCMAKE_BUILD_TYPE={cfg}",  # not used on MSVC, but no harm
-            f"-DBuild_Python=ON"
+            f"-DBuild_Python=ON",
         ]
         build_args = []
         # Adding CMake arguments set as environment variable
@@ -57,7 +57,7 @@ class CMakeBuild(build_ext):
             cmake_args += [item for item in os.environ["CMAKE_ARGS"].split(" ") if item]
 
         # In this example, we pass in the version to C++. You might not need to.
-        cmake_args += [f"-DEXAMPLE_VERSION_INFO={self.distribution.get_version()}"]  # type: ignore[attr-defined]
+        #cmake_args += [f"-DEXAMPLE_VERSION_INFO={self.distribution.get_version()}"]  # type: ignore[attr-defined]
 
         if self.compiler.compiler_type != "msvc":
             # Using Ninja-build since it a) is available as a wheel and b)
@@ -73,6 +73,7 @@ class CMakeBuild(build_ext):
                     cmake_args += [
                         "-GNinja",
                         f"-DCMAKE_MAKE_PROGRAM:FILEPATH={ninja_executable_path}",
+                        f"-DBuild_Python=ON",
                     ]
                 except ImportError:
                     pass
@@ -123,7 +124,6 @@ class CMakeBuild(build_ext):
         subprocess.run(
             ["cmake", "--build", "."] + build_args, cwd=build_temp, check=True
         )
-
 
 # The information here can also be placed in setup.cfg - better separation of
 # logic and declaration, and simpler if you include description/version in a file.

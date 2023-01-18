@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set( CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} -Wall -O3 -fPIC" )
 configure_file(src/MoleKingConfig.hpp.in MoleKing.hpp)
-option(Build_Python "Build Python" ON)
+add_definitions(-DBuild_Python=ON)
 #find_package(pybind11 REQUIRED)
 if(Build_Python)
 message(STATUS "Python is built")
@@ -19,7 +19,7 @@ add_subdirectory(src/berny)
 add_subdirectory(src/chemicalUnits)
 add_subdirectory(pybind11)
 
-#add_executable(MoleKing_util src/main.cpp)
+#add_executable(MoleKing src/main.cpp)
 pybind11_add_module(MoleKing src/main.cpp)
 #Update serash folders
 target_include_directories(MoleKing PUBLIC
@@ -52,7 +52,7 @@ add_subdirectory(src/outputProcess)
 add_subdirectory(src/berny)
 add_subdirectory(src/chemicalUnits)
 
-add_executable(MoleKing src/main.cpp)
+add_executable(MoleKing src/main2.cpp)
 #pybind11_add_module(MoleKing src/main.cpp)
 #Update serash folders
 target_include_directories(MoleKing PUBLIC
