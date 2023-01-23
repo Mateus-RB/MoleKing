@@ -1,6 +1,6 @@
 // the configured options and settings for Tutorial
 #define MoleKing_VERSION_MAJOR @MoleKing_VERSION_MAJOR@
 #define MoleKing_VERSION_MINOR @MoleKing_VERSION_MINOR@
-
+#define MoleKing_VERSION_PATCH @MoleKing_VERSION_PATCH@
 // TODO 13: use cmakedefine to define USE_MYMATH
 //#cmakedefine USE_MYMATH

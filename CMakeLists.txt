@@ -69,5 +69,25 @@ target_link_libraries(MoleKing
                         PUBLIC outputProcess
                         PUBLIC berny
                         )
-
+enable_testing()
+# First Test
+add_test(NAME Usage COMMAND MoleKing)
+set_tests_properties(Usage 
+                    PROPERTIES PASS_REGULAR_EXPRESSION "Usage: .* parameter"
+                    )
+# Second Test
+add_test(NAME Version COMMAND MoleKing --version)
+set_tests_properties(Version 
+                    PROPERTIES PASS_REGULAR_EXPRESSION "MoleKing.*Version.*${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}"
+                    )
+# Third Test
+add_test(NAME Water COMMAND MoleKing water)
+set_tests_properties(Water 
+                    PROPERTIES PASS_REGULAR_EXPRESSION "Molecule.*O.*1.*H.*2.*\n.*0.*\n.*1.*\n.*0.*\n.*2.*"
+                    )
+# Fourth Test
+add_test(NAME Methanol COMMAND MoleKing methanol)
+set_tests_properties(Methanol 
+                    PROPERTIES PASS_REGULAR_EXPRESSION ".*1.*0.*2.*\n.*1.*0.*3.*\n.*1.*0.*4.*\n.*2.*0.*3.*\n.*2.*0.*4.*\n.*3.*0.*4.*\n.*0.*4.*5.*\n"
+                    )
 endif()
