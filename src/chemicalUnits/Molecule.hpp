@@ -33,6 +33,7 @@ class Molecule{
 
 private:
     typedef vector<Atom> AtomList;
+    double VDWRatio;
     AtomList molecule;
     typedef vector<ChargePoint> ChargeList;
     ChargeList chargePoint;
@@ -73,7 +74,9 @@ public:
     long getSize();
     vector <Atom> getMoleculeVector();
     void setMultiplicity(int multiplicity);
+    void setVDWRatio(double VDWratio);
     int getMultiplicity();
+    double getVDWRatio();
     void normalizeCPs(int norm);
     vector< vector<string> > getMolecule(bool symbol = 0);
     vector< vector<string> > getChargePoints();

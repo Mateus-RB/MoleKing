@@ -67,6 +67,9 @@ int main(){
     M.addAtom(A1);
     M.addAtom(A2);
     M.addAtom(A3);
+    cout << M.getVDWRatio() << endl;
+    M.setVDWRatio(2.0);
+    cout << M.getVDWRatio() << endl;
     cout << "The molecule is:" << endl;
     cout << M.toStr() << endl;
     

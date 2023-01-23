@@ -112,6 +112,8 @@ PYBIND11_MODULE(MoleKing, m) {
         .def("__len__", &Molecule::getSize)
         .def("__iter__", [](Molecule &mol) {return py::make_iterator(mol.begin(), mol.end());}, py::keep_alive<0, 1>())
         .def("setMultiplicity", &Molecule::setMultiplicity)
+        .def("setVDWRatio", &Molecule::setVDWRatio)
+        .def("getVDWRatio", &Molecule::getVDWRatio)
         .def("getMultiplicity", &Molecule::getMultiplicity)
         .def("copy", &Molecule::copy)
         .def("normChargePoints", &Molecule::normalizeCPs)

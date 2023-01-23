@@ -58,7 +58,7 @@ void Molecule::getBonds(){
             symbol1 = this->molecule[i].getAtomicSymbol();
             symbol2 = this->molecule[j].getAtomicSymbol();
             PeriodicTable table = PeriodicTable();
-            double radii = 1.3 * (table.getCovalentRadii(symbol1) + table.getCovalentRadii(symbol2));
+            double radii = this->VDWRatio * (table.getCovalentRadii(symbol1) + table.getCovalentRadii(symbol2));
             if (length <= radii){
                 if (i != j){
                     StraightSegment bond = StraightSegment(this->molecule[i].getPoint(), this->molecule[j].getPoint());
@@ -150,6 +150,7 @@ vector<double> Molecule::minNmaxValue(vector <double> v){
 
 Molecule::Molecule(){
     this->multiplicity = 1;
+    this->VDWRatio = 1.3;
     this->charge = 0;
 };
 
@@ -210,6 +211,11 @@ ChargePoint Molecule::getChargePointsObj(int number){
     return this->chargePoint[number];
 }
 
+void Molecule::setVDWRatio(double VDWratio){
+    this->VDWRatio = VDWratio;
+    this->doIRC();
+};
+
 void Molecule::setCharge(int charge){
     this->charge = charge;
 };
@@ -224,6 +230,10 @@ void Molecule::setMultiplicity(int multiplicity){
 
 int Molecule::getMultiplicity(){
     return this->multiplicity;
+};
+
+double Molecule::getVDWRatio(){
+    return this->VDWRatio;
 };
 
 vector< vector<string> > Molecule::getMolecule(bool symbol){
@@ -542,8 +552,8 @@ vector < vector <int> > Molecule::getIRCDihedrals(){
     if (this->dihedrals.size() == 0){
         this->doIRC();
     }
-    vector < vector <int> > temp(this->dihedrals.size());
-    //vector < vector <int> > temp;
+    //vector < vector <int> > temp(this->dihedrals.size());
+    vector < vector <int> > temp;
     for (int i = 0; i < (int) this->dihedrals.size(); i++){
         temp.push_back(this->dihedrals[i].first);
     }
