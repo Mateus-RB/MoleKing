@@ -31,7 +31,7 @@ class Matrix{
 
     public:
 
-    double eigenvalue();
+    //double eigenvalue();
 
     Matrix(vector < vector <double> > matrix);
     Matrix();
