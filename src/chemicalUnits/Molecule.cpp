@@ -13,7 +13,7 @@
 //   Description: ['A python module written in C++ for theoretical chemestry']
 
 #include "Molecule.hpp"
-#include <eigen3/Eigen/Eigenvalues>
+//#include <eigen3/Eigen/Eigenvalues>
 
 double Molecule::angleToSpinInAref(int ref, char axisName){
     vector <double> cart = this->molecule[ref].getPos();
@@ -354,7 +354,7 @@ vector <double> Molecule::standardOrientationPath(){
     this->moveMassCenter();
     return vector <double> {angle1, zspinSpherical[2], angle2};
 };
-
+/*
 Eigen::Matrix<double, 3, 3> Molecule::moleculeTensor(){
     Point centerOfMass = this->getMassCenter();
     double Ixx = 0.0;
@@ -466,6 +466,7 @@ void Molecule::TesteTensor(){
 
     return;
 }
+*/
 
 vector <int> Molecule::molecularAxis(){
     int j = 0;
