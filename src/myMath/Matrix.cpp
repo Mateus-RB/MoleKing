@@ -13,7 +13,7 @@
 //   Description: ['A python module written in C++ for theoretical chemestry']
 
 #include "Matrix.hpp"
-#include <eigen3/Eigen/Core>
+//#include <eigen3/Eigen/Core>
 #include <string>
 
 Matrix::Matrix(vector < vector <double> > matrix){
