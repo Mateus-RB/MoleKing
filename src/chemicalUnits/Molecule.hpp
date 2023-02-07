@@ -27,7 +27,7 @@
 #include <iterator>
 #include <algorithm>
 #include <vector>
-#include <eigen3/Eigen/Eigenvalues>
+//#include <eigen3/Eigen/Eigenvalues>
 
 class Molecule{
 
@@ -58,8 +58,8 @@ public:
     ~Molecule();
 
 
-    Eigen::Matrix<double, 3, 3> moleculeTensor();
-    void TesteTensor();
+    //Eigen::Matrix<double, 3, 3> moleculeTensor();
+    //void TesteTensor();
 
     void addChargePoints(double xPos, double yPos, double zPos, double charge);
     void addChargePoints(ChargePoint cp);
