@@ -15,7 +15,7 @@
 #include <iostream>
 #include <string>
 #include <math.h>
-//#include <eigen3/Eigen/Eigenvalues>
+#include "../include/Eigen/Eigenvalues"
 #include "MoleKing.hpp"
 #include "myMath/MassCenter.hpp"
 #include "chemicalUnits/AtomicScale.hpp"
@@ -126,7 +126,7 @@ PYBIND11_MODULE(MoleKing, m) {
         .def("moveMassCenter", &Molecule::moveMassCenter, py::arg("x")=0, py::arg("y")=0, py::arg("z")=0)
         .def("moveTail", &Molecule::moveTail, py::arg("atomNumber"), py::arg("x")=0, py::arg("y")=0, py::arg("z")=0)
         .def("stdOrientation", &Molecule::standardOrientation)
-        //.def("TesteTensor", &Molecule::TesteTensor)
+        .def("TesteTensor", &Molecule::TesteTensor)
         .def("bondLength", &Molecule::bondLength)
         .def("valenceAngle", &Molecule::valenceAngle)
         .def("torsion", &Molecule::torsion)
