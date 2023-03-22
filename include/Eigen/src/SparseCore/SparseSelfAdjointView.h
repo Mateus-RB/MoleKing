@@ -154,7 +154,7 @@ template<typename MatrixType, unsigned int _Mode> class SparseSelfAdjointView
       EIGEN_ONLY_USED_FOR_DEBUG(rows);
       EIGEN_ONLY_USED_FOR_DEBUG(cols);
       eigen_assert(rows == this->rows() && cols == this->cols()
-                && "SparseSelfadjointView::resize() does not actually allow to resize.");
+                && "SparseSelfadjointView::resize() does not actually allow one to resize.");
     }
     
   protected:
@@ -453,7 +453,7 @@ void permute_symm_to_fullsymm(const MatrixType& mat, SparseMatrix<typename Matri
       Index r = it.row();
       Index c = it.col();
       Index ip = perm ? perm[i] : i;
-      if(Mode==int(Upper|Lower))
+      if(Mode==(Upper|Lower))
         count[StorageOrderMatch ? jp : ip]++;
       else if(r==c)
         count[ip]++;
@@ -486,7 +486,7 @@ void permute_symm_to_fullsymm(const MatrixType& mat, SparseMatrix<typename Matri
       StorageIndex jp = perm ? perm[j] : j;
       StorageIndex ip = perm ? perm[i] : i;
       
-      if(Mode==int(Upper|Lower))
+      if(Mode==(Upper|Lower))
       {
         Index k = count[StorageOrderMatch ? jp : ip]++;
         dest.innerIndexPtr()[k] = StorageOrderMatch ? ip : jp;

@@ -40,7 +40,7 @@ static inline void check_DenseIndex_is_signed() {
   */
 template<typename Derived> class DenseBase
 #ifndef EIGEN_PARSED_BY_DOXYGEN
-  : public DenseCoeffsBase<Derived, internal::accessors_level<Derived>::value>
+  : public DenseCoeffsBase<Derived>
 #else
   : public DenseCoeffsBase<Derived,DirectWriteAccessors>
 #endif // not EIGEN_PARSED_BY_DOXYGEN
@@ -71,7 +71,7 @@ template<typename Derived> class DenseBase
     typedef Scalar value_type;
     
     typedef typename NumTraits<Scalar>::Real RealScalar;
-    typedef DenseCoeffsBase<Derived, internal::accessors_level<Derived>::value> Base;
+    typedef DenseCoeffsBase<Derived> Base;
 
     using Base::derived;
     using Base::const_cast_derived;
@@ -242,7 +242,7 @@ template<typename Derived> class DenseBase
     {
       EIGEN_ONLY_USED_FOR_DEBUG(newSize);
       eigen_assert(newSize == this->size()
-                && "DenseBase::resize() does not actually allow to resize.");
+                && "DenseBase::resize() does not actually allow one to resize.");
     }
     /** Only plain matrices/arrays, not expressions, may be resized; therefore the only useful resize methods are
       * Matrix::resize() and Array::resize(). The present method only asserts that the new size equals the old size, and does
@@ -254,7 +254,7 @@ template<typename Derived> class DenseBase
       EIGEN_ONLY_USED_FOR_DEBUG(rows);
       EIGEN_ONLY_USED_FOR_DEBUG(cols);
       eigen_assert(rows == this->rows() && cols == this->cols()
-                && "DenseBase::resize() does not actually allow to resize.");
+                && "DenseBase::resize() does not actually allow one to resize.");
     }
 
 #ifndef EIGEN_PARSED_BY_DOXYGEN
