@@ -129,10 +129,10 @@ class CMakeBuild(build_ext):
 # logic and declaration, and simpler if you include description/version in a file.
 setup(
     name="MoleKing",
-    version="1.4.3",
-    author="LEEDMOL",
-    author_email="meuemail@email.com",
-    description="A test build of MoleKing using pybind11 and CMake",
+    version="1.4.4",
+    author="LEEDMOL Research Group",
+    author_email="mateus_barbosa@discente.ufg.br",
+    description="A test build of MoleKing using pybind11 and CMake use with caution!",
     long_description="",
     ext_modules=[CMakeExtension("MoleKing")],
     cmdclass={"build_ext": CMakeBuild},
