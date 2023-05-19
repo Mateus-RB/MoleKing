@@ -27,6 +27,7 @@
 #include "chemicalUnits/OPLSff.hpp"
 #include "myMath/Vectors.hpp"
 #include "outputProcess/G16Process.hpp"
+#include "outputProcess/Testing.hpp"
 using namespace std;
 
 #include <pybind11/pybind11.h>
@@ -216,6 +217,18 @@ PYBIND11_MODULE(MoleKing, m) {
         .def("elem", &Matrix::element)
         .def("show", &Matrix::print)
         .def("__str__", &Matrix::toStr);
+
+    //! UNDER DEVELOPMENT
+
+    py::class_<G16LOGtest>(m, "G16LOGtest", "This class is experimental and under development.")
+        .def(py::init< string, bool>(), py::arg("filePath"), py::arg("polarAsw") = 0)
+        .def("getDate", &G16LOGtest::getDate)
+        .def("getSCF", &G16LOGtest::getSCF)
+        .def("getBasis", &G16LOGtest::getBasis)
+        .def("getMethod", &G16LOGtest::getMethod)
+        .def("Summary", &G16LOGtest::Summary)
+        .def("getMol", &G16LOGtest::getMol);
+
     py::class_<G16LOGfile>(m, "G16LOGfile", "This class extract significant properties from Gaussian 16 .log or .out output files.")
         .def(py::init< string, bool>(), py::arg("filePath"), py::arg("polarAsw") = 0)
         .def("scfEnergy", &G16LOGfile::scfEnergy)

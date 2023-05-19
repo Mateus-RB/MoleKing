@@ -98,6 +98,8 @@ G16LOGfile::G16LOGfile(string filePath, bool polarAsw){
     };
 };
 
+
+
 int G16LOGfile::statesNum(vector <string> fileLines){
     int statesNumber = 3;
     regex regexNstates1("(.*)TD(.*)nstates(.*)=(.*)[0-9]+(.*)");
@@ -511,10 +513,6 @@ vector <vector <string>> G16LOGfile::getTransContributions(){
     return results;
 };
 
-
-
-
-
 /*
 ----------------------- G16FCHKfile -----------------------
 */
@@ -827,6 +825,7 @@ double PolarValues::getGamma(string eleName, string name){
 /*
 ----------------------- ExcStates -----------------------
 */
+
 ExcStates::ExcStates(){
     this->statesNumber = 0;
 };

@@ -1,4 +1,8 @@
-add_library(outputProcess G16Process.cpp)
+add_library(outputProcess 
+                        G16Process.cpp
+                        G16Process.hpp
+                        Testing.cpp
+                        Testing.hpp)
 
 target_include_directories( outputProcess PRIVATE 
         "${CMAKE_CURRENT_SOURCE_DIR}"
