@@ -218,16 +218,18 @@ PYBIND11_MODULE(MoleKing, m) {
         .def("show", &Matrix::print)
         .def("__str__", &Matrix::toStr);
 
-    //! UNDER DEVELOPMENT
+    //! ################## UNDER DEVELOPMENT ##################
 
     py::class_<G16LOGtest>(m, "G16LOGtest", "This class is experimental and under development.")
         .def(py::init< string, bool>(), py::arg("filePath"), py::arg("polarAsw") = 0)
         .def("getDate", &G16LOGtest::getDate)
-        .def("getSCF", &G16LOGtest::getSCF)
+        .def("getEnergy", &G16LOGtest::getEnergy)
         .def("getBasis", &G16LOGtest::getBasis)
         .def("getMethod", &G16LOGtest::getMethod)
-        .def("Summary", &G16LOGtest::Summary)
+        .def("getSummary", &G16LOGtest::getSummary)
         .def("getMol", &G16LOGtest::getMol);
+
+    //! ################## UNDER DEVELOPMENT ##################
 
     py::class_<G16LOGfile>(m, "G16LOGfile", "This class extract significant properties from Gaussian 16 .log or .out output files.")
         .def(py::init< string, bool>(), py::arg("filePath"), py::arg("polarAsw") = 0)

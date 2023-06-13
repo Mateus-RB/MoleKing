@@ -31,22 +31,53 @@ using namespace std;
 
 class G16LOGtest{
 private:
+
+    //* size_t
+    size_t scf;
+    size_t normalT;   
+    size_t stdT; 
+    size_t starterSCF;
+    size_t endSCF;
+    size_t starterMethod;  
+    size_t basis; 
+
+    //* string
+    string basisValue;    
     string line;
     string value;
     string moleculeRange;
-    
-    double scf;
-    string info; 
-    string basis;
+    string info;
     string method;
+    string moleculeSTR = "";
+    string teste = "";
+    string filePath;
+    vector <string> iptStorage;
+    vector <string> stdStorage;
+
+    //* double
+    double scfValue;
+
+    //* molecule
+    Molecule mol;
     
 
+    //* Void
+    void setMol();
+
+    //* bool
+
+    bool ntFound;
+    bool stdFound;
+
+    //* teste
+   
 public:
     G16LOGtest(string filePath, bool polarAsw = 0);     
-    double getSCF();
+    
+    double getEnergy();
     string getDate();    
     string getBasis();
     string getMethod();
-    string Summary();
-    string getMol();   
+    string getSummary();
+    Molecule getMol();   
 };
