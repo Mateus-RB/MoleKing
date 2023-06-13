@@ -128,7 +128,9 @@ G16LOGtest::G16LOGtest(string filePath, bool polarAsw)
 
     // If stdFound is true, set the molecule string to the last geometry in stdStorage, as default molecule geometry is always be standard orientation if it is available
     if (stdFound)
-    {
+    {   
+        //TODO: When having more than one calculations like "code /home/phfmatias/Desktop/Testes/MoleKing/o_esch_Z_ts_Et_373.log", make moleking get all the tree geometries, not only the last one!
+
         this->moleculeSTR = "";
         this->moleculeSTR = stdStorage[stdStorage.size() - 1];
     }
