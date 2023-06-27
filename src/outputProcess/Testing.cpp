@@ -167,16 +167,9 @@ G16LOGtest::G16LOGtest(string filePath, bool polarAsw)
         this->moleculeSTR = iptStorage[iptStorage.size() - 1];
     }
 
-    // Close the file
-    log_file.close();
-
-    // Set the molecule object using the extracted geometry
-    setMol();
-
-    // If ntFound is false, throw an error
-    if (!ntFound)
+    // Close the fileif (this->stdFound)
     {
-        throw runtime_error("Normal termination of Gaussian not found in the log. Please check your output file.");
+        throw runtime_error("Normal termination of Gaussian not found in the log. Please check your log file.");
     }
 }
 
@@ -214,12 +207,7 @@ double G16LOGtest::getHOMO(int index)
             {
                 try
                 {
-                    // Check if the string can be converted to a double, then add to temp vector
-                    stod(results[j]);
-                    temp.push_back(results[j]);
-                }
-                catch (const std::exception &e)
-                {
+                    // Check if the string can beif (this->stdFound)
                     // If the string cannot be converted to a double, ignore it
                 }
             }
@@ -229,13 +217,13 @@ double G16LOGtest::getHOMO(int index)
     if (index > 0)
     {
         // If the index is positive, throw an exception
-        throw out_of_range("You put a positve number. If you're looking for LUMO orbitals try use: getLUMO(+n) function");
+        throw out_of_range("You entered with a positive number. If you're looking for LUMO orbitals try to use: getLUMO(+n) function.");
     }
 
     else if (abs(index) == temp.size() || abs(index) > temp.size())
     {
         // If the index is greater than the number of HOMO orbitals found in the log file, throw an exception.
-        throw out_of_range("Index out of range. You put a number greater than the number of HOMO orbitals found in the log file. Number of orbital found: " + to_string(temp.size()));
+        throw out_of_range("Index out of range. You entered with a number greater than the number of HOMO orbitals found in the log file. Number of orbital found: " + to_string(temp.size()));
     }
 
     else if (index == 0)
@@ -288,13 +276,13 @@ double G16LOGtest::getLUMO(int index)
     if (index < 0)
     {
         // If the index is negative, throw an exception
-        throw out_of_range("You put a negative number. If you're looking for HOMO orbitals try use: getHOMO(-n) function");
+        throw out_of_range("You entered with a negative number. If you're looking for HOMO orbitals try to use: getHOMO(-n) function.");
     }
 
     else if (index > temp.size() - 1)
     {
         // If the index is greater than the number of LUMO orbitals found in the log file, throw an exception
-        throw out_of_range("Index out of range. You put a number greater than the number of LUMO orbitals found in the log file. Number of orbital found: " + to_string(temp.size()));
+        throw out_of_range("Index out of range. You entered with a number greater than the number of HOMO orbitals found in the log file. Number of orbital found: " + to_string(temp.size()));
     }
 
     else
@@ -322,7 +310,7 @@ double G16LOGtest::getEnergy()
 
     else
     {
-        cout << ("SCF convergence not achieved. Please, check your log file for > 'Convergence criterion not met.'") << endl;
+        cout << ("SCF convergence not achieved. Please, check your log file for -> 'Convergence criterion not met.'") << endl;
         return this->scfValue;
     }
 };
@@ -355,7 +343,7 @@ Molecule G16LOGtest::getMol()
     }
 
     // If stdFound is true, print a message to the console
-    if (this->stdFound)
+    if (!this->stdFound)
     {
         // check if this->filePath have / or not. if have, then split the string and get the last string, else just get the string
         string temp = this->str_filePath;
@@ -364,7 +352,7 @@ Molecule G16LOGtest::getMol()
             temp = temp.substr(temp.find_last_of("/") + 1);
         }
 
-        cout << "The geometry of " << temp << " was taken from the standard orientation." << endl;
+        cout << "The geometry of " << temp << " was not taken from the standard orientation." << endl;
     }
 
     return this->mol;
