@@ -34,6 +34,9 @@ private:
 
     //* size_t
     size_t scf;
+    size_t scfC;
+    size_t homoFinder;
+    size_t lumoFinder;
     size_t normalT;   
     size_t stdT; 
     size_t starterSCF;
@@ -48,14 +51,20 @@ private:
     string moleculeRange;
     string info;
     string method;
+    string lumoSTR = "";
+    string homoSTR = "";
     string moleculeSTR = "";
     string teste = "";
-    string filePath;
+    string str_filePath;
     vector <string> iptStorage;
     vector <string> stdStorage;
+    vector <string> homoStorage;
+    vector <string> lumoStorage;
 
     //* double
     double scfValue;
+    double homoValue;
+    double lumoValue;
 
     //* molecule
     Molecule mol;
@@ -68,6 +77,7 @@ private:
 
     bool ntFound;
     bool stdFound;
+    bool scfConvergence;
 
     //* teste
    
@@ -75,6 +85,8 @@ public:
     G16LOGtest(string filePath, bool polarAsw = 0);     
     
     double getEnergy();
+    double getHOMO(int index = -1);
+    double getLUMO(int index = 0);
     string getDate();    
     string getBasis();
     string getMethod();

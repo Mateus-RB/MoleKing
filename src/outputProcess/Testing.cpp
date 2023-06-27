@@ -24,7 +24,8 @@ G16LOGtest::G16LOGtest(string filePath, bool polarAsw)
     // Initialize some variables
     ntFound = false;
     stdFound = false;
-    this->filePath = filePath;
+    scfConvergence = true;
+    this->str_filePath = str_filePath;
 
     // Loop through each line in the file
     while (getline(log_file, line))
@@ -33,7 +34,10 @@ G16LOGtest::G16LOGtest(string filePath, bool polarAsw)
         scf = line.find("SCF Done:");
         normalT = line.find("Normal termination of Gaussian");
         stdT = line.find("Standard orientation:");
+        scfC = line.find("Convergence criterion not met");
         basis = line.find("Standard basis:");
+        homoFinder = line.find(" Alpha  occ. eigenvalues --");
+        lumoFinder = line.find(" Alpha virt. eigenvalues --");
 
         // If the line contains "Normal termination of Gaussian", set ntFound to true
         if (normalT != string::npos)
@@ -45,6 +49,13 @@ G16LOGtest::G16LOGtest(string filePath, bool polarAsw)
         if (stdT != string::npos)
         {
             stdFound = true;
+        }
+
+        // If the line contains ":", set scfConvergence to false
+
+        if (scfC != string::npos)
+        {
+            this->scfConvergence = false;
         }
 
         // If the line contains "SCF Done:", extract the SCF value and calculation method used
@@ -59,6 +70,22 @@ G16LOGtest::G16LOGtest(string filePath, bool polarAsw)
 
             this->scfValue = stod(value.substr(starterSCF + 3, endSCF - starterSCF - 3));
             this->method = value.substr(starterMethod + 3, starterSCF - starterMethod - 5);
+        }
+
+        // Getting HOMO and LUMO lines and appending into a vector;
+
+        if (lumoFinder != string::npos)
+        {
+            lumoSTR = "";
+            lumoSTR += line;
+            this->lumoStorage.push_back(lumoSTR);
+        }
+
+        if (homoFinder != string::npos)
+        {
+            homoSTR = "";
+            homoSTR += line;
+            this->homoStorage.push_back(homoSTR);
         }
 
         // If the line contains "Standard basis:", extract the basis set used
@@ -128,9 +155,7 @@ G16LOGtest::G16LOGtest(string filePath, bool polarAsw)
 
     // If stdFound is true, set the molecule string to the last geometry in stdStorage, as default molecule geometry is always be standard orientation if it is available
     if (stdFound)
-    {   
-        //TODO: When having more than one calculations like "code /home/phfmatias/Desktop/Testes/MoleKing/o_esch_Z_ts_Et_373.log", make moleking get all the tree geometries, not only the last one!
-
+    {
         this->moleculeSTR = "";
         this->moleculeSTR = stdStorage[stdStorage.size() - 1];
     }
@@ -170,6 +195,117 @@ void G16LOGtest::setMol()
     }
 };
 
+// Function to user get the HOMO value;
+
+double G16LOGtest::getHOMO(int index)
+{
+    stringstream ss;
+    vector<string> temp;
+
+    for (int i = 0; i < this->homoStorage.size(); i++)
+    {
+        ss = stringstream(this->homoStorage[i]);
+        string line;
+        while (getline(ss, line))
+        {
+            istringstream iss(line);
+            vector<string> results((istream_iterator<string>(iss)), istream_iterator<string>());
+            for (int j = 0; j < results.size(); j++)
+            {
+                try
+                {
+                    // Check if the string can be converted to a double, then add to temp vector
+                    stod(results[j]);
+                    temp.push_back(results[j]);
+                }
+                catch (const std::exception &e)
+                {
+                    // If the string cannot be converted to a double, ignore it
+                }
+            }
+        }
+    }
+
+    if (index > 0)
+    {
+        // If the index is positive, throw an exception
+        throw out_of_range("You put a positve number. If you're looking for LUMO orbitals try use: getLUMO(+n) function");
+    }
+
+    else if (abs(index) == temp.size() || abs(index) > temp.size())
+    {
+        // If the index is greater than the number of HOMO orbitals found in the log file, throw an exception.
+        throw out_of_range("Index out of range. You put a number greater than the number of HOMO orbitals found in the log file. Number of orbital found: " + to_string(temp.size()));
+    }
+
+    else if (index == 0)
+    {
+        // If the index is 0, return the last value in the temp vector
+        this->homoValue = stod(temp[temp.size() - 1]);
+    }
+
+    else
+    {
+        // subtract 1 from the index, the default one is zero then the index will be -1 [Highest occ molecular orbital], so if the user puts the -1, in C++ we'll look for the index -2 that will be the HOMO-1 orbital. Then return the value at that index in the temp vector
+        index += -1;
+        this->homoValue = stod(temp[temp.size() + index]);
+    }
+
+    return this->homoValue;
+};
+
+// Function to user get the LUMO value;
+
+double G16LOGtest::getLUMO(int index)
+{
+    stringstream ss;
+    vector<string> temp;
+
+    for (int i = 0; i < this->lumoStorage.size(); i++)
+    {
+        ss = stringstream(this->lumoStorage[i]);
+        string line;
+        while (getline(ss, line))
+        {
+            istringstream iss(line);
+            vector<string> results((istream_iterator<string>(iss)), istream_iterator<string>());
+            for (int j = 0; j < results.size(); j++)
+            {
+                try
+                {
+                    // Check if the string can be converted to a double, then add to temp vector
+                    stod(results[j]);
+                    temp.push_back(results[j]);
+                }
+                catch (const std::exception &e)
+                {
+                    // If the string cannot be converted to a double, ignore it
+                }
+            }
+        }
+    }
+
+    if (index < 0)
+    {
+        // If the index is negative, throw an exception
+        throw out_of_range("You put a negative number. If you're looking for HOMO orbitals try use: getHOMO(-n) function");
+    }
+
+    else if (index > temp.size() - 1)
+    {
+        // If the index is greater than the number of LUMO orbitals found in the log file, throw an exception
+        throw out_of_range("Index out of range. You put a number greater than the number of LUMO orbitals found in the log file. Number of orbital found: " + to_string(temp.size()));
+    }
+
+    else
+    {
+        // If the index is valid, return the value at that index in the temp vector
+        this->lumoValue = stod(temp[index]);
+    }
+
+    return this->lumoValue;
+};
+
 // Function to user get the date and time of the calculation
 string G16LOGtest::getDate()
 {
@@ -179,7 +315,16 @@ string G16LOGtest::getDate()
 // Function to user get the SCF energy
 double G16LOGtest::getEnergy()
 {
-    return this->scfValue;
+    if (this->scfConvergence)
+    {
+        return this->scfValue;
+    }
+
+    else
+    {
+        cout << ("SCF convergence not achieved. Please, check your log file for > 'Convergence criterion not met.'") << endl;
+        return this->scfValue;
+    }
 };
 
 // Function to user get the basis set used
@@ -211,16 +356,15 @@ Molecule G16LOGtest::getMol()
 
     // If stdFound is true, print a message to the console
     if (this->stdFound)
-    {   
-        //check if this->filePath have / or not. if have, then split the string and get the last string, else just get the string
-        string temp = this->filePath;
+    {
+        // check if this->filePath have / or not. if have, then split the string and get the last string, else just get the string
+        string temp = this->str_filePath;
         if (temp.find("/") != string::npos)
         {
             temp = temp.substr(temp.find_last_of("/") + 1);
         }
 
         cout << "The geometry of " << temp << " was taken from the standard orientation." << endl;
-
     }
 
     return this->mol;
