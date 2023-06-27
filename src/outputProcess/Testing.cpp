@@ -167,7 +167,14 @@ G16LOGtest::G16LOGtest(string filePath, bool polarAsw)
         this->moleculeSTR = iptStorage[iptStorage.size() - 1];
     }
 
-    // Close the fileif (this->stdFound)
+    // Close the file
+    log_file.close();
+
+    // Set the molecule object using the extracted geometry
+    setMol();
+
+    // If ntFound is false, throw an error
+    if (!ntFound)
     {
         throw runtime_error("Normal termination of Gaussian not found in the log. Please check your log file.");
     }
@@ -207,7 +214,12 @@ double G16LOGtest::getHOMO(int index)
             {
                 try
                 {
-                    // Check if the string can beif (this->stdFound)
+                    // Check if the string can be converted to a double, then add to temp vector
+                    stod(results[j]);
+                    temp.push_back(results[j]);
+                }
+                catch (const std::exception &e)
+                {
                     // If the string cannot be converted to a double, ignore it
                 }
             }
@@ -217,13 +229,13 @@ double G16LOGtest::getHOMO(int index)
     if (index > 0)
     {
         // If the index is positive, throw an exception
-        throw out_of_range("You entered with a positive number. If you're looking for LUMO orbitals try to use: getLUMO(+n) function.");
+        throw out_of_range("You've entered with a positive number. If you're looking for LUMO orbitals try to use: getLUMO(+n) function.");
     }
 
     else if (abs(index) == temp.size() || abs(index) > temp.size())
     {
         // If the index is greater than the number of HOMO orbitals found in the log file, throw an exception.
-        throw out_of_range("Index out of range. You entered with a number greater than the number of HOMO orbitals found in the log file. Number of orbital found: " + to_string(temp.size()));
+        throw out_of_range("Index out of range. You've entered with a number greater than the number of HOMO orbitals found in the log file. Number of orbital found: " + to_string(temp.size())+".");
     }
 
     else if (index == 0)
@@ -276,13 +288,13 @@ double G16LOGtest::getLUMO(int index)
     if (index < 0)
     {
         // If the index is negative, throw an exception
-        throw out_of_range("You entered with a negative number. If you're looking for HOMO orbitals try to use: getHOMO(-n) function.");
+        throw out_of_range("You've entered with a negative number. If you're looking for HOMO orbitals try to use: getHOMO(-n) function.");
     }
 
     else if (index > temp.size() - 1)
     {
         // If the index is greater than the number of LUMO orbitals found in the log file, throw an exception
-        throw out_of_range("Index out of range. You entered with a number greater than the number of HOMO orbitals found in the log file. Number of orbital found: " + to_string(temp.size()));
+        throw out_of_range("Index out of range. You've entered with a number greater than the number of HOMO orbitals found in the log file. Number of orbital found: " + to_string(temp.size())+".");
     }
 
     else
