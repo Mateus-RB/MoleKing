@@ -218,7 +218,7 @@ PYBIND11_MODULE(MoleKing, m) {
         .def("show", &Matrix::print)
         .def("__str__", &Matrix::toStr);
 
-    //! ################## UNDER DEVELOPMENT ##################
+    //! ################## INSTABLE: UNDER DEVELOPMENT ##################
 
     py::class_<G16LOGtest>(m, "G16LOGtest", "This class is experimental and under development.")
         .def(py::init< string, bool>(), py::arg("filePath"), py::arg("polarAsw") = 0)
@@ -232,7 +232,7 @@ PYBIND11_MODULE(MoleKing, m) {
         .def("getHOMO", &G16LOGtest::getHOMO, py::arg("index") = 0)
         .def("getLUMO", &G16LOGtest::getLUMO, py::arg("index") = 0);
 
-    //! ################## UNDER DEVELOPMENT ##################
+    //! ################## INSTABLE: UNDER DEVELOPMENT ##################
 
     py::class_<G16LOGfile>(m, "G16LOGfile", "This class extract significant properties from Gaussian 16 .log or .out output files.")
         .def(py::init< string, bool>(), py::arg("filePath"), py::arg("polarAsw") = 0)
