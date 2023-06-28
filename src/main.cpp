@@ -228,6 +228,7 @@ PYBIND11_MODULE(MoleKing, m) {
         .def("getMethod", &G16LOGtest::getMethod)
         .def("getSummary", &G16LOGtest::getSummary)
         .def("getMol", &G16LOGtest::getMol)
+        .def("getOrbitals", &G16LOGtest::getOrbitals)
         .def("getHOMO", &G16LOGtest::getHOMO, py::arg("index") = 0)
         .def("getLUMO", &G16LOGtest::getLUMO, py::arg("index") = 0);
 

@@ -79,7 +79,12 @@ private:
     bool stdFound;
     bool scfConvergence;
 
+    //* map
+
+    map<string, vector<string>> Orbitals;
+
     //* teste
+
    
 public:
     G16LOGtest(string filePath, bool polarAsw = 0);     
@@ -87,9 +92,10 @@ public:
     double getEnergy();
     double getHOMO(int index = -1);
     double getLUMO(int index = 0);
+    map<string, vector<string>> getOrbitals(); 
     string getDate();    
     string getBasis();
     string getMethod();
     string getSummary();
-    Molecule getMol();   
+    Molecule getMol();  
 };

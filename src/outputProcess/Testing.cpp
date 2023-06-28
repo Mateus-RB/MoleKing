@@ -201,6 +201,7 @@ double G16LOGtest::getHOMO(int index)
 {
     stringstream ss;
     vector<string> temp;
+    map<string, vector<string>> Occupied;
 
     for (int i = 0; i < this->homoStorage.size(); i++)
     {
@@ -225,6 +226,10 @@ double G16LOGtest::getHOMO(int index)
             }
         }
     }
+
+    //put vector temp into a map
+
+    this->Orbitals["Occupied"] = temp;
 
     if (index > 0)
     {
@@ -260,6 +265,7 @@ double G16LOGtest::getLUMO(int index)
 {
     stringstream ss;
     vector<string> temp;
+    map<string, vector<string>> Unoccupied;
 
     for (int i = 0; i < this->lumoStorage.size(); i++)
     {
@@ -285,6 +291,10 @@ double G16LOGtest::getLUMO(int index)
         }
     }
 
+    //put vector temp into a map
+
+    this->Orbitals["Unoccupied"] = temp;
+
     if (index < 0)
     {
         // If the index is negative, throw an exception
@@ -305,6 +315,16 @@ double G16LOGtest::getLUMO(int index)
 
     return this->lumoValue;
 };
+
+// Function to user get the orbitals
+
+map<string, vector<string>> G16LOGtest::getOrbitals()
+{
+    getHOMO();
+    getLUMO();
+
+    return this->Orbitals;
+}
 
 // Function to user get the date and time of the calculation
 string G16LOGtest::getDate()
