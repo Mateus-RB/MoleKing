@@ -14,7 +14,7 @@
 
 #include "Testing.hpp"
 
-//!----------------------- G16LOGtest -----------------------
+//!----------------------- G16LOGtest -----------------------//
 
 G16LOGtest::G16LOGtest(string filePath, bool polarAsw)
 {
@@ -25,7 +25,7 @@ G16LOGtest::G16LOGtest(string filePath, bool polarAsw)
     ntFound = false;
     stdFound = false;
     scfConvergence = true;
-    this->str_filePath = str_filePath;
+    this->str_filePath = filePath;
 
     // Loop through each line in the file
     while (getline(log_file, line))
@@ -38,6 +38,7 @@ G16LOGtest::G16LOGtest(string filePath, bool polarAsw)
         basis = line.find("Standard basis:");
         homoFinder = line.find(" Alpha  occ. eigenvalues --");
         lumoFinder = line.find(" Alpha virt. eigenvalues --");
+        dipoleFinder = line.find("Tot=");
 
         // If the line contains "Normal termination of Gaussian", set ntFound to true
         if (normalT != string::npos)
@@ -72,20 +73,27 @@ G16LOGtest::G16LOGtest(string filePath, bool polarAsw)
             this->method = value.substr(starterMethod + 3, starterSCF - starterMethod - 5);
         }
 
+        // Getting the dipoleValue
+
+        if (dipoleFinder != string::npos)
+        {
+           // only append if "Dipole=" and "NTot=" not in line
+            if ((line.find("Dipole=") == string::npos) && (line.find("NTot=") == string::npos))
+            {
+                this->dipoleStorage.push_back(line);
+            }
+        }
+
         // Getting HOMO and LUMO lines and appending into a vector;
 
         if (lumoFinder != string::npos)
         {
-            lumoSTR = "";
-            lumoSTR += line;
-            this->lumoStorage.push_back(lumoSTR);
+            this->lumoStorage.push_back(line);
         }
 
         if (homoFinder != string::npos)
         {
-            homoSTR = "";
-            homoSTR += line;
-            this->homoStorage.push_back(homoSTR);
+            this->homoStorage.push_back(line);
         }
 
         // If the line contains "Standard basis:", extract the basis set used
@@ -180,7 +188,7 @@ G16LOGtest::G16LOGtest(string filePath, bool polarAsw)
     }
 };
 
-//!----------------------- Set Functions -----------------------
+//!----------------------- Set Functions -----------------------//
 
 // Function to set the molecule object using the extracted geometry
 void G16LOGtest::setMol()
@@ -197,7 +205,7 @@ void G16LOGtest::setMol()
     }
 };
 
-//!----------------------- User Functions -----------------------
+//!----------------------- User Functions -----------------------//
 
 // Function to user get the orbitals
 
@@ -236,6 +244,50 @@ string G16LOGtest::getBasis()
     return this->basisValue;
 };
 
+// Function to user get the Dipole Value
+
+double G16LOGtest::getDipole(string axis)
+{
+    stringstream ss(this->dipoleStorage.back());
+    string line;
+
+    while (getline(ss,line))
+    {
+        istringstream iss(line);
+        vector<string> results((istream_iterator<string>(iss)), istream_iterator<string>());
+        this->dipoleX = stod(results[1]);
+        this->dipoleY = stod(results[3]);
+        this->dipoleZ = stod(results[5]);
+        this->dipoleTot = stod(results[7]);
+    }
+
+    if (axis == "tot")
+    {
+        return dipoleTot;
+    }
+
+    else if (axis == "x")
+    {
+        return dipoleX;
+    }
+
+    else if (axis == "y")
+    {
+        return dipoleY;
+    }
+
+    else if (axis == "z")
+    {
+        return dipoleZ;
+    }
+
+    else
+    {
+        throw runtime_error("Invalid axis. Please, use 'tot', 'x', 'y' or 'z'.");
+    }
+
+};
+
 // Function to user get the method used
 string G16LOGtest::getMethod()
 {
@@ -249,7 +301,7 @@ string G16LOGtest::getSummary()
 };
 
 // Function to user get the molecule object
-Molecule G16LOGtest::getMol()
+Molecule G16LOGtest::getMolecule()
 {
     // If the molecule object has no atoms, throw an error
     if (this->mol.getSize() == 0)
@@ -393,3 +445,40 @@ double G16LOGtest::getLUMO(int index)
 
     return this->lumoValue;
 };
+
+//!----------------------- Notepad -----------------------//
+
+
+//! New Features:
+
+//? getDate
+//? getBasis
+//? getMethod
+//? getSummary
+//? getMolecule
+//? getOrbitals
+//? getHOMO
+//? getLUMO
+
+//! TODO:
+
+//TODO:getDipole
+//TODO:getAlpha
+//TODO:getBeta
+//TODO:getGamma
+//TODO:getOscillatorForce
+//TODO:getWavelength
+//TODO:getOscillatorForces
+//TODO:getWavelengths
+//TODO:getSymmetries
+//TODO:getSymmetry
+//TODO:getTransitions
+//TODO:getTransitionsStr
+//TODO:getTransContributions
+//TODO:getGradient
+
+
+//! Done:
+
+//*  getEnergy | scfEnergy
+//*  getMolecule

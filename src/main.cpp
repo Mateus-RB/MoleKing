@@ -227,8 +227,9 @@ PYBIND11_MODULE(MoleKing, m) {
         .def("getBasis", &G16LOGtest::getBasis)
         .def("getMethod", &G16LOGtest::getMethod)
         .def("getSummary", &G16LOGtest::getSummary)
-        .def("getMol", &G16LOGtest::getMol)
+        .def("getMolecule", &G16LOGtest::getMolecule)
         .def("getOrbitals", &G16LOGtest::getOrbitals)
+        .def("getDipole", &G16LOGtest::getDipole, py::arg("axis") = "tot")
         .def("getHOMO", &G16LOGtest::getHOMO, py::arg("index") = 0)
         .def("getLUMO", &G16LOGtest::getLUMO, py::arg("index") = 0);
 

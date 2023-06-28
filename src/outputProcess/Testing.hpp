@@ -33,6 +33,7 @@ class G16LOGtest{
 private:
 
     //* size_t
+    size_t dipoleFinder;
     size_t scf;
     size_t scfC;
     size_t homoFinder;
@@ -51,8 +52,6 @@ private:
     string moleculeRange;
     string info;
     string method;
-    string lumoSTR = "";
-    string homoSTR = "";
     string moleculeSTR = "";
     string teste = "";
     string str_filePath;
@@ -60,11 +59,17 @@ private:
     vector <string> stdStorage;
     vector <string> homoStorage;
     vector <string> lumoStorage;
+    vector <string> dipoleStorage;
 
     //* double
     double scfValue;
     double homoValue;
     double lumoValue;
+    double dipoleTot;
+    double dipoleX;
+    double dipoleY;
+    double dipoleZ;
+    double charge;
 
     //* molecule
     Molecule mol;
@@ -85,7 +90,6 @@ private:
 
     //* teste
 
-   
 public:
     G16LOGtest(string filePath, bool polarAsw = 0);     
     
@@ -93,9 +97,10 @@ public:
     double getEnergy();
     double getHOMO(int index = -1);
     double getLUMO(int index = 0);    
+    double getDipole(string axis = "tot");
     string getDate();    
     string getBasis();
     string getMethod();
     string getSummary();
-    Molecule getMol();  
+    Molecule getMolecule();  
 };
