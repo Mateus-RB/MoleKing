@@ -448,21 +448,8 @@ double G16LOGtest::getLUMO(int index)
 
 //!----------------------- Notepad -----------------------//
 
-
-//! New Features:
-
-//? getDate
-//? getBasis
-//? getMethod
-//? getSummary
-//? getMolecule
-//? getOrbitals
-//? getHOMO
-//? getLUMO
-
 //! TODO:
 
-//TODO:getDipole
 //TODO:getAlpha
 //TODO:getBeta
 //TODO:getGamma
@@ -482,3 +469,15 @@ double G16LOGtest::getLUMO(int index)
 
 //*  getEnergy | scfEnergy
 //*  getMolecule
+//*  getDipole
+
+//! New Features (didn't exist before):
+
+//? getDate
+//? getBasis
+//? getMethod
+//? getSummary
+//? getMolecule
+//? getOrbitals
+//? getHOMO() -> getHOMO(-n)
+//? getLUMO -> getLUMO(+n)
