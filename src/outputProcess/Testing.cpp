@@ -178,7 +178,9 @@ G16LOGtest::G16LOGtest(string filePath, bool polarAsw)
     {
         throw runtime_error("Normal termination of Gaussian not found in the log. Please check your log file.");
     }
-}
+};
+
+//!----------------------- Set Functions -----------------------
 
 // Function to set the molecule object using the extracted geometry
 void G16LOGtest::setMol()
@@ -193,6 +195,82 @@ void G16LOGtest::setMol()
         vector<string> results((istream_iterator<string>(iss)), istream_iterator<string>());
         this->mol.addAtom(stoi(results[1]), stod(results[3]), stod(results[4]), stod(results[5]));
     }
+};
+
+//!----------------------- User Functions -----------------------
+
+// Function to user get the orbitals
+
+map<string, vector<string>> G16LOGtest::getOrbitals()
+{
+    getHOMO();
+    getLUMO();
+
+    return this->Orbitals;
+};
+
+// Function to user get the date and time of the calculation
+string G16LOGtest::getDate()
+{
+    return this->info;
+};
+
+// Function to user get the SCF energy
+double G16LOGtest::getEnergy()
+{
+    if (this->scfConvergence)
+    {
+        return this->scfValue;
+    }
+
+    else
+    {
+        cout << ("SCF convergence not achieved. Please, check your log file for -> 'Convergence criterion not met.'") << endl;
+        return this->scfValue;
+    }
+};
+
+// Function to user get the basis set used
+string G16LOGtest::getBasis()
+{
+    return this->basisValue;
+};
+
+// Function to user get the method used
+string G16LOGtest::getMethod()
+{
+    return this->method;
+};
+
+// Function to user get a summary of the calculation
+string G16LOGtest::getSummary()
+{
+    return "Calculation done in " + this->info + "\nWith the level of theory " + this->method + "/" + this->basisValue + '.' + "\nSCF energy of " + to_string(this->scfValue) + " Hartree.";
+};
+
+// Function to user get the molecule object
+Molecule G16LOGtest::getMol()
+{
+    // If the molecule object has no atoms, throw an error
+    if (this->mol.getSize() == 0)
+    {
+        throw runtime_error("Molecule not found in the log. Please check your output file.");
+    }
+
+    // If stdFound is true, print a message to the console
+    if (!this->stdFound)
+    {
+        // check if this->filePath have / or not. if have, then split the string and get the last string, else just get the string
+        string temp = this->str_filePath;
+        if (temp.find("/") != string::npos)
+        {
+            temp = temp.substr(temp.find_last_of("/") + 1);
+        }
+
+        cout << "The geometry of " << temp << " was not taken from the standard orientation." << endl;
+    }
+
+    return this->mol;
 };
 
 // Function to user get the HOMO value;
@@ -314,78 +392,4 @@ double G16LOGtest::getLUMO(int index)
     }
 
     return this->lumoValue;
-};
-
-// Function to user get the orbitals
-
-map<string, vector<string>> G16LOGtest::getOrbitals()
-{
-    getHOMO();
-    getLUMO();
-
-    return this->Orbitals;
-}
-
-// Function to user get the date and time of the calculation
-string G16LOGtest::getDate()
-{
-    return this->info;
-};
-
-// Function to user get the SCF energy
-double G16LOGtest::getEnergy()
-{
-    if (this->scfConvergence)
-    {
-        return this->scfValue;
-    }
-
-    else
-    {
-        cout << ("SCF convergence not achieved. Please, check your log file for -> 'Convergence criterion not met.'") << endl;
-        return this->scfValue;
-    }
-};
-
-// Function to user get the basis set used
-string G16LOGtest::getBasis()
-{
-    return this->basisValue;
-};
-
-// Function to user get the method used
-string G16LOGtest::getMethod()
-{
-    return this->method;
-};
-
-// Function to user get a summary of the calculation
-string G16LOGtest::getSummary()
-{
-    return "Calculation done in " + this->info + "\nWith the level of theory " + this->method + "/" + this->basisValue + '.' + "\nSCF energy of " + to_string(this->scfValue) + " Hartree.";
-};
-
-// Function to user get the molecule object
-Molecule G16LOGtest::getMol()
-{
-    // If the molecule object has no atoms, throw an error
-    if (this->mol.getSize() == 0)
-    {
-        throw runtime_error("Molecule not found in the log. Please check your output file.");
-    }
-
-    // If stdFound is true, print a message to the console
-    if (!this->stdFound)
-    {
-        // check if this->filePath have / or not. if have, then split the string and get the last string, else just get the string
-        string temp = this->str_filePath;
-        if (temp.find("/") != string::npos)
-        {
-            temp = temp.substr(temp.find_last_of("/") + 1);
-        }
-
-        cout << "The geometry of " << temp << " was not taken from the standard orientation." << endl;
-    }
-
-    return this->mol;
 };

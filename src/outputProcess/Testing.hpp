@@ -89,10 +89,10 @@ private:
 public:
     G16LOGtest(string filePath, bool polarAsw = 0);     
     
+    map<string, vector<string>> getOrbitals(); 
     double getEnergy();
     double getHOMO(int index = -1);
-    double getLUMO(int index = 0);
-    map<string, vector<string>> getOrbitals(); 
+    double getLUMO(int index = 0);    
     string getDate();    
     string getBasis();
     string getMethod();
