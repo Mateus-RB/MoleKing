@@ -142,6 +142,9 @@ template<typename MatrixType, unsigned int _Mode> class SparseSelfAdjointView
       return *this = src.twistedBy(pnull);
     }
 
+    // Since we override the copy-assignment operator, we need to explicitly re-declare the copy-constructor
+    EIGEN_DEFAULT_COPY_CONSTRUCTOR(SparseSelfAdjointView)
+
     template<typename SrcMatrixType,unsigned int SrcMode>
     SparseSelfAdjointView& operator=(const SparseSelfAdjointView<SrcMatrixType,SrcMode>& src)
     {
@@ -154,7 +157,7 @@ template<typename MatrixType, unsigned int _Mode> class SparseSelfAdjointView
       EIGEN_ONLY_USED_FOR_DEBUG(rows);
       EIGEN_ONLY_USED_FOR_DEBUG(cols);
       eigen_assert(rows == this->rows() && cols == this->cols()
-                && "SparseSelfadjointView::resize() does not actually allow one to resize.");
+                && "SparseSelfadjointView::resize() does not actually allow to resize.");
     }
     
   protected:
@@ -453,7 +456,7 @@ void permute_symm_to_fullsymm(const MatrixType& mat, SparseMatrix<typename Matri
       Index r = it.row();
       Index c = it.col();
       Index ip = perm ? perm[i] : i;
-      if(Mode==(Upper|Lower))
+      if(Mode==int(Upper|Lower))
         count[StorageOrderMatch ? jp : ip]++;
       else if(r==c)
         count[ip]++;
@@ -486,7 +489,7 @@ void permute_symm_to_fullsymm(const MatrixType& mat, SparseMatrix<typename Matri
       StorageIndex jp = perm ? perm[j] : j;
       StorageIndex ip = perm ? perm[i] : i;
       
-      if(Mode==(Upper|Lower))
+      if(Mode==int(Upper|Lower))
       {
         Index k = count[StorageOrderMatch ? jp : ip]++;
         dest.innerIndexPtr()[k] = StorageOrderMatch ? ip : jp;
