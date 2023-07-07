@@ -221,7 +221,7 @@ PYBIND11_MODULE(MoleKing, m) {
     //! ################## INSTABLE: UNDER DEVELOPMENT ##################
 
     py::class_<G16LOGtest>(m, "G16LOGtest", "This class is experimental and under development.")
-        .def(py::init< string, bool>(), py::arg("filePath"), py::arg("polarAsw") = 0)
+        .def(py::init< string, bool, bool>(), py::arg("filePath"), py::arg("polarAsw") = 0, py::arg("tdAsw") = 0)
         .def("getDate", &G16LOGtest::getDate)
         .def("getEnergy", &G16LOGtest::getEnergy)
         .def("getBasis", &G16LOGtest::getBasis)
@@ -229,6 +229,7 @@ PYBIND11_MODULE(MoleKing, m) {
         .def("getSummary", &G16LOGtest::getSummary)
         .def("getMolecule", &G16LOGtest::getMolecule)
         .def("getOrbitals", &G16LOGtest::getOrbitals)
+        .def("getTransitions", &G16LOGtest::getTransitions)
         .def("getDipole", &G16LOGtest::getDipole, py::arg("axis") = "tot")
         .def("getHOMO", &G16LOGtest::getHOMO, py::arg("index") = 0)
         .def("getLUMO", &G16LOGtest::getLUMO, py::arg("index") = 0);

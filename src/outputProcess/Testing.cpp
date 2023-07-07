@@ -16,7 +16,7 @@
 
 //!----------------------- G16LOGtest -----------------------//
 
-G16LOGtest::G16LOGtest(string filePath, bool polarAsw)
+G16LOGtest::G16LOGtest(string filePath, bool polarAsw, bool tdAsw)
 {
     // Open the file at the given file path
     ifstream log_file(filePath);
@@ -26,6 +26,8 @@ G16LOGtest::G16LOGtest(string filePath, bool polarAsw)
     stdFound = false;
     scfConvergence = true;
     this->str_filePath = filePath;
+    this->polarAsw = polarAsw;
+    this->tdAsw = tdAsw;
 
     // Loop through each line in the file
     while (getline(log_file, line))
@@ -39,6 +41,7 @@ G16LOGtest::G16LOGtest(string filePath, bool polarAsw)
         homoFinder = line.find(" Alpha  occ. eigenvalues --");
         lumoFinder = line.find(" Alpha virt. eigenvalues --");
         dipoleFinder = line.find("Tot=");
+        tdFinder = line.find("Excited State ");
 
         // If the line contains "Normal termination of Gaussian", set ntFound to true
         if (normalT != string::npos)
@@ -52,7 +55,7 @@ G16LOGtest::G16LOGtest(string filePath, bool polarAsw)
             stdFound = true;
         }
 
-        // If the line contains ":", set scfConvergence to false
+        // If the line contains "Convergence criterion not met.", set scfConvergence to false
 
         if (scfC != string::npos)
         {
@@ -77,7 +80,7 @@ G16LOGtest::G16LOGtest(string filePath, bool polarAsw)
 
         if (dipoleFinder != string::npos)
         {
-           // only append if "Dipole=" and "NTot=" not in line
+            // only append if "Dipole=" and "NTot=" not in line
             if ((line.find("Dipole=") == string::npos) && (line.find("NTot=") == string::npos))
             {
                 this->dipoleStorage.push_back(line);
@@ -159,6 +162,20 @@ G16LOGtest::G16LOGtest(string filePath, bool polarAsw)
 
             moleculeSTR = "";
         }
+
+        // If the line contains "Excited State", extract the TD-DFT information
+
+        if (tdAsw)
+        {
+            if (tdFinder != string::npos)
+            {
+                // only append if "Dipole=" and "NTot=" not in line
+                if ((line.find("Excited State =") == string::npos) && (line.find("symmetry could not be determined.") == string::npos))
+                {
+                    this->tdStorage.push_back(line);
+                }
+            }
+        }
     }
 
     // If stdFound is true, set the molecule string to the last geometry in stdStorage, as default molecule geometry is always be standard orientation if it is available
@@ -217,6 +234,50 @@ map<string, vector<string>> G16LOGtest::getOrbitals()
     return this->Orbitals;
 };
 
+// get Transitions
+
+map<int, map<string, double>> G16LOGtest::getTransitions()
+{
+    if (!this->tdAsw){
+        throw runtime_error("Please, add tdAsw=1 to the G16LOGtest object to get the transitions.");
+    }
+
+    for (int i = 0; i < this->tdStorage.size(); i++)
+    {
+        stringstream ss(this->tdStorage[i]);
+        string line;
+        while (getline(ss, line))
+        {
+            if (line.find("Excited State") != string::npos)
+            {
+                istringstream iss(line);
+                vector<string> results((istream_iterator<string>(iss)), istream_iterator<string>());
+
+                string state = results[2];
+                state.pop_back();
+                int stateInt = stoi(state);
+                string energy = results[4];
+                double transitionEnergyDouble = stod(energy);
+                string wv = results[6];
+                double wvDouble = stod(wv);
+                string osc = results[8];
+                osc.erase(0, 2);
+                double oscDouble = stod(osc);                
+
+                map<string, double> values = {              
+                    {"Energy", transitionEnergyDouble},                    
+                    {"Wavelength", wvDouble},                    
+                    {"Oscillation_Strength", oscDouble}
+                };
+
+                this->transitions[stateInt] = values;
+            }
+        }
+    }
+
+    return this->transitions;
+}
+
 // Function to user get the date and time of the calculation
 string G16LOGtest::getDate()
 {
@@ -251,7 +312,7 @@ double G16LOGtest::getDipole(string axis)
     stringstream ss(this->dipoleStorage.back());
     string line;
 
-    while (getline(ss,line))
+    while (getline(ss, line))
     {
         istringstream iss(line);
         vector<string> results((istream_iterator<string>(iss)), istream_iterator<string>());
@@ -285,7 +346,6 @@ double G16LOGtest::getDipole(string axis)
     {
         throw runtime_error("Invalid axis. Please, use 'tot', 'x', 'y' or 'z'.");
     }
-
 };
 
 // Function to user get the method used
@@ -357,7 +417,7 @@ double G16LOGtest::getHOMO(int index)
         }
     }
 
-    //put vector temp into a map
+    // put vector temp into a map
 
     this->Orbitals["Occupied"] = temp;
 
@@ -370,7 +430,7 @@ double G16LOGtest::getHOMO(int index)
     else if (abs(index) == temp.size() || abs(index) > temp.size())
     {
         // If the index is greater than the number of HOMO orbitals found in the log file, throw an exception.
-        throw out_of_range("Index out of range. You've entered with a number greater than the number of HOMO orbitals found in the log file. Number of orbital found: " + to_string(temp.size())+".");
+        throw out_of_range("Index out of range. You've entered with a number greater than the number of HOMO orbitals found in the log file. Number of orbital found: " + to_string(temp.size()) + ".");
     }
 
     else if (index == 0)
@@ -421,7 +481,7 @@ double G16LOGtest::getLUMO(int index)
         }
     }
 
-    //put vector temp into a map
+    // put vector temp into a map
 
     this->Orbitals["Unoccupied"] = temp;
 
@@ -434,7 +494,7 @@ double G16LOGtest::getLUMO(int index)
     else if (index > temp.size() - 1)
     {
         // If the index is greater than the number of LUMO orbitals found in the log file, throw an exception
-        throw out_of_range("Index out of range. You've entered with a number greater than the number of HOMO orbitals found in the log file. Number of orbital found: " + to_string(temp.size())+".");
+        throw out_of_range("Index out of range. You've entered with a number greater than the number of HOMO orbitals found in the log file. Number of orbital found: " + to_string(temp.size()) + ".");
     }
 
     else
@@ -450,20 +510,19 @@ double G16LOGtest::getLUMO(int index)
 
 //! TODO:
 
-//TODO:getAlpha
-//TODO:getBeta
-//TODO:getGamma
-//TODO:getOscillatorForce
-//TODO:getWavelength
-//TODO:getOscillatorForces
-//TODO:getWavelengths
-//TODO:getSymmetries
-//TODO:getSymmetry
-//TODO:getTransitions
-//TODO:getTransitionsStr
-//TODO:getTransContributions
-//TODO:getGradient
-
+// TODO:getAlpha
+// TODO:getBeta
+// TODO:getGamma
+// TODO:getOscillatorForce
+// TODO:getWavelength
+// TODO:getOscillatorForces
+// TODO:getWavelengths
+// TODO:getSymmetries
+// TODO:getSymmetry
+// TODO:getTransitions
+// TODO:getTransitionsStr
+// TODO:getTransContributions
+// TODO:getGradient
 
 //! Done:
 

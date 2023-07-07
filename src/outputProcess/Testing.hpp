@@ -38,6 +38,7 @@ private:
     size_t scfC;
     size_t homoFinder;
     size_t lumoFinder;
+    size_t tdFinder;
     size_t normalT;   
     size_t stdT; 
     size_t starterSCF;
@@ -60,6 +61,7 @@ private:
     vector <string> homoStorage;
     vector <string> lumoStorage;
     vector <string> dipoleStorage;
+    vector <string> tdStorage;
 
     //* double
     double scfValue;
@@ -83,17 +85,21 @@ private:
     bool ntFound;
     bool stdFound;
     bool scfConvergence;
+    bool polarAsw;
+    bool tdAsw;
 
     //* map
 
     map<string, vector<string>> Orbitals;
+    map<int, map<string, double>> transitions;
 
     //* teste
 
 public:
-    G16LOGtest(string filePath, bool polarAsw = 0);     
+    G16LOGtest(string filePath, bool polarAsw = 0, bool tdAsw = 0);     
     
     map<string, vector<string>> getOrbitals(); 
+    map<int, map<string, double>> getTransitions();
     double getEnergy();
     double getHOMO(int index = -1);
     double getLUMO(int index = 0);    
