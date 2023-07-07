@@ -54,7 +54,6 @@ private:
     string info;
     string method;
     string moleculeSTR = "";
-    string teste = "";
     string str_filePath;
     vector <string> iptStorage;
     vector <string> stdStorage;
@@ -75,10 +74,6 @@ private:
 
     //* molecule
     Molecule mol;
-    
-
-    //* Void
-    void setMol();
 
     //* bool
 
@@ -93,13 +88,25 @@ private:
     map<string, vector<string>> Orbitals;
     map<int, map<string, double>> transitions;
 
+    vector<string> Occupied;
+    vector<string> Unoccupied;
+
     //* teste
 
+    //* set functions
+    void readLOGFile();
+    void setMolecule();
+    void setOrbitals();
+    void setHOMO();
+    void setLUMO();
+    void setTransitions();
+    void setDipole();
+
 public:
-    G16LOGtest(string filePath, bool polarAsw = 0, bool tdAsw = 0);     
-    
+    G16LOGtest(string filePath, bool polarAsw = 0, bool tdAsw = 0);   
+    ~G16LOGtest();      
     map<string, vector<string>> getOrbitals(); 
-    map<int, map<string, double>> getTransitions();
+    map<int, map<string, double>> getTransitions(int index = 0);
     double getEnergy();
     double getHOMO(int index = -1);
     double getLUMO(int index = 0);    
@@ -107,6 +114,6 @@ public:
     string getDate();    
     string getBasis();
     string getMethod();
-    string getSummary();
+    string toStr();
     Molecule getMolecule();  
 };

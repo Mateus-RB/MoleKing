@@ -43,7 +43,6 @@ PYBIND11_MODULE(MoleKing, m) {
         .def("getSymbol", &PeriodicTable::getSymbol)
         .def("getCovalentRadii", &PeriodicTable::getCovalentRadii);
     
-    
     py::class_<Atom>(m, "Atom", "This class creates a atom variable type allowing for the usage in python like a primitive type.")
         .def(py::init<int, double, double, double, double, bool>(), py::arg("atomicNumber"), py::arg("xPos"), py::arg("yPos"), py::arg("zPos"), py::arg("atomicCharge") = 0.0, py::arg("freezeCode_") = 0)
         .def(py::init<string, double, double, double, double, bool>(), py::arg("atomicSymbol"), py::arg("xPos"), py::arg("yPos"), py::arg("zPos"), py::arg("atomicCharge") = 0.0, py::arg("freezeCode_") = 0)
@@ -226,13 +225,13 @@ PYBIND11_MODULE(MoleKing, m) {
         .def("getEnergy", &G16LOGtest::getEnergy)
         .def("getBasis", &G16LOGtest::getBasis)
         .def("getMethod", &G16LOGtest::getMethod)
-        .def("getSummary", &G16LOGtest::getSummary)
         .def("getMolecule", &G16LOGtest::getMolecule)
         .def("getOrbitals", &G16LOGtest::getOrbitals)
-        .def("getTransitions", &G16LOGtest::getTransitions)
+        .def("getTransitions", &G16LOGtest::getTransitions, py::arg("index") = 0)
         .def("getDipole", &G16LOGtest::getDipole, py::arg("axis") = "tot")
         .def("getHOMO", &G16LOGtest::getHOMO, py::arg("index") = 0)
-        .def("getLUMO", &G16LOGtest::getLUMO, py::arg("index") = 0);
+        .def("getLUMO", &G16LOGtest::getLUMO, py::arg("index") = 0)
+        .def("__str__", &G16LOGtest::toStr);
 
     //! ################## INSTABLE: UNDER DEVELOPMENT ##################
 
