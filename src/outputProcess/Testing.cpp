@@ -583,7 +583,7 @@ G16LOGtest::~G16LOGtest()
     this->dipoleZ = 0;
 
     // clear the molecules
-    // this->mol.clear();
+    this->mol.clear();
 
     // clear maps and vectors
 

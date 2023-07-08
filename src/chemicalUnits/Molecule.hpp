@@ -108,6 +108,7 @@ public:
     void removeElement(string element);
     Molecule copy();
     double getMolecularMass();
+    void clear();
     //void doOPLS();
 };
 

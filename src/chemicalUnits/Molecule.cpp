@@ -577,6 +577,11 @@ void Molecule::removeAtom(int atomNumber){
     this->molecule.erase(this->molecule.begin() + atomNumber);
 };
 
+void Molecule::clear()
+{
+    this->molecule.clear();
+};
+
 void Molecule::removeAtom(Atom atom){
     for (int i = 0; i < (int) this->molecule.size(); i++){
         if (atom == this->molecule[i]){

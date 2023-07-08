@@ -116,6 +116,7 @@ PYBIND11_MODULE(MoleKing, m) {
         .def("getVDWRatio", &Molecule::getVDWRatio)
         .def("getMultiplicity", &Molecule::getMultiplicity)
         .def("copy", &Molecule::copy)
+        .def("clear", &Molecule::clear)
         .def("normChargePoints", &Molecule::normalizeCPs)
         .def("getMolecule", &Molecule::getMolecule)
         .def("getChargePoints", &Molecule::getChargePoints)
