@@ -32,19 +32,26 @@ using namespace std;
 class G16LOGtest{
 private:
 
+    //* int
+
+    int charge;
+    int multiplicity;
+
     //* size_t
     size_t dipoleFinder;
-    size_t scf;
-    size_t scfC;
+    size_t mullikenFinder;
     size_t homoFinder;
     size_t lumoFinder;
     size_t tdFinder;
+    size_t scf;
+    size_t scfC;
     size_t normalT;   
     size_t stdT; 
     size_t starterSCF;
     size_t endSCF;
     size_t starterMethod;  
     size_t basis; 
+    size_t chargeMultiFinder;
 
     //* string
     string basisValue;    
@@ -61,6 +68,7 @@ private:
     vector <string> lumoStorage;
     vector <string> dipoleStorage;
     vector <string> tdStorage;
+    vector <string> mullikenStorage;
 
     //* double
     double scfValue;
@@ -69,8 +77,7 @@ private:
     double dipoleTot;
     double dipoleX;
     double dipoleY;
-    double dipoleZ;
-    double charge;
+    double dipoleZ;   
 
     //* molecule
     Molecule mol;
@@ -83,11 +90,12 @@ private:
     bool polarAsw;
     bool tdAsw;
 
-    //* map
+    //* map and vectors
 
     map<string, vector<string>> Orbitals;
     map<int, map<string, double>> transitions;
 
+    vector<double> atomicCharge;
     vector<string> Occupied;
     vector<string> Unoccupied;
 
@@ -95,18 +103,20 @@ private:
 
     //* set functions
     void readLOGFile();
+    void setAtomicCharge();
     void setMolecule();
     void setOrbitals();
     void setHOMO();
     void setLUMO();
     void setTransitions();
     void setDipole();
+    void splitter();
 
 public:
     G16LOGtest(string filePath, bool polarAsw = 0, bool tdAsw = 0);   
     ~G16LOGtest();      
     map<string, vector<string>> getOrbitals(); 
-    map<int, map<string, double>> getTransitions(int index = 0);
+    map<int, map<string, double>> getTransitions(const int index = 0);
     double getEnergy();
     double getHOMO(int index = -1);
     double getLUMO(int index = 0);    

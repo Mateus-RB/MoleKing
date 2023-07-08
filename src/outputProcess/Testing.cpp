@@ -17,17 +17,11 @@
 //!----------------------- G16LOGtest -----------------------//
 
 G16LOGtest::G16LOGtest(string filePath, bool polarAsw, bool tdAsw)
+    : ntFound(false), stdFound(false), scfConvergence(true),str_filePath(filePath), polarAsw(polarAsw), tdAsw(tdAsw)
 {
-    // Initialize some variables
-    ntFound = false;
-    stdFound = false;
-    scfConvergence = true;
-    this->str_filePath = filePath;
-    this->polarAsw = polarAsw;
-    this->tdAsw = tdAsw;
-
     // SET FUNCTIONS
     readLOGFile();
+    setAtomicCharge();
     setMolecule();
     setDipole();
     setHOMO();
@@ -37,7 +31,7 @@ G16LOGtest::G16LOGtest(string filePath, bool polarAsw, bool tdAsw)
     if (tdAsw)
     {
         setTransitions();
-    }
+    };
 };
 
 //!----------------------- Set Functions -----------------------//
@@ -48,7 +42,6 @@ void G16LOGtest::readLOGFile()
 {
     // Open the file at the given file path
     ifstream log_file(this->str_filePath);
-
     // Loop through each line in the file
     while (getline(log_file, line))
     {
@@ -62,25 +55,23 @@ void G16LOGtest::readLOGFile()
         lumoFinder = line.find(" Alpha virt. eigenvalues --");
         dipoleFinder = line.find("Tot=");
         tdFinder = line.find("Excited State ");
-
+        chargeMultiFinder = line.find(" Charge =");
+        mullikenFinder = line.find("Mulliken charges:");
         // If the line contains "Normal termination of Gaussian", set ntFound to true
         if (normalT != string::npos)
         {
             ntFound = true;
-        }
-
+        };
         // If the line contains "Standard orientation:", set stdFound to true
         if (stdT != string::npos)
         {
             stdFound = true;
-        }
-
+        };
         // If the line contains "Convergence criterion not met.", set scfConvergence to false
         if (scfC != string::npos)
         {
             this->scfConvergence = false;
-        }
-
+        };
         // If the line contains "SCF Done:", extract the SCF value and calculation method used
         if (scf != string::npos)
         {
@@ -93,42 +84,57 @@ void G16LOGtest::readLOGFile()
 
             this->scfValue = stod(value.substr(starterSCF + 3, endSCF - starterSCF - 3));
             this->method = value.substr(starterMethod + 3, starterSCF - starterMethod - 5);
-        }
-
+        };
+        // Getting mulliken charges
+        if (mullikenFinder != string::npos)
+        {   
+            int temp = 0;
+            while (getline(log_file, line)) // while only this->mol.size()
+            {   
+                //if  Sum of Mulliken charges =, break;
+                if (line.find(" Sum of Mulliken charges =") != string::npos)
+                {
+                    break;
+                };
+                mullikenStorage.emplace_back(line);
+                temp++;
+            };
+        };
+        // Getting the charge and multiplicity
+        if (chargeMultiFinder != string::npos)
+        {   
+            this->charge = stoi((line.substr(chargeMultiFinder + 11, 1)));
+            this->multiplicity = stoi((line.substr(chargeMultiFinder + 28, 1)));
+        };
         // Getting the dipoleValue
         if (dipoleFinder != string::npos)
         {
             // only append if "Dipole=" and "NTot=" not in line
             if ((line.find("Dipole=") == string::npos) && (line.find("NTot=") == string::npos))
             {
-                this->dipoleStorage.push_back(line);
-            }
-        }
-
+                this->dipoleStorage.emplace_back(line);
+            };
+        };
         // Getting HOMO and LUMO lines and appending into a vector;
         if (lumoFinder != string::npos)
         {
-            this->lumoStorage.push_back(line);
+            this->lumoStorage.emplace_back(line);
         }
-
         if (homoFinder != string::npos)
         {
-            this->homoStorage.push_back(line);
-        }
-
+            this->homoStorage.emplace_back(line);
+        };
         // If the line contains "Standard basis:", extract the basis set used
         if (basis != string::npos)
         {
             this->basisValue = line.substr(basis + 16);
         };
-
         // If the line contains "Normal termination of Gaussian", extract the date and time of the calculation
         if (normalT != string::npos)
         {
             this->info = line.substr(normalT + 31);
             this->info.pop_back(); // this remove the '.' of the string, wich is the last char in the string.
-        }
-
+        };
         // If the line contains "Input orientation:", extract the molecule's geometry in Input Orientation
         if (line.find("Input orientation:") != string::npos)
         {
@@ -137,24 +143,18 @@ void G16LOGtest::readLOGFile()
                 if (line.find("Distance matrix (angstroms):") != string::npos)
                 {
                     break;
-                }
-
+                };
                 moleculeSTR += line + "\n";
-            }
-
+            };
             for (int i = 0; i < 4; i++)
             {
                 moleculeSTR = moleculeSTR.substr(moleculeSTR.find("\n") + 1);
-            }
-
+            };
             moleculeSTR = moleculeSTR.substr(0, moleculeSTR.rfind("---------------------------------------------------------------------\n"));
             moleculeSTR = moleculeSTR.substr(0, moleculeSTR.rfind("\n"));
-
-            iptStorage.push_back(moleculeSTR);
-
+            iptStorage.emplace_back(moleculeSTR);
             moleculeSTR = "";
-        }
-
+        };
         // If the line contains "Standard orientation:", extract the molecule's geometry in Standard Orientation
         if (line.find("Standard orientation:") != string::npos)
         {
@@ -163,24 +163,18 @@ void G16LOGtest::readLOGFile()
                 if (line.find(" Rotational constants (GHZ): ") != string::npos)
                 {
                     break;
-                }
-
+                };
                 moleculeSTR += line + "\n";
-            }
-
+            };
             for (int i = 0; i < 4; i++)
             {
                 moleculeSTR = moleculeSTR.substr(moleculeSTR.find("\n") + 1);
-            }
-
+            };
             moleculeSTR = moleculeSTR.substr(0, moleculeSTR.rfind("---------------------------------------------------------------------\n"));
             moleculeSTR = moleculeSTR.substr(0, moleculeSTR.rfind("\n"));
-
-            stdStorage.push_back(moleculeSTR);
-
+            stdStorage.emplace_back(moleculeSTR);
             moleculeSTR = "";
-        }
-
+        };
         // If the line contains "Excited State", extract the TD-DFT information
         if (tdAsw)
         {
@@ -189,68 +183,76 @@ void G16LOGtest::readLOGFile()
                 // only append if "Dipole=" and "NTot=" not in line
                 if ((line.find("Excited State =") == string::npos) && (line.find("symmetry could not be determined.") == string::npos))
                 {
-                    this->tdStorage.push_back(line);
-                }
-            }
-        }
-    }
-
+                    this->tdStorage.emplace_back(line);
+                };
+            };
+        };
+    };
     // Close the file
     log_file.close();
-
     // If stdFound is true, set the molecule string to the last geometry in stdStorage, as default molecule geometry is always be standard orientation if it is available
     if (stdFound)
     {
         this->moleculeSTR = "";
         this->moleculeSTR = stdStorage[stdStorage.size() - 1];
     }
-
     // If stdFound is false, set the molecule string to the last geometry in iptStorage
     else
     {
         this->moleculeSTR = "";
         this->moleculeSTR = iptStorage[iptStorage.size() - 1];
-    }
-
+    };
     // If ntFound is false, throw an error
     if (!ntFound)
     {
         throw runtime_error("Normal termination of Gaussian not found in the log. Please check your log file.");
-    }
-}
+    };
+};
 
-// Function to set the molecule object using the extracted geometry
-void G16LOGtest::setMolecule()
-{
-    stringstream ss(this->moleculeSTR);
-    string line;
-
-    while (getline(ss, line))
+void G16LOGtest::setAtomicCharge()
+{   
+    this->mullikenStorage.erase(this->mullikenStorage.begin());    
+    for (auto &line : this->mullikenStorage)
     {
         istringstream iss(line);
         vector<string> results((istream_iterator<string>(iss)), istream_iterator<string>());
-        this->mol.addAtom(stoi(results[1]), stod(results[3]), stod(results[4]), stod(results[5]));
-    }
+        this->atomicCharge.emplace_back(stod(results[2]));
+    };
+};
 
+// Function to set the molecule object using the extracted geometry
+void G16LOGtest::setMolecule()
+{   
+    stringstream ss(this->moleculeSTR);
+    string line;
+    int i = 0;
+    while (getline(ss, line))
+    {   
+        istringstream iss(line);
+        vector<string> results((istream_iterator<string>(iss)), istream_iterator<string>());
+        this->mol.addAtom(stoi(results[1]), stod(results[3]), stod(results[4]), stod(results[5]), this->atomicCharge[i]); 
+        i++;
+    };
+    //this->mol.setCharge(this->charge);
+    this->mol.setMultiplicity(this->multiplicity);
     // If the molecule object has no atoms, throw an error
     if (this->mol.getSize() == 0)
     {
         throw runtime_error("Molecule not found in the log. Please check your output file.");
-    }
+    };
 };
 
 void G16LOGtest::setOrbitals()
 {
     this->Orbitals["Unoccupied"] = this->Unoccupied;
     this->Orbitals["Occupied"] = this->Occupied;
-}
+};
 
 // Function to set the HOMO orbital of the calculation
 void G16LOGtest::setHOMO()
 {
     stringstream ss;
     vector<string> temp;
-
     for (int i = 0; i < this->homoStorage.size(); i++)
     {
         ss = stringstream(this->homoStorage[i]);
@@ -265,15 +267,15 @@ void G16LOGtest::setHOMO()
                 {
                     // Check if the string can be converted to a double, then add to temp vector
                     stod(results[j]);
-                    temp.push_back(results[j]);
+                    temp.emplace_back(results[j]);
                 }
                 catch (const std::exception &e)
                 {
                     // If the string cannot be converted to a double, ignore it
-                }
-            }
-        }
-    }
+                };
+            };
+        };
+    };
     // this->Orbitals["Occupied"] = temp;
     this->Occupied = temp;
 };
@@ -283,7 +285,6 @@ void G16LOGtest::setLUMO()
 {
     stringstream ss;
     vector<string> temp;
-
     for (int i = 0; i < this->lumoStorage.size(); i++)
     {
         ss = stringstream(this->lumoStorage[i]);
@@ -298,37 +299,39 @@ void G16LOGtest::setLUMO()
                 {
                     // Check if the string can be converted to a double, then add to temp vector
                     stod(results[j]);
-                    temp.push_back(results[j]);
+                    temp.emplace_back(results[j]);
                 }
                 catch (const std::exception &e)
                 {
                     // If the string cannot be converted to a double, ignore it
-                }
-            }
-        }
-    }
+                };
+            };
+        };
+    };
     this->Unoccupied = temp;
 };
 
 // Function to set the transitions of the calculation
 void G16LOGtest::setTransitions()
-{
+{   
+    //if tdAsw is false, throw an error
     if (!this->tdAsw)
     {
         throw runtime_error("Please, add tdAsw=1 to the G16LOGtest object to get the transitions.");
     }
-
+    // if true, iterate through the tdStorage vector
     for (int i = 0; i < this->tdStorage.size(); i++)
     {
         stringstream ss(this->tdStorage[i]);
         string line;
         while (getline(ss, line))
-        {
+        {   
+            // if the line contains "Excited State", extract the information
             if (line.find("Excited State") != string::npos)
             {
                 istringstream iss(line);
                 vector<string> results((istream_iterator<string>(iss)), istream_iterator<string>());
-
+                // extract the state, energy, wavelength and oscillator strength, and conver it to the correct type
                 string state = results[2];
                 state.pop_back();
                 int stateInt = stoi(state);
@@ -337,35 +340,37 @@ void G16LOGtest::setTransitions()
                 string wv = results[6];
                 double wvDouble = stod(wv);
                 string osc = results[8];
+
+                //this is removing the first two characters of the string, which are the F=
                 osc.erase(0, 2);
                 double oscDouble = stod(osc);
 
+                // create a map with the extracted information and add it to the transitions map
                 map<string, double> values = {
                     {"Energy", transitionEnergyDouble},
                     {"Wavelength", wvDouble},
                     {"Oscillation_Strength", oscDouble}};
-
                 this->transitions[stateInt] = values;
-            }
-        }
-    }
+            };
+        };
+    };
 };
 
 // Function to set the dipole moment of the calculation
 void G16LOGtest::setDipole()
-{
+{   
     stringstream ss(this->dipoleStorage.back());
     string line;
-
     while (getline(ss, line))
     {
         istringstream iss(line);
         vector<string> results((istream_iterator<string>(iss)), istream_iterator<string>());
+        // extract the dipole moment components and convert them to the correct type
         this->dipoleX = stod(results[1]);
         this->dipoleY = stod(results[3]);
         this->dipoleZ = stod(results[5]);
         this->dipoleTot = stod(results[7]);
-    }
+    };
 };
 
 //!----------------------- Get Functions -----------------------//
@@ -376,19 +381,20 @@ string G16LOGtest::getDate()
     return this->info;
 };
 
-// Function to user get the SCF energy
+// Function to user get the SCF energy 
 double G16LOGtest::getEnergy()
-{
+{   
+    // If scfConvergence is true, return the scfValue
     if (this->scfConvergence)
     {
         return this->scfValue;
     }
-
+    // If scfConvergence is false, print a message to the console, to warn the user
     else
     {
-        cout << ("SCF convergence not achieved. Please, check your log file for -> 'Convergence criterion not met.'") << endl;
+        cerr << "WARNING in G16LOGtest::getEnergy(): SCF convergence not achieved. Please check your log file for 'Convergence criterion not met.'" << endl;
         return this->scfValue;
-    }
+    };
 };
 
 // Function to user get the basis set used
@@ -414,31 +420,31 @@ Molecule G16LOGtest::getMolecule()
         if (temp.find("/") != string::npos)
         {
             temp = temp.substr(temp.find_last_of("/") + 1);
-        }
-        cout << "The geometry of " << temp << " was not taken from the standard orientation." << endl;
-    }
+        };
+        cerr << "WARNING in G16LOGtest::getMolecule(): The geometry of " << temp << " was not taken from the standard orientation." << endl;
+    };
     return this->mol;
 };
 
 // Function to user get the orbitals
-map<string, vector<string>> G16LOGtest::getOrbitals()
+map<string, vector<string>> G16LOGtest::getOrbitals() 
 {
     return this->Orbitals;
 };
 
 // Function to user get the HOMO value;
-double G16LOGtest::getHOMO(int index)
+double G16LOGtest::getHOMO(int index) 
 {
     if (index > 0)
     {
         // If the index is positive, throw an exception
-        throw out_of_range("You've entered with a positive number. If you're looking for LUMO orbitals try to use: getLUMO(+n) function.");
+        throw out_of_range("ERROR in G16LOGtest::getHOMO(): Invalid index. Index can't be a positive number. If you're looking for LUMO orbitals try to use: getLUMO(+n) function.");
     }
 
     else if (abs(index) == this->Occupied.size() || abs(index) > this->Occupied.size())
     {
         // If the index is greater than the number of HOMO orbitals found in the log file, throw an exception.
-        throw out_of_range("Index out of range. You've entered with a number greater than the number of HOMO orbitals found in the log file. Number of orbital found: " + to_string(this->Occupied.size()) + ".");
+        throw out_of_range("ERROR in G16LOGtest::getHOMO(): Index out of range. Index greather than the number greater than the number of HOMO orbitals found in the log file. Number of orbital found: " + to_string(this->Occupied.size()) + ".");
     }
 
     else if (index == 0)
@@ -452,7 +458,7 @@ double G16LOGtest::getHOMO(int index)
         // subtract 1 from the index, the default one is zero then the index will be -1 [Highest occ molecular orbital], so if the user puts the -1, in C++ we'll look for the index -2 that will be the HOMO-1 orbital. Then return the value at that index in the temp vector
         index += -1;
         this->homoValue = stod(this->Occupied[this->Occupied.size() + index]);
-    }
+    };
     return this->homoValue;
 };
 
@@ -462,21 +468,20 @@ double G16LOGtest::getLUMO(int index)
     if (index < 0)
     {
         // If the index is negative, throw an exception
-        throw out_of_range("You've entered with a negative number. If you're looking for HOMO orbitals try to use: getHOMO(-n) function.");
+        throw out_of_range("ERROR in G16LOGtest::getLUMO(): Invalid index. Index can't be a negative number. If you're looking for HOMO orbitals try to use: getHOMO(-n) function.");
     }
 
     else if (index > this->Unoccupied.size() - 1)
     {
         // If the index is greater than the number of LUMO orbitals found in the log file, throw an exception
-        throw out_of_range("Index out of range. You've entered with a number greater than the number of HOMO orbitals found in the log file. Number of orbital found: " + to_string(this->Unoccupied.size()) + ".");
+        throw out_of_range("ERROR in G16LOGtest::getLUMO(): Index out of range.  Index greater than the number of HOMO orbitals found in the log file. Number of orbital found: " + to_string(this->Unoccupied.size()) + ".");
     }
 
     else
     {
         // If the index is valid, return the value at that index in the temp vector
         this->lumoValue = stod(this->Unoccupied[index]);
-    }
-
+    };
     return this->lumoValue;
 };
 
@@ -485,11 +490,11 @@ map<int, map<string, double>> G16LOGtest::getTransitions(int index)
 {
     if (index < 0)
     {
-        throw runtime_error("Do not exist Excited State lower than 1.");
+        throw runtime_error("ERROR in G16LOGtest::getTransitions(): Invalid index. Excited state indices start at 1.");
     }
     else if (index > this->transitions.size())
     {
-        throw runtime_error("You've entered with a number higher then the excited states found (" + to_string(this->transitions.size()) + ").");
+        throw runtime_error("ERROR in G16LOGtest::getTransitions(): Invalid index. The number of excited states found in the log file is " + to_string(this->transitions.size()) + ".");
     }
 
     else if (index == 0)
@@ -506,8 +511,8 @@ map<int, map<string, double>> G16LOGtest::getTransitions(int index)
             {"Oscillation_Strength", this->transitions[index]["Oscillation_Strength"]}};
         temp[index] = temp2;
         return temp;
-    }
-}
+    };
+};
 
 // Function to user get the Dipole Value
 double G16LOGtest::getDipole(string axis)
@@ -534,19 +539,23 @@ double G16LOGtest::getDipole(string axis)
 
     else
     {
-        throw runtime_error("Invalid axis. Please, use 'tot', 'x', 'y' or 'z'.");
-    }
+        throw runtime_error("ERROR in G16LOGtest::getDipole(): Invalid axis. Please, use 'tot', 'x', 'y' or 'z'.");
+    };
 };
 
 string G16LOGtest::toStr()
 {
     return "G16LOGFile: Calculation of " + this->str_filePath.substr(this->str_filePath.find_last_of("/") + 1) + " done in " + this->info + ", with the level of theory " + this->method + "/" + this->basisValue + " and " + "SCF energy of " + to_string(this->scfValue) + " Hartrees.";
-}
+};
 
 //!----------------------- Destructor -----------------------//
 
 G16LOGtest::~G16LOGtest()
 {
+    //clear int
+    this->charge = 0;
+    this->multiplicity = 0;
+
     // clear the size_t
     this->dipoleFinder = 0;
     this->scf = 0;
@@ -572,7 +581,6 @@ G16LOGtest::~G16LOGtest()
     this->dipoleX = 0;
     this->dipoleY = 0;
     this->dipoleZ = 0;
-    this->charge = 0;
 
     // clear the molecules
     // this->mol.clear();
@@ -583,6 +591,7 @@ G16LOGtest::~G16LOGtest()
     this->Occupied.clear();
     this->Unoccupied.clear();
     this->transitions.clear();
+    this->atomicCharge.clear();
 };
 
 //!----------------------- Notepad -----------------------//
@@ -592,15 +601,18 @@ G16LOGtest::~G16LOGtest()
 // TODO:getAlpha
 // TODO:getBeta
 // TODO:getGamma
-// TODO:getOscillatorForce
+// TODO:getGradient
+// TODO:getTransitions_str
+
+// IDK WHAT THIS BELOW IS
+
 // TODO:getWavelength
 // TODO:getOscillatorForces
 // TODO:getWavelengths
 // TODO:getSymmetries
 // TODO:getSymmetry
+// TODO:getOscillatorForce
 // TODO:getTransContributions
-// TODO:getGradient
-// TODO:getTransitions_str
 
 //! Done:
 

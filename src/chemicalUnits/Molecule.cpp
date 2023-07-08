@@ -608,8 +608,12 @@ string Molecule::toStr(){
     for (int i = 0; i < (int) s.size(); i++){
         result = result + s[i].first + "_{"  + to_string(s[i].second) + "}";
     };
+    result = result + ", with charge " + to_string(this->charge);
+    if (this->multiplicity != 0){
+        result = result + " and multiplicity " + to_string(this->multiplicity) ;
+    };
     if (this->chargePoint.size() != 0){
-        result = result + " with " + to_string(this->chargePoint.size()) + " charge points";
+        result = result + " and with " + to_string(this->chargePoint.size()) + " charge points";
     };
     return result;
 };
