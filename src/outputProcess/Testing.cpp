@@ -29,8 +29,13 @@ G16LOGtest::G16LOGtest(string filePath, bool polarAsw, bool tdAsw)
     setOrbitals();
 
     if (tdAsw)
-    {
+    {   
         setTransitions();
+    }
+
+    if (polarAsw)
+    {
+        cout << "Need to do!" << endl;
     };
 };
 
@@ -56,7 +61,7 @@ void G16LOGtest::readLOGFile()
         dipoleFinder = line.find("Tot=");
         tdFinder = line.find("Excited State ");
         chargeMultiFinder = line.find(" Charge =");
-        mullikenFinder = line.find("Mulliken charges:");
+        mullikenFinder = line.find("Mulliken charges:");        
         // If the line contains "Normal termination of Gaussian", set ntFound to true
         if (normalT != string::npos)
         {
@@ -88,17 +93,17 @@ void G16LOGtest::readLOGFile()
         // Getting mulliken charges
         if (mullikenFinder != string::npos)
         {   
-            int temp = 0;
             while (getline(log_file, line)) // while only this->mol.size()
             {   
                 //if  Sum of Mulliken charges =, break;
-                if (line.find(" Sum of Mulliken charges =") != string::npos)
+                if (line.find("Sum of Mulliken charges =") != string::npos)
                 {
                     break;
                 };
-                mullikenStorage.emplace_back(line);
-                temp++;
+                mullikenSTR += line + "\n";                
             };
+            mullikenStorage.emplace_back(mullikenSTR);
+            mullikenSTR = "";
         };
         // Getting the charge and multiplicity
         if (chargeMultiFinder != string::npos)
@@ -188,6 +193,7 @@ void G16LOGtest::readLOGFile()
             };
         };
     };
+
     // Close the file
     log_file.close();
     // If stdFound is true, set the molecule string to the last geometry in stdStorage, as default molecule geometry is always be standard orientation if it is available
@@ -211,12 +217,19 @@ void G16LOGtest::readLOGFile()
 
 void G16LOGtest::setAtomicCharge()
 {   
-    this->mullikenStorage.erase(this->mullikenStorage.begin());    
-    for (auto &line : this->mullikenStorage)
-    {
-        istringstream iss(line);
-        vector<string> results((istream_iterator<string>(iss)), istream_iterator<string>());
-        this->atomicCharge.emplace_back(stod(results[2]));
+    string temp = this->mullikenStorage.back();
+    temp = temp.substr(temp.find("\n") + 1);
+
+    if (!this->mullikenStorage.empty() && this->mullikenStorage.back().size() > 0)
+    {     
+        stringstream ss(temp);
+        string line;
+        while (getline(ss, line))
+        {   
+            istringstream iss(line);
+            vector<string> results((istream_iterator<string>(iss)), istream_iterator<string>());
+            this->atomicCharge.emplace_back(stod(results[2]));
+        };
     };
 };
 
@@ -230,7 +243,14 @@ void G16LOGtest::setMolecule()
     {   
         istringstream iss(line);
         vector<string> results((istream_iterator<string>(iss)), istream_iterator<string>());
-        this->mol.addAtom(stoi(results[1]), stod(results[3]), stod(results[4]), stod(results[5]), this->atomicCharge[i]); 
+        if (this->atomicCharge.size() == 0)
+        {
+            this->mol.addAtom(stoi(results[1]), stod(results[3]), stod(results[4]), stod(results[5]));
+        }
+        else
+        {
+            this->mol.addAtom(stoi(results[1]), stod(results[3]), stod(results[4]), stod(results[5]), this->atomicCharge[i]); 
+        };    
         i++;
     };
     //this->mol.setCharge(this->charge);
@@ -359,17 +379,20 @@ void G16LOGtest::setTransitions()
 // Function to set the dipole moment of the calculation
 void G16LOGtest::setDipole()
 {   
-    stringstream ss(this->dipoleStorage.back());
-    string line;
-    while (getline(ss, line))
+    if (this->dipoleStorage.size() > 0)
     {
-        istringstream iss(line);
-        vector<string> results((istream_iterator<string>(iss)), istream_iterator<string>());
-        // extract the dipole moment components and convert them to the correct type
-        this->dipoleX = stod(results[1]);
-        this->dipoleY = stod(results[3]);
-        this->dipoleZ = stod(results[5]);
-        this->dipoleTot = stod(results[7]);
+        stringstream ss(this->dipoleStorage.back());
+        string line;
+        while (getline(ss, line))
+        {
+            istringstream iss(line);
+            vector<string> results((istream_iterator<string>(iss)), istream_iterator<string>());
+            // extract the dipole moment components and convert them to the correct type
+            this->dipoleX = stod(results[1]);
+            this->dipoleY = stod(results[3]);
+            this->dipoleZ = stod(results[5]);
+            this->dipoleTot = stod(results[7]);
+        };
     };
 };
 
@@ -499,6 +522,11 @@ map<int, map<string, double>> G16LOGtest::getTransitions(int index)
 
     else if (index == 0)
     {
+        if (this->tdAsw && this->transitions.size() == 0)
+        {
+            throw runtime_error("ERROR in G16LOGtest::getTransitions(): No transitions found in the log file.");
+        };
+
         return this->transitions;
     }
     else
@@ -509,15 +537,26 @@ map<int, map<string, double>> G16LOGtest::getTransitions(int index)
             {"Energy", this->transitions[index]["Energy"]},
             {"Wavelength", this->transitions[index]["Wavelength"]},
             {"Oscillation_Strength", this->transitions[index]["Oscillation_Strength"]}};
-        temp[index] = temp2;
+        temp[index] = temp2;    
+
+        if (this->tdAsw && temp.size() == 0)
+        {
+            throw runtime_error("ERROR in G16LOGtest::getTransitions(): No transitions found in the log file.");
+        };
+
         return temp;
     };
 };
 
 // Function to user get the Dipole Value
 double G16LOGtest::getDipole(string axis)
-{
-    if (axis == "tot")
+{   
+    if (this->dipoleStorage.size() == 0)
+    {
+        throw runtime_error("ERROR in G16LOGtest::getDipole(): No dipole found in the log file.");
+    }    
+
+    else if (axis == "tot")
     {
         return this->dipoleTot;
     }
@@ -592,6 +631,7 @@ G16LOGtest::~G16LOGtest()
     this->Unoccupied.clear();
     this->transitions.clear();
     this->atomicCharge.clear();
+    this->mullikenStorage.clear();
 };
 
 //!----------------------- Notepad -----------------------//
@@ -631,3 +671,9 @@ G16LOGtest::~G16LOGtest()
 //? getOrbitals
 //? getHOMO() -> getHOMO(-n)
 //? getLUMO -> getLUMO(+n)
+
+
+//! BUGS:
+
+// Wrong HOMO for NLO calculations; Need to make a storage like Molecule
+// For mulliken charges iden;

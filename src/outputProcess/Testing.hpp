@@ -61,6 +61,7 @@ private:
     string info;
     string method;
     string moleculeSTR = "";
+    string mullikenSTR = "";
     string str_filePath;
     vector <string> iptStorage;
     vector <string> stdStorage;
@@ -69,6 +70,11 @@ private:
     vector <string> dipoleStorage;
     vector <string> tdStorage;
     vector <string> mullikenStorage;
+
+    vector<string> elstDipoleStorage;
+    vector<string> alphaStorage;
+    vector<string> betaStorage;
+    vector<string> gammaStorage;
 
     //* double
     double scfValue;
@@ -111,6 +117,7 @@ private:
     void setTransitions();
     void setDipole();
     void splitter();
+    void setNLO();
 
 public:
     G16LOGtest(string filePath, bool polarAsw = 0, bool tdAsw = 0);   
