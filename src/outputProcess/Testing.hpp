@@ -69,7 +69,6 @@ private:
     vector <string> lumoStorage;
     vector <string> dipoleStorage;
     vector <string> tdStorage;
-    vector <string> mullikenStorage;
 
     vector<string> elstDipoleStorage;
     vector<string> alphaStorage;
@@ -101,7 +100,6 @@ private:
     map<string, vector<string>> Orbitals;
     map<int, map<string, double>> transitions;
 
-    vector<double> atomicCharge;
     vector<string> Occupied;
     vector<string> Unoccupied;
 
@@ -109,7 +107,6 @@ private:
 
     //* set functions
     void readLOGFile();
-    void setAtomicCharge();
     void setMolecule();
     void setOrbitals();
     void setHOMO();

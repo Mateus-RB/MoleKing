@@ -126,8 +126,8 @@ PYBIND11_MODULE(MoleKing, m) {
         .def("translation", &Molecule::translation)
         .def("moveMassCenter", &Molecule::moveMassCenter, py::arg("x")=0, py::arg("y")=0, py::arg("z")=0)
         .def("moveTail", &Molecule::moveTail, py::arg("atomNumber"), py::arg("x")=0, py::arg("y")=0, py::arg("z")=0)
-        .def("stdOrientation", &Molecule::standardOrientation)
-        .def("TesteTensor", &Molecule::TesteTensor)
+        //.def("stdOrientation", &Molecule::standardOrientation)
+        .def("stdOrientation", &Molecule::stdOrientation)
         .def("bondLength", &Molecule::bondLength)
         .def("valenceAngle", &Molecule::valenceAngle)
         .def("torsion", &Molecule::torsion)
@@ -136,6 +136,8 @@ PYBIND11_MODULE(MoleKing, m) {
         .def("getIRCAngles", &Molecule::getIRCAngles)
         .def("getIRCDihedrals", &Molecule::getIRCDihedrals)
         .def("removeElement", &Molecule::removeElement)
+        .def("toXYZ", &Molecule::toXYZ, py::arg("fileName") = "MK_Molecule.xyz")
+        .def("toGJF", &Molecule::toGJF, py::arg("fileName") = "MK_Molecule.gjf", py::arg("method") = "B3LYP", py::arg("basis") = "6-311g(d)", py::arg("addKeywords") = "", py::arg("charge") = 0, py::arg("multiplicity") = 1)
         .def("getMM", &Molecule::getMolecularMass);
     
     py::class_<SupraMolecule>(m, "SupraMolecule", "This class creates a set of molecules variable type allowing for the usage in python like a primitive type.")
@@ -169,6 +171,7 @@ PYBIND11_MODULE(MoleKing, m) {
         .def("__eq__", &SupraMolecule::operator==)
         .def("__ne__", &SupraMolecule::operator!=)
         .def("getSupraMM", &SupraMolecule::getSupraMolecularMass);;
+    
     py::class_<Point>(m, "Point", "This class creates a point variable type allowing for the usage in python like a primitive type.")
         .def(py::init())
         .def(py::init<double, double, double, char>(), py::arg("coord1"), py::arg("coord2"), py::arg("coord3"), py::arg("typeCoord") = 'c')

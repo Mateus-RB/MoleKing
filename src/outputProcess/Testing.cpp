@@ -21,7 +21,6 @@ G16LOGtest::G16LOGtest(string filePath, bool polarAsw, bool tdAsw)
 {
     // SET FUNCTIONS
     readLOGFile();
-    setAtomicCharge();
     setMolecule();
     setDipole();
     setHOMO();
@@ -42,7 +41,6 @@ G16LOGtest::G16LOGtest(string filePath, bool polarAsw, bool tdAsw)
 //!----------------------- Set Functions -----------------------//
 
 // Function to read file and extract the information
-
 void G16LOGtest::readLOGFile()
 {
     // Open the file at the given file path
@@ -60,8 +58,7 @@ void G16LOGtest::readLOGFile()
         lumoFinder = line.find(" Alpha virt. eigenvalues --");
         dipoleFinder = line.find("Tot=");
         tdFinder = line.find("Excited State ");
-        chargeMultiFinder = line.find(" Charge =");
-        mullikenFinder = line.find("Mulliken charges:");        
+        chargeMultiFinder = line.find(" Charge =");       
         // If the line contains "Normal termination of Gaussian", set ntFound to true
         if (normalT != string::npos)
         {
@@ -89,21 +86,6 @@ void G16LOGtest::readLOGFile()
 
             this->scfValue = stod(value.substr(starterSCF + 3, endSCF - starterSCF - 3));
             this->method = value.substr(starterMethod + 3, starterSCF - starterMethod - 5);
-        };
-        // Getting mulliken charges
-        if (mullikenFinder != string::npos)
-        {   
-            while (getline(log_file, line)) // while only this->mol.size()
-            {   
-                //if  Sum of Mulliken charges =, break;
-                if (line.find("Sum of Mulliken charges =") != string::npos)
-                {
-                    break;
-                };
-                mullikenSTR += line + "\n";                
-            };
-            mullikenStorage.emplace_back(mullikenSTR);
-            mullikenSTR = "";
         };
         // Getting the charge and multiplicity
         if (chargeMultiFinder != string::npos)
@@ -215,24 +197,6 @@ void G16LOGtest::readLOGFile()
     };
 };
 
-void G16LOGtest::setAtomicCharge()
-{   
-    string temp = this->mullikenStorage.back();
-    temp = temp.substr(temp.find("\n") + 1);
-
-    if (!this->mullikenStorage.empty() && this->mullikenStorage.back().size() > 0)
-    {     
-        stringstream ss(temp);
-        string line;
-        while (getline(ss, line))
-        {   
-            istringstream iss(line);
-            vector<string> results((istream_iterator<string>(iss)), istream_iterator<string>());
-            this->atomicCharge.emplace_back(stod(results[2]));
-        };
-    };
-};
-
 // Function to set the molecule object using the extracted geometry
 void G16LOGtest::setMolecule()
 {   
@@ -243,17 +207,10 @@ void G16LOGtest::setMolecule()
     {   
         istringstream iss(line);
         vector<string> results((istream_iterator<string>(iss)), istream_iterator<string>());
-        if (this->atomicCharge.size() == 0)
-        {
-            this->mol.addAtom(stoi(results[1]), stod(results[3]), stod(results[4]), stod(results[5]));
-        }
-        else
-        {
-            this->mol.addAtom(stoi(results[1]), stod(results[3]), stod(results[4]), stod(results[5]), this->atomicCharge[i]); 
-        };    
+        this->mol.addAtom(stoi(results[1]), stod(results[3]), stod(results[4]), stod(results[5]));  
         i++;
     };
-    //this->mol.setCharge(this->charge);
+    this->mol.setCharge(this->charge);
     this->mol.setMultiplicity(this->multiplicity);
     // If the molecule object has no atoms, throw an error
     if (this->mol.getSize() == 0)
@@ -296,7 +253,6 @@ void G16LOGtest::setHOMO()
             };
         };
     };
-    // this->Orbitals["Occupied"] = temp;
     this->Occupied = temp;
 };
 
@@ -444,7 +400,7 @@ Molecule G16LOGtest::getMolecule()
         {
             temp = temp.substr(temp.find_last_of("/") + 1);
         };
-        cerr << "WARNING in G16LOGtest::getMolecule(): The geometry of " << temp << " was not taken from the standard orientation." << endl;
+        //cerr << "WARNING in G16LOGtest::getMolecule(): The geometry of " << temp << " was not taken from the standard orientation." << endl;
     };
     return this->mol;
 };
@@ -630,8 +586,6 @@ G16LOGtest::~G16LOGtest()
     this->Occupied.clear();
     this->Unoccupied.clear();
     this->transitions.clear();
-    this->atomicCharge.clear();
-    this->mullikenStorage.clear();
 };
 
 //!----------------------- Notepad -----------------------//
@@ -644,7 +598,7 @@ G16LOGtest::~G16LOGtest()
 // TODO:getGradient
 // TODO:getTransitions_str
 
-// IDK WHAT THIS BELOW IS
+// IDK WHAT IS THIS BELOW
 
 // TODO:getWavelength
 // TODO:getOscillatorForces
@@ -675,5 +629,4 @@ G16LOGtest::~G16LOGtest()
 
 //! BUGS:
 
-// Wrong HOMO for NLO calculations; Need to make a storage like Molecule
-// For mulliken charges iden;
+// Wrong HOMO for NLO calculations; Need to make a storage like Molecule;
