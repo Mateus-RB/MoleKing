@@ -42,7 +42,6 @@ PYBIND11_MODULE(MoleKing, m) {
         .def("getSymbol", &PeriodicTable::getSymbol)
         .def("getCovalentRadii", &PeriodicTable::getCovalentRadii);
     
-    
     py::class_<Atom>(m, "Atom", "This class creates a atom variable type allowing for the usage in python like a primitive type.")
         .def(py::init<int, double, double, double, double, bool>(), py::arg("atomicNumber"), py::arg("xPos"), py::arg("yPos"), py::arg("zPos"), py::arg("atomicCharge") = 0.0, py::arg("freezeCode_") = 0)
         .def(py::init<string, double, double, double, double, bool>(), py::arg("atomicSymbol"), py::arg("xPos"), py::arg("yPos"), py::arg("zPos"), py::arg("atomicCharge") = 0.0, py::arg("freezeCode_") = 0)
@@ -116,6 +115,7 @@ PYBIND11_MODULE(MoleKing, m) {
         .def("getVDWRatio", &Molecule::getVDWRatio)
         .def("getMultiplicity", &Molecule::getMultiplicity)
         .def("copy", &Molecule::copy)
+        .def("clear", &Molecule::clear)
         .def("normChargePoints", &Molecule::normalizeCPs)
         .def("getMolecule", &Molecule::getMolecule)
         .def("getChargePoints", &Molecule::getChargePoints)
@@ -125,8 +125,8 @@ PYBIND11_MODULE(MoleKing, m) {
         .def("translation", &Molecule::translation)
         .def("moveMassCenter", &Molecule::moveMassCenter, py::arg("x")=0, py::arg("y")=0, py::arg("z")=0)
         .def("moveTail", &Molecule::moveTail, py::arg("atomNumber"), py::arg("x")=0, py::arg("y")=0, py::arg("z")=0)
-        .def("stdOrientation", &Molecule::standardOrientation)
-        .def("TesteTensor", &Molecule::TesteTensor)
+        //.def("stdOrientation", &Molecule::standardOrientation)
+        .def("stdOrientation", &Molecule::stdOrientation)
         .def("bondLength", &Molecule::bondLength)
         .def("valenceAngle", &Molecule::valenceAngle)
         .def("torsion", &Molecule::torsion)
@@ -135,6 +135,8 @@ PYBIND11_MODULE(MoleKing, m) {
         .def("getIRCAngles", &Molecule::getIRCAngles)
         .def("getIRCDihedrals", &Molecule::getIRCDihedrals)
         .def("removeElement", &Molecule::removeElement)
+        .def("toXYZ", &Molecule::toXYZ, py::arg("fileName") = "MK_Molecule.xyz")
+        .def("toGJF", &Molecule::toGJF, py::arg("fileName") = "MK_Molecule.gjf", py::arg("method") = "B3LYP", py::arg("basis") = "6-311g(d)", py::arg("addKeywords") = "", py::arg("endKeywords") = "", py::arg("charge") = 0, py::arg("multiplicity") = 1)
         .def("getMM", &Molecule::getMolecularMass);
     
     py::class_<SupraMolecule>(m, "SupraMolecule", "This class creates a set of molecules variable type allowing for the usage in python like a primitive type.")
@@ -168,6 +170,7 @@ PYBIND11_MODULE(MoleKing, m) {
         .def("__eq__", &SupraMolecule::operator==)
         .def("__ne__", &SupraMolecule::operator!=)
         .def("getSupraMM", &SupraMolecule::getSupraMolecularMass);;
+    
     py::class_<Point>(m, "Point", "This class creates a point variable type allowing for the usage in python like a primitive type.")
         .def(py::init())
         .def(py::init<double, double, double, char>(), py::arg("coord1"), py::arg("coord2"), py::arg("coord3"), py::arg("typeCoord") = 'c')
@@ -216,27 +219,18 @@ PYBIND11_MODULE(MoleKing, m) {
         .def("elem", &Matrix::element)
         .def("show", &Matrix::print)
         .def("__str__", &Matrix::toStr);
-    py::class_<G16LOGfile>(m, "G16LOGfile", "This class extract significant properties from Gaussian 16 .log or .out output files.")
-        .def(py::init< string, bool>(), py::arg("filePath"), py::arg("polarAsw") = 0)
-        .def("scfEnergy", &G16LOGfile::scfEnergy)
+
+    py::class_<G16LOGfile>(m, "G16LOGfile", "This class is experimental and under development.")
+        .def(py::init< string, bool, bool>(), py::arg("filePath"), py::arg("polarAsw") = 0, py::arg("tdAsw") = 0)
+        .def("getDate", &G16LOGfile::getDate)
+        .def("getEnergy", &G16LOGfile::getEnergy)
+        .def("getBasis", &G16LOGfile::getBasis)
+        .def("getMethod", &G16LOGfile::getMethod)
         .def("getMolecule", &G16LOGfile::getMolecule)
-        .def("getDipole", (double (G16LOGfile::*)(string)) &G16LOGfile::getDipole)
-        .def("getAlpha", (double (G16LOGfile::*)(string, string)) &G16LOGfile::getAlpha)
-        .def("getBeta", (double (G16LOGfile::*)(string, string)) &G16LOGfile::getBeta)
-        .def("getGamma", (double (G16LOGfile::*)(string, string)) &G16LOGfile::getGamma)
-        .def("getOscillatorForce", (double (G16LOGfile::*)(int)) &G16LOGfile::getOscillatorForce)
-        .def("getWavelength", (double (G16LOGfile::*)(int)) &G16LOGfile::getWavelength)
-        .def("getOscillatorForces", (vector <double> (G16LOGfile::*)()) &G16LOGfile::getOscillatorForces)
-        .def("getWavelengths", (vector <double> (G16LOGfile::*)()) &G16LOGfile::getWavelengths)
-        .def("getSymmetries", (vector <string> (G16LOGfile::*)()) &G16LOGfile::getSymmetries)
-        .def("getSymmetry", (string (G16LOGfile::*)(int)) &G16LOGfile::getSymmetry)
-        .def("getTransitions", &G16LOGfile::getTransitions)
-        .def("getTransitionsStr", &G16LOGfile::getTransitionsStr)
-        .def("getTransContributions", &G16LOGfile::getTransContributions)
-        .def("getGradient", &G16LOGfile::getGradient)
-        .def("__str__", &G16LOGfile::toStr);
-    py::class_<G16FCHKfile>(m, "G16FCHKfile", "This class extract significant properties from Gaussian 16 .fchk output file.")
-        .def(py::init< string>(), py::arg("filePath"))
-        .def("getCartesianGradient", (Matrix (G16FCHKfile::*)()) &G16FCHKfile::getCartesianGradient)
-        .def("getMolecule", &G16FCHKfile::getMolecule);
+        .def("getOrbitals", &G16LOGfile::getOrbitals)
+        .def("getTransitions", &G16LOGfile::getTransitions, py::arg("index") = 0)
+        .def("getDipole", &G16LOGfile::getDipole, py::arg("axis") = "tot")
+        .def("getHOMO", &G16LOGfile::getHOMO, py::arg("index") = 0)
+        .def("getLUMO", &G16LOGfile::getLUMO, py::arg("index") = 0)
+        .def("__str__", &G16LOGfile::toStr);    
 };

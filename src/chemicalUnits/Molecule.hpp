@@ -18,6 +18,8 @@
 
 #include <stdio.h>
 #include <string>
+#include <fstream>
+#include <iomanip>
 #include "../myMath/MassCenter.hpp"
 #include "AtomicScale.hpp"
 #include "OPLSff.hpp"
@@ -59,8 +61,9 @@ public:
 
 
     Eigen::Matrix<double, 3, 3> moleculeTensor();
-    void TesteTensor();
-
+    void stdOrientation();
+    void toXYZ(string fileName = "MK_Molecule.xyz");
+    void toGJF(string fileName = "MK_Molecule.gjf", string method = "B3LYP", string basis = "6-311g(d)", string addKeywords = "", string endKeywords = "", int charge = 0, int multiplicity = 1);
     void addChargePoints(double xPos, double yPos, double zPos, double charge);
     void addChargePoints(ChargePoint cp);
     void addAtom(string atomSymbol, double xPos, double yPos, double zPos, double atomicCharge = 0.0, bool freezeCode_ = 0);
@@ -108,6 +111,7 @@ public:
     void removeElement(string element);
     Molecule copy();
     double getMolecularMass();
+    void clear();
     //void doOPLS();
 };
 
