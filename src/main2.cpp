@@ -27,7 +27,7 @@
 #include "chemicalUnits/OPLSff.hpp"
 #include "myMath/Vectors.hpp"
 #include "outputProcess/G16Process.hpp"
-#include "outputProcess/Testing.hpp"
+
 using namespace std;
 
 int main(int argc, char* argv[]){
