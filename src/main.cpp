@@ -27,7 +27,6 @@
 #include "chemicalUnits/OPLSff.hpp"
 #include "myMath/Vectors.hpp"
 #include "outputProcess/G16Process.hpp"
-#include "outputProcess/Testing.hpp"
 using namespace std;
 
 #include <pybind11/pybind11.h>
@@ -221,45 +220,17 @@ PYBIND11_MODULE(MoleKing, m) {
         .def("show", &Matrix::print)
         .def("__str__", &Matrix::toStr);
 
-    //! ################## INSTABLE: UNDER DEVELOPMENT ##################
-
-    py::class_<G16LOGtest>(m, "G16LOGtest", "This class is experimental and under development.")
+    py::class_<G16LOGfile>(m, "G16LOGfile", "This class is experimental and under development.")
         .def(py::init< string, bool, bool>(), py::arg("filePath"), py::arg("polarAsw") = 0, py::arg("tdAsw") = 0)
-        .def("getDate", &G16LOGtest::getDate)
-        .def("getEnergy", &G16LOGtest::getEnergy)
-        .def("getBasis", &G16LOGtest::getBasis)
-        .def("getMethod", &G16LOGtest::getMethod)
-        .def("getMolecule", &G16LOGtest::getMolecule)
-        .def("getOrbitals", &G16LOGtest::getOrbitals)
-        .def("getTransitions", &G16LOGtest::getTransitions, py::arg("index") = 0)
-        .def("getDipole", &G16LOGtest::getDipole, py::arg("axis") = "tot")
-        .def("getHOMO", &G16LOGtest::getHOMO, py::arg("index") = 0)
-        .def("getLUMO", &G16LOGtest::getLUMO, py::arg("index") = 0)
-        .def("__str__", &G16LOGtest::toStr);
-
-    //! ################## INSTABLE: UNDER DEVELOPMENT ##################
-
-    py::class_<G16LOGfile>(m, "G16LOGfile", "This class extract significant properties from Gaussian 16 .log or .out output files.")
-        .def(py::init< string, bool>(), py::arg("filePath"), py::arg("polarAsw") = 0)
-        .def("scfEnergy", &G16LOGfile::scfEnergy)
+        .def("getDate", &G16LOGfile::getDate)
+        .def("getEnergy", &G16LOGfile::getEnergy)
+        .def("getBasis", &G16LOGfile::getBasis)
+        .def("getMethod", &G16LOGfile::getMethod)
         .def("getMolecule", &G16LOGfile::getMolecule)
-        .def("getDipole", (double (G16LOGfile::*)(string)) &G16LOGfile::getDipole)
-        .def("getAlpha", (double (G16LOGfile::*)(string, string)) &G16LOGfile::getAlpha)
-        .def("getBeta", (double (G16LOGfile::*)(string, string)) &G16LOGfile::getBeta)
-        .def("getGamma", (double (G16LOGfile::*)(string, string)) &G16LOGfile::getGamma)
-        .def("getOscillatorForce", (double (G16LOGfile::*)(int)) &G16LOGfile::getOscillatorForce)
-        .def("getWavelength", (double (G16LOGfile::*)(int)) &G16LOGfile::getWavelength)
-        .def("getOscillatorForces", (vector <double> (G16LOGfile::*)()) &G16LOGfile::getOscillatorForces)
-        .def("getWavelengths", (vector <double> (G16LOGfile::*)()) &G16LOGfile::getWavelengths)
-        .def("getSymmetries", (vector <string> (G16LOGfile::*)()) &G16LOGfile::getSymmetries)
-        .def("getSymmetry", (string (G16LOGfile::*)(int)) &G16LOGfile::getSymmetry)
-        .def("getTransitions", &G16LOGfile::getTransitions)
-        .def("getTransitionsStr", &G16LOGfile::getTransitionsStr)
-        .def("getTransContributions", &G16LOGfile::getTransContributions)
-        .def("getGradient", &G16LOGfile::getGradient)
-        .def("__str__", &G16LOGfile::toStr);
-    py::class_<G16FCHKfile>(m, "G16FCHKfile", "This class extract significant properties from Gaussian 16 .fchk output file.")
-        .def(py::init< string>(), py::arg("filePath"))
-        .def("getCartesianGradient", (Matrix (G16FCHKfile::*)()) &G16FCHKfile::getCartesianGradient)
-        .def("getMolecule", &G16FCHKfile::getMolecule);
+        .def("getOrbitals", &G16LOGfile::getOrbitals)
+        .def("getTransitions", &G16LOGfile::getTransitions, py::arg("index") = 0)
+        .def("getDipole", &G16LOGfile::getDipole, py::arg("axis") = "tot")
+        .def("getHOMO", &G16LOGfile::getHOMO, py::arg("index") = 0)
+        .def("getLUMO", &G16LOGfile::getLUMO, py::arg("index") = 0)
+        .def("__str__", &G16LOGfile::toStr);    
 };

@@ -574,6 +574,9 @@ void Molecule::toGJF(string fileName, string method, string basis, string addKey
         if (endKeywords != ""){
             file << endl << " " << endKeywords << endl << endl;
         }
+        else {
+            file << endl;
+        }
         for (int i = 0; i < static_cast<int>(this->chargePoint.size()); i++){
             file << " " <<fixed << setw(12) << this->chargePoint[i].getX()
                  << " " <<fixed << setw(12) << this->chargePoint[i].getY()
@@ -586,8 +589,7 @@ void Molecule::toGJF(string fileName, string method, string basis, string addKey
         file << endl << " " << endKeywords << endl;
     }
 
-    file << endl;
-    
+    file << endl;    
     file.close();
 }
 

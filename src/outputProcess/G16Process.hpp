@@ -1,6 +1,6 @@
 //   MoleKing //
 //
-//   File:        [G16Process.hpp]
+//   File:        [G16LOGfile.hpp]
 //
 //   Author(s):   ['LEEDMOL Reserch Group']
 //   Site(s):     ['https://www.researchgate.net/lab/LEEDMOL-Heibbe-Cristhians-Research-Group-Heibbe-Cristhian-B-De-Oliveira']
@@ -27,123 +27,107 @@
 #include <map>
 
 using namespace std;
-#endif /* G16Process_hpp */
-
-class ExcStates{
-private:
-    int statesNumber;
-    vector<double> wlValues;
-    vector <double> energies;
-    vector <double> oscillator;
-    vector <string> symmetries;
-    vector <vector <pair < pair <int, int>, double > > > transitions;
-    
-public:
-    ExcStates(int statesNumber);
-    ExcStates();
-    
-    void setWavelength(int state, double value);
-    void setEnergy(int state, double value);
-    void setOscillatorForce(int state, double value);
-    void setTransitions(int state, vector <pair < pair <int, int>, double > > values);
-    void setSymmetry(int state, string value);
-    
-    int getstatesNumber();
-    string getSymmetry(int state);
-    double getWavelength(int state);
-    double getEnergy(int state);
-    double getOscillatorForce(int state);
-    vector <pair < pair <int, int>, double > > getTransition(int state);
-    vector < pair <string, double> > getTransContribution(int state);
-};
-
-class PolarValues{
-private:
-    vector<string> dName;
-    vector< pair <string, vector<string> > > aName, bName, gName;
-    vector<double> dValue;
-    vector< pair <string, vector<double> > > aValue, bValue, gValue;
-    
-public:
-    PolarValues();
-    
-    void setDipole(string name, double value);
-    void setAlpha(string eleName, string name, double value);
-    void setBeta(string eleName, string name, double value);
-    void setGamma(string eleName, string name, double value);
-    
-    double getDipole(string name);
-    double getAlpha(string eleName, string name);
-    double getBeta(string eleName, string name);
-    double getGamma(string eleName, string name);
-    
-};
-
-class GradientValues{
-private:
-    Matrix cartesianGradient;
-public:
-    GradientValues(); 
-
-    void setGradient(Matrix gradient);
-    Matrix getGradient();
-};
+#endif /* Testing_hpp */
 
 class G16LOGfile{
 private:
-    double energy;
-    string filePath, fileType, levelTheory, basis, date;
-    int size;
-    bool polarAsw, optAsw, stateAsw, calcDone, not_stop, chelpg;
-    vector<double> occOrb, virtOrb;
-    Molecule molecule;
-    PolarValues polarValues;
-    GradientValues gradientValues;
-    void makePolar(vector <string> fileLines);
-    void makeStates(vector <string> fileLines);
-    void molConstructor(vector <string> fileLines);
-    void makeGradient(vector <string> fileLines);
-    int statesNum(vector <string> fileLines);
-    ExcStates exSates;
-    vector <string>  getTransition(int state);
-    
+
+    //* int
+
+    int charge;
+    int multiplicity;
+
+    //* size_t
+    size_t dipoleFinder;
+    size_t mullikenFinder;
+    size_t homoFinder;
+    size_t lumoFinder;
+    size_t tdFinder;
+    size_t scf;
+    size_t scfC;
+    size_t normalT;   
+    size_t stdT; 
+    size_t starterSCF;
+    size_t endSCF;
+    size_t starterMethod;  
+    size_t basis; 
+    size_t chargeMultiFinder;
+
+    //* string
+    string basisValue;    
+    string line;
+    string value;
+    string moleculeRange;
+    string info;
+    string method;
+    string moleculeSTR = "";
+    string mullikenSTR = "";
+    string str_filePath;
+    vector <string> iptStorage;
+    vector <string> stdStorage;
+    vector <string> homoStorage;
+    vector <string> lumoStorage;
+    vector <string> dipoleStorage;
+    vector <string> tdStorage;
+
+    vector<string> elstDipoleStorage;
+    vector<string> alphaStorage;
+    vector<string> betaStorage;
+    vector<string> gammaStorage;
+
+    //* double
+    double scfValue;
+    double homoValue;
+    double lumoValue;
+    double dipoleTot;
+    double dipoleX;
+    double dipoleY;
+    double dipoleZ;   
+
+    //* molecule
+    Molecule mol;
+
+    //* bool
+
+    bool ntFound;
+    bool stdFound;
+    bool scfConvergence;
+    bool polarAsw;
+    bool tdAsw;
+
+    //* map and vectors
+
+    map<string, vector<string>> Orbitals;
+    map<int, map<string, double>> transitions;
+
+    vector<string> Occupied;
+    vector<string> Unoccupied;
+
+    //* teste
+
+    //* set functions
+    void readLOGFile();
+    void setMolecule();
+    void setOrbitals();
+    void setHOMO();
+    void setLUMO();
+    void setTransitions();
+    void setDipole();
+    void splitter();
+    void setNLO();
+
 public:
-    G16LOGfile(string filePath, bool polarAsw = 0);
-    double scfEnergy();
-    Molecule getMolecule();
-    double getDipole(string name);
-    double getAlpha(string eleName, string name);
-    double getBeta(string eleName, string name);
-    double getGamma(string eleName, string name);
+    G16LOGfile(string filePath, bool polarAsw = 0, bool tdAsw = 0);   
+    ~G16LOGfile();      
+    map<string, vector<string>> getOrbitals(); 
+    map<int, map<string, double>> getTransitions(const int index = 0);
+    double getEnergy();
+    double getHOMO(int index = -1);
+    double getLUMO(int index = 0);    
+    double getDipole(string axis = "tot");
+    string getDate();    
+    string getBasis();
+    string getMethod();
     string toStr();
-    double getOscillatorForce(int state);
-    double getWavelength(int state);
-    string getSymmetry(int state);
-    vector <double> getOscillatorForces();
-    vector <double> getWavelengths();
-    vector <string> getSymmetries();
-    vector <vector <string> > getTransitions();
-    vector <string> getTransitionsStr();
-    vector <vector <string>> getTransContributions();
-    Matrix getGradient();
+    Molecule getMolecule();  
 };
-
-class G16FCHKfile{
-private:
-    double energy;
-    string filePath, fileType, levelTheory, basis, date;
-    int size, electronNumber;
-    bool  optAsw, calcDone;
-    Matrix cartesianGradient, quadrupoleMoment;
-    vector<double> occOrb, virtOrb;
-    GradientValues gradientValues;
-    Molecule molecule;
-    void molConstructor(vector <string> fileLines);
-    void makeGradient(vector <string> fileLines);
-
-public:
-    G16FCHKfile(string filePath);
-    Molecule getMolecule();
-    Matrix getCartesianGradient();
-};
-
