@@ -18,11 +18,13 @@
 //!----------------------- Psi4OUTfile -----------------------//
 
 Psi4OUTfile::Psi4OUTfile(string filePath)
-    : ntFound(false), stdFound(false), scfConvergence(true),str_filePath(filePath)
+    : str_filePath(filePath)
 {
     // SET FUNCTIONS
     readOUTFile();
-    setMolecule();
+    setCharge();
+    setMul();
+    //setMolecule();
 };
 
 //!----------------------- Set Functions -----------------------//
@@ -37,80 +39,24 @@ void Psi4OUTfile::readOUTFile()
     {
         // Check if the line contains certain keywords
         geo = line.find("==> Geometry <==");
-        chargeMultiFinder = line.find(" Charge =");       
+        chargeFinder = line.find("Charge       =");
+        multiFinder = line.find("Multiplicity =");      
         // Getting the charge and multiplicity
-        if (chargeMultiFinder != string::npos)
+        if (chargeFinder != string::npos)
         {   
-            this->charge = stoi((line.substr(chargeMultiFinder + 11, 1)));
-            this->multiplicity = stoi((line.substr(chargeMultiFinder + 28, 1)));
+            this->chargeStorage.emplace_back(line);
         };
-        // If the line contains "Standard basis:", extract the basis set used
-        if (basis != string::npos)
-        {
-            this->basisValue = line.substr(basis + 16);
-        };
-        // If the line contains "Input orientation:", extract the molecule's geometry in Input Orientation
-        if (line.find("Input orientation:") != string::npos)
-        {
-            while (getline(log_file, line))
-            {
-                if (line.find("Distance matrix (angstroms):") != string::npos)
-                {
-                    break;
-                };
-                moleculeSTR += line + "\n";
-            };
-            for (int i = 0; i < 4; i++)
-            {
-                moleculeSTR = moleculeSTR.substr(moleculeSTR.find("\n") + 1);
-            };
-            moleculeSTR = moleculeSTR.substr(0, moleculeSTR.rfind("---------------------------------------------------------------------\n"));
-            moleculeSTR = moleculeSTR.substr(0, moleculeSTR.rfind("\n"));
-            iptStorage.emplace_back(moleculeSTR);
-            moleculeSTR = "";
-        };
-        // If the line contains "Standard orientation:", extract the molecule's geometry in Standard Orientation
-        if (line.find("Standard orientation:") != string::npos)
-        {
-            while (getline(log_file, line))
-            {
-                if (line.find(" Rotational constants (GHZ): ") != string::npos)
-                {
-                    break;
-                };
-                moleculeSTR += line + "\n";
-            };
-            for (int i = 0; i < 4; i++)
-            {
-                moleculeSTR = moleculeSTR.substr(moleculeSTR.find("\n") + 1);
-            };
-            moleculeSTR = moleculeSTR.substr(0, moleculeSTR.rfind("---------------------------------------------------------------------\n"));
-            moleculeSTR = moleculeSTR.substr(0, moleculeSTR.rfind("\n"));
-            stdStorage.emplace_back(moleculeSTR);
-            moleculeSTR = "";
+        if (multiFinder != string::npos)
+        {   
+            this->multiplicityStorage.emplace_back(line);
         };
 
+
     // Close the file
+    };
     log_file.close();
-    // If stdFound is true, set the molecule string to the last geometry in stdStorage, as default molecule geometry is always be standard orientation if it is available
-    if (stdFound)
-    {
-        this->moleculeSTR = "";
-        this->moleculeSTR = stdStorage[stdStorage.size() - 1];
-    }
-    // If stdFound is false, set the molecule string to the last geometry in iptStorage
-    else
-    {
-        this->moleculeSTR = "";
-        this->moleculeSTR = iptStorage[iptStorage.size() - 1];
-    };
-    // If ntFound is false, throw an error
-    if (!ntFound)
-    {
-        throw runtime_error("Normal termination of Gaussian not found in the log. Please check your log file.");
-    };
 };
-};
+
 // Function to set the molecule object using the extracted geometry
 void Psi4OUTfile::setMolecule()
 {   
@@ -141,6 +87,49 @@ string Psi4OUTfile::getDate()
     return this->info;
 };
 
+void Psi4OUTfile::setMul()
+{
+    if (this->multiplicityStorage.size() > 0)
+    {
+        stringstream ss(this->multiplicityStorage.back());
+        string line;
+        while (getline(ss, line))
+        {
+            istringstream iss(line);
+            vector<string> results((istream_iterator<string>(iss)), istream_iterator<string>());
+            // extract the dipole moment components and convert them to the correct type
+            this->multiplicity = stod(results[2]);
+
+        };
+    };
+};
+
+void Psi4OUTfile::setCharge()
+{
+    if (this->chargeStorage.size() > 0)
+    {
+        stringstream ss(this->chargeStorage.back());
+        string line;
+        while (getline(ss, line))
+        {
+            istringstream iss(line);
+            vector<string> results((istream_iterator<string>(iss)), istream_iterator<string>());
+            // extract the dipole moment components and convert them to the correct type
+            this->charge = stod(results[2]);
+
+        };
+    };
+};
+
+int Psi4OUTfile::getMul()
+{
+    return this->multiplicity;
+};
+
+int Psi4OUTfile::getCharge()
+{
+    return this->charge;
+};
 // Function to user get the SCF energy 
 double Psi4OUTfile::getEnergy()
 {   
@@ -204,7 +193,6 @@ Psi4OUTfile::~Psi4OUTfile()
     this->scf = 0;
     this->scfC = 0;
     this->starterMethod = 0;
-    this->basis = 0;
 
     // clear the strings
     this->moleculeSTR.clear();

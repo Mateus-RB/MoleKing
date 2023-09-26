@@ -43,7 +43,8 @@ private:
     size_t beer;   
     size_t starterMethod;  
     size_t geo; 
-    size_t chargeMultiFinder;
+    size_t multiFinder;
+    size_t chargeFinder;
 
     //* string
     string basisValue;    
@@ -56,6 +57,8 @@ private:
     string mullikenSTR = "";
     string str_filePath;
     vector <string> iptStorage;
+    vector <string> chargeStorage;
+    vector <string> multiplicityStorage;
     vector <string> stdStorage;
     vector <string> homoStorage;
     vector <string> lumoStorage;
@@ -101,6 +104,8 @@ private:
     void readOUTFile();
     void setMolecule();
     void splitter();
+    void setMul();
+    void setCharge();
 
 public:
     Psi4OUTfile(string filePath);   
@@ -111,4 +116,6 @@ public:
     string getMethod();
     string toStr();
     Molecule getMolecule();  
+    int getMul();
+    int getCharge();
 };
