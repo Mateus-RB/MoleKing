@@ -24,16 +24,14 @@
 using namespace std;
 
 
-
-
-
 class PeriodicTable{
     private:
     map<string, int> symbolMap;
     map<string, double> massMap;
     map<string, double> radiiMap;
     map<string, string> ColorMap;
-    
+    string getColor(string symbol);
+
     public:
     PeriodicTable();
     ~PeriodicTable();

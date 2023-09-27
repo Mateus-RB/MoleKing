@@ -502,22 +502,23 @@ PeriodicTable::PeriodicTable(){
     this->ColorMap.insert(pair<string, string>("Mt", "EB0026"));
     this->ColorMap.insert(pair<string, string>("Ds", "EB0026"));
     this->ColorMap.insert(pair<string, string>("Cn", "EB0026"));
-    this->ColorMap.insert(pair<string, string>("Nh", "EB0026"));
-    this->ColorMap.insert(pair<string, string>("FI", "EB0026"));
-    this->ColorMap.insert(pair<string, string>("Mc", "EB0026"));
+    this->ColorMap.insert(pair<string, string>("Uut", "EB0026"));
+    this->ColorMap.insert(pair<string, string>("Fl", "EB0026"));
+    this->ColorMap.insert(pair<string, string>("Uup", "EB0026"));
     this->ColorMap.insert(pair<string, string>("Lv", "EB0026"));
-    this->ColorMap.insert(pair<string, string>("Ts", "EB0026"));
-    this->ColorMap.insert(pair<string, string>("Og", "EB0026"));
-    
-
-
-
+    this->ColorMap.insert(pair<string, string>("Uus", "EB0026"));
+    this->ColorMap.insert(pair<string, string>("Uuo", "EB0026"));
+    this->ColorMap.insert(pair<string, string>("Uue", "EB0026"));
+    this->ColorMap.insert(pair<string, string>("Ubn", "EB0026"));
+    this->ColorMap.insert(pair<string, string>("00", "98f58e"));
 
 };
 
 PeriodicTable::~PeriodicTable(){
     this->symbolMap.clear();
     this->massMap.clear();
+    this->radiiMap.clear();
+    this->ColorMap.clear();
 };   
 
 int PeriodicTable::getAtomicNumber(string symbol){
@@ -540,4 +541,9 @@ string PeriodicTable::getSymbol(int atomicNumber){
         };
     };
     return target;
+
+};
+
+string PeriodicTable::getColor(string symbol){
+    return this->ColorMap[symbol];
 };
