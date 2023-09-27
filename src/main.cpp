@@ -255,5 +255,4 @@ PYBIND11_MODULE(MoleKing, m) {
         .def("getMul", &Psi4OUTfile::getMul)
         .def("getCharge", &Psi4OUTfile::getCharge)
         .def("__str__", &Psi4OUTfile::toStr);    
-    
 };
