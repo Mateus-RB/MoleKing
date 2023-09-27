@@ -237,8 +237,6 @@ PYBIND11_MODULE(MoleKing, m) {
 
     py::class_<Psi4OUTfile>(m, "Psi4OUTfile", "This class is experimental and under development.")
         .def(py::init< string >(), py::arg("filePath"))
-        .def("getDate", &Psi4OUTfile::getDate)
-        .def("getEnergy", &Psi4OUTfile::getEnergy)
         .def("getMolecule", &Psi4OUTfile::getMolecule)
         .def("getMul", &Psi4OUTfile::getMul)
         .def("getCharge", &Psi4OUTfile::getCharge)

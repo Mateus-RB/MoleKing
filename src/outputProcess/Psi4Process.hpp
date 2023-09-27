@@ -38,11 +38,8 @@ private:
     int multiplicity;
 
     //* size_t
-    size_t scf;
-    size_t scfC;
     size_t beer;   
-    size_t starterMethod;  
-    size_t geo; 
+    size_t geometry; 
     size_t multiFinder;
     size_t chargeFinder;
 
@@ -54,30 +51,11 @@ private:
     string info;
     string method;
     string moleculeSTR = "";
-    string mullikenSTR = "";
     string str_filePath;
-    vector <string> iptStorage;
+    vector <string> geoStorage;
     vector <string> chargeStorage;
     vector <string> multiplicityStorage;
-    vector <string> stdStorage;
-    vector <string> homoStorage;
-    vector <string> lumoStorage;
-    vector <string> dipoleStorage;
-    vector <string> tdStorage;
 
-    vector<string> elstDipoleStorage;
-    vector<string> alphaStorage;
-    vector<string> betaStorage;
-    vector<string> gammaStorage;
-
-    //* double
-    double scfValue;
-    double homoValue;
-    double lumoValue;
-    double dipoleTot;
-    double dipoleX;
-    double dipoleY;
-    double dipoleZ;   
 
     //* molecule
     Molecule mol;
@@ -85,35 +63,16 @@ private:
     //* bool
 
     bool ntFound;
-    bool stdFound;
-    bool scfConvergence;
-    bool polarAsw;
-    bool tdAsw;
-
-    //* map and vectors
-
-    map<string, vector<string>> Orbitals;
-    map<int, map<string, double>> transitions;
-
-    vector<string> Occupied;
-    vector<string> Unoccupied;
-
-    //* teste
 
     //* set functions
     void readOUTFile();
     void setMolecule();
-    void splitter();
     void setMul();
     void setCharge();
 
 public:
     Psi4OUTfile(string filePath);   
     ~Psi4OUTfile();      
-    double getEnergy();
-    string getDate();    
-    string getBasis();
-    string getMethod();
     string toStr();
     Molecule getMolecule();  
     int getMul();
