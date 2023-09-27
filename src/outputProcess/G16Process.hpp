@@ -40,8 +40,10 @@ private:
     //* size_t
     size_t dipoleFinder;
     size_t mullikenFinder;
-    size_t homoFinder;
-    size_t lumoFinder;
+    size_t aHomoFinder;
+    size_t aLumoFinder;
+    size_t bHomoFinder;
+    size_t bLumoFinder;
     size_t tdFinder;
     size_t scf;
     size_t scfC;
@@ -65,8 +67,10 @@ private:
     string str_filePath;
     vector <string> iptStorage;
     vector <string> stdStorage;
-    vector <string> homoStorage;
-    vector <string> lumoStorage;
+    vector <string> aHomoStorage;
+    vector <string> aLumoStorage;
+    vector <string> bHomoStorage;
+    vector <string> bLumoStorage;
     vector <string> dipoleStorage;
     vector <string> tdStorage;
 
@@ -77,8 +81,10 @@ private:
 
     //* double
     double scfValue;
-    double homoValue;
-    double lumoValue;
+    double aHomoValue;
+    double aLumoValue;
+    double bHomoValue;
+    double bLumoValue;
     double dipoleTot;
     double dipoleX;
     double dipoleY;
@@ -98,12 +104,20 @@ private:
     //* map and vectors
 
     map<string, vector<string>> Orbitals;
+    map<string, vector<string>> bOrbitals;
     map<int, map<string, double>> transitions;
 
     vector<string> Occupied;
+    vector<string> bOccupied;
     vector<string> Unoccupied;
+    vector<string> bUnoccupied;
 
     //* teste
+
+    string aLumoStorageSTR = "";
+    string aHomoStorageSTR = "";
+    string bLumoStorageSTR = "";
+    string bHomoStorageSTR = "";
 
     //* set functions
     void readLOGFile();
@@ -122,8 +136,8 @@ public:
     map<string, vector<string>> getOrbitals(); 
     map<int, map<string, double>> getTransitions(const int index = 0);
     double getEnergy();
-    double getHOMO(int index = -1);
-    double getLUMO(int index = 0);    
+    vector<double> getHOMO(int index = -1);
+    vector<double> getLUMO(int index = 0);    
     double getDipole(string axis = "tot");
     string getDate();    
     string getBasis();
