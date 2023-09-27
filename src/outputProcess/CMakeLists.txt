@@ -1,6 +1,8 @@
 add_library(outputProcess 
                         G16Process.cpp
-                        G16Process.hpp)
+                        G16Process.hpp
+                        Psi4Process.cpp
+                        Psi4Process.hpp)
 
 target_include_directories( outputProcess PRIVATE 
         "${CMAKE_CURRENT_SOURCE_DIR}"

@@ -1,8 +1,7 @@
-from MoleKing import G16LOGfile
+from MoleKing import G16LOGfile, Psi4OUTfile
 from os import getcwd
 
 class TestOutput():
-
 
     def test_reader(self):
         home_path = getcwd()+'/test'
@@ -33,3 +32,19 @@ class TestOutput():
             home_path = home_path.replace('/test/test', '/test')    
         Ob = G16LOGfile(home_path+'/MK_Test.log').getDipole()
         assert Ob == 1.8442
+
+    def test_psi4(self):
+        home_path = getcwd()+'/test'
+        if '/test/test' in home_path:
+            home_path = home_path.replace('/test/test', '/test')    
+        file = Psi4OUTfile(home_path+'/MK_Test.out')
+        assert file.getMul() == 1
+        assert file.getCharge() == 0
+
+    def test_psi4_geo(self):
+        home_path = getcwd()+'/test'
+        if '/test/test' in home_path:
+            home_path = home_path.replace('/test/test', '/test')    
+        file = Psi4OUTfile(home_path+'/MK_Test.out')
+        assert file.getMolecule().__str__() == 'Molecule BR_{4}O_{2}N_{2}C_{44}H_{30}, with charge 0 and multiplicity 1'
+        assert file.getCharge() == 0

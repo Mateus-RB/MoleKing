@@ -27,6 +27,7 @@
 #include "chemicalUnits/OPLSff.hpp"
 #include "myMath/Vectors.hpp"
 #include "outputProcess/G16Process.hpp"
+#include "outputProcess/Psi4Process.hpp"
 using namespace std;
 
 #include <pybind11/pybind11.h>
@@ -232,5 +233,13 @@ PYBIND11_MODULE(MoleKing, m) {
         .def("getDipole", &G16LOGfile::getDipole, py::arg("axis") = "tot")
         .def("getHOMO", &G16LOGfile::getHOMO, py::arg("index") = 0)
         .def("getLUMO", &G16LOGfile::getLUMO, py::arg("index") = 0)
-        .def("__str__", &G16LOGfile::toStr);    
+        .def("__str__", &G16LOGfile::toStr);
+
+    py::class_<Psi4OUTfile>(m, "Psi4OUTfile", "This class is experimental and under development.")
+        .def(py::init< string >(), py::arg("filePath"))
+        .def("getMolecule", &Psi4OUTfile::getMolecule)
+        .def("getMul", &Psi4OUTfile::getMul)
+        .def("getCharge", &Psi4OUTfile::getCharge)
+        .def("__str__", &Psi4OUTfile::toStr);    
+    
 };
