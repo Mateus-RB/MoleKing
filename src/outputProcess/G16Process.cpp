@@ -36,6 +36,7 @@ G16LOGfile::G16LOGfile(string filePath, bool polarAsw, bool tdAsw)
     {
         cout << "Need to do!" << endl;
     };
+    
 };
 
 //!----------------------- Set Functions -----------------------//
@@ -44,22 +45,34 @@ G16LOGfile::G16LOGfile(string filePath, bool polarAsw, bool tdAsw)
 void G16LOGfile::readLOGFile()
 {
     // Open the file at the given file path
+
+    //check if the file exist
+    ifstream check_file(this->str_filePath);
+    if (!check_file)
+    {
+        throw runtime_error("ERROR in G16LOGfile::readLOGFile(): File not found. Please check your file path.");
+    };
+
     ifstream log_file(this->str_filePath);
+
     // Loop through each line in the file
     while (getline(log_file, line))
     {
         // Check if the line contains certain keywords
         scf = line.find("SCF Done:");
-        normalT = line.find("Normal termination of Gaussian");
+        normalT = line.find(" Normal termination of Gaussian ");
         stdT = line.find("Standard orientation:");
         scfC = line.find("Convergence criterion not met");
         basis = line.find("Standard basis:");
-        homoFinder = line.find(" Alpha  occ. eigenvalues --");
-        lumoFinder = line.find(" Alpha virt. eigenvalues --");
+        aHomoFinder = line.find(" Alpha  occ. eigenvalues --");
+        aLumoFinder = line.find(" Alpha virt. eigenvalues --");
+        bHomoFinder = line.find(" Beta  occ. eigenvalues --");
+        bLumoFinder = line.find(" Beta virt. eigenvalues --");
         dipoleFinder = line.find("Tot=");
         tdFinder = line.find("Excited State ");
         chargeMultiFinder = line.find(" Charge =");       
         // If the line contains "Normal termination of Gaussian", set ntFound to true
+
         if (normalT != string::npos)
         {
             ntFound = true;
@@ -103,14 +116,67 @@ void G16LOGfile::readLOGFile()
             };
         };
         // Getting HOMO and LUMO lines and appending into a vector;
-        if (lumoFinder != string::npos)
+        if (aHomoFinder != string::npos)
         {
-            this->lumoStorage.emplace_back(line);
-        }
-        if (homoFinder != string::npos)
-        {
-            this->homoStorage.emplace_back(line);
+            aHomoStorageSTR += line + "\n";
+            while (getline(log_file, line))
+            {   
+                if (line.find(" Alpha virt. eigenvalues --") != string::npos)
+                {
+                    aLumoStorageSTR += line + "\n";
+                    break;
+                };
+                aHomoStorageSTR += line + "\n";
+            };
+            this->aHomoStorage.emplace_back(aHomoStorageSTR);
+            aHomoStorageSTR = "";
         };
+        if (aLumoFinder != string::npos)
+        {
+            aLumoStorageSTR += line + "\n";
+            while (getline(log_file, line))
+            {   
+                if (line.find("          Condensed to atoms (all electrons):") != string::npos || line.find("     Molecular Orbital Coefficients:") != string::npos || line.find(" Electronic spatial extent (au):") != string::npos || line.find("  Beta  occ. eigenvalues --") != string::npos)
+                {
+                    bHomoStorageSTR += line + "\n";
+                    break;
+                };
+                aLumoStorageSTR += line + "\n";
+            };
+            this->aLumoStorage.emplace_back(aLumoStorageSTR);
+            aLumoStorageSTR = "";
+        };
+
+        if (bHomoFinder != string::npos)
+        {
+            bHomoStorageSTR += line + "\n";
+            while (getline(log_file, line))
+            {   
+                if (line.find(" Beta virt. eigenvalues --") != string::npos)
+                {
+                    bLumoStorageSTR += line + "\n";
+                    break;
+                };
+                bHomoStorageSTR += line + "\n";
+            };
+            this->bHomoStorage.emplace_back(bHomoStorageSTR);
+            bHomoStorageSTR = "";
+        };
+        if (bLumoFinder != string::npos)
+        {
+            bLumoStorageSTR += line + "\n";
+            while (getline(log_file, line))
+            {   
+                if (line.find("          Condensed to atoms (all electrons):") != string::npos || line.find("     Molecular Orbital Coefficients:") != string::npos || line.find(" Electronic spatial extent (au):") != string::npos)
+                {
+                    break;
+                };
+                bLumoStorageSTR += line + "\n";
+            };
+            this->bLumoStorage.emplace_back(bLumoStorageSTR);
+            bLumoStorageSTR = "";
+        };
+        
         // If the line contains "Standard basis:", extract the basis set used
         if (basis != string::npos)
         {
@@ -178,6 +244,13 @@ void G16LOGfile::readLOGFile()
 
     // Close the file
     log_file.close();
+
+    // If ntFound is false, throw an error
+    if (!ntFound)
+    {
+        throw runtime_error("Normal termination of Gaussian not found in the log. Please check your log file.");
+    };
+
     // If stdFound is true, set the molecule string to the last geometry in stdStorage, as default molecule geometry is always be standard orientation if it is available
     if (stdFound)
     {
@@ -189,11 +262,6 @@ void G16LOGfile::readLOGFile()
     {
         this->moleculeSTR = "";
         this->moleculeSTR = iptStorage[iptStorage.size() - 1];
-    };
-    // If ntFound is false, throw an error
-    if (!ntFound)
-    {
-        throw runtime_error("Normal termination of Gaussian not found in the log. Please check your log file.");
     };
 };
 
@@ -220,70 +288,129 @@ void G16LOGfile::setMolecule()
 };
 
 void G16LOGfile::setOrbitals()
-{
-    this->Orbitals["Unoccupied"] = this->Unoccupied;
-    this->Orbitals["Occupied"] = this->Occupied;
+{   
+    if (this->bOccupied.size() > 0 && this->bUnoccupied.size() > 0) {
+        this->bOrbitals["Beta_Unoccupied"] = this->bUnoccupied;
+        this->bOrbitals["Beta_Occupied"] = this->bOccupied;
+        this->bOrbitals["Alpha_Unoccupied"] = this->Unoccupied;
+        this->bOrbitals["Alpha_Occupied"] = this->Occupied;
+    }
+    else
+    {
+        this->Orbitals["Unoccupied"] = this->Unoccupied;
+        this->Orbitals["Occupied"] = this->Occupied;
+    }
 };
 
 // Function to set the HOMO orbital of the calculation
 void G16LOGfile::setHOMO()
 {
-    stringstream ss;
     vector<string> temp;
-    for (int i = 0; i < this->homoStorage.size(); i++)
-    {
-        ss = stringstream(this->homoStorage[i]);
-        string line;
-        while (getline(ss, line))
-        {
-            istringstream iss(line);
-            vector<string> results((istream_iterator<string>(iss)), istream_iterator<string>());
-            for (int j = 0; j < results.size(); j++)
+    string aHomoAuxiliary;
+    aHomoAuxiliary = this->aHomoStorage[this->aHomoStorage.size() - 1];
+    stringstream ss(aHomoAuxiliary);
+
+    while (getline(ss, line))
+    {   
+        istringstream iss(line);
+        vector<string> results ((istream_iterator<string>(iss)), istream_iterator<string>());
+
+        for (int i = 4; i < results.size(); i++)
+        {   
+            try
+            {   
+                temp.emplace_back(results[i]);
+            }
+            catch (const std::exception &e)
             {
+                // If the string cannot be converted to a double, ignore it
+            };
+        }
+    };
+    
+    if (this->bHomoStorage.size() > 0)
+    {
+        vector<string> bTemp;
+        string bHomoAuxiliary;
+        bHomoAuxiliary = this->bHomoStorage[this->bHomoStorage.size()-1];
+        stringstream ss(bHomoAuxiliary);
+
+        while (getline(ss, line))
+        {   
+            istringstream iss(line);
+            vector<string> bResults ((istream_iterator<string>(iss)), istream_iterator<string>());
+
+            for (int i = 4; i < bResults.size(); i++)
+            {   
                 try
-                {
-                    // Check if the string can be converted to a double, then add to temp vector
-                    stod(results[j]);
-                    temp.emplace_back(results[j]);
+                {   
+                    bTemp.emplace_back(bResults[i]);
                 }
                 catch (const std::exception &e)
                 {
                     // If the string cannot be converted to a double, ignore it
                 };
-            };
-        };
-    };
+            }
+        };  
+        this->bOccupied = bTemp;
+    }
     this->Occupied = temp;
 };
 
 // Function to set the LUMO orbital of the calculation
 void G16LOGfile::setLUMO()
-{
-    stringstream ss;
+{   
     vector<string> temp;
-    for (int i = 0; i < this->lumoStorage.size(); i++)
-    {
-        ss = stringstream(this->lumoStorage[i]);
-        string line;
-        while (getline(ss, line))
-        {
-            istringstream iss(line);
-            vector<string> results((istream_iterator<string>(iss)), istream_iterator<string>());
-            for (int j = 0; j < results.size(); j++)
+    string aLumoAuxiliary;
+    aLumoAuxiliary = this->aLumoStorage[this->aLumoStorage.size() - 1];
+    stringstream ss(aLumoAuxiliary);
+
+    while (getline(ss, line))
+    {   
+        istringstream iss(line);
+        vector<string> results ((istream_iterator<string>(iss)), istream_iterator<string>());
+
+        for (int i = 4; i < results.size(); i++)
+        {   
+            try
+            {   
+
+                temp.emplace_back(results[i]);
+            }
+            catch (const std::exception &e)
             {
+                // If the string cannot be converted to a double, ignore it
+            };
+        }
+    }
+
+    if (this->bLumoStorage.size() > 0)
+    {
+        vector<string> bTemp;
+        string bLumoAuxiliary;
+        bLumoAuxiliary = this->bLumoStorage[this->bLumoStorage.size()-1];
+        stringstream ss(bLumoAuxiliary);
+
+        while (getline(ss, line))
+        {   
+            istringstream iss(line);
+            vector<string> bResults ((istream_iterator<string>(iss)), istream_iterator<string>());
+
+            for (int i = 4; i < bResults.size(); i++)
+            {   
                 try
-                {
-                    // Check if the string can be converted to a double, then add to temp vector
-                    stod(results[j]);
-                    temp.emplace_back(results[j]);
+                {   
+                    bTemp.emplace_back(bResults[i]);
                 }
                 catch (const std::exception &e)
                 {
                     // If the string cannot be converted to a double, ignore it
                 };
-            };
-        };
-    };
+            }
+        };  
+        this->bUnoccupied = bTemp;
+    }
+
     this->Unoccupied = temp;
 };
 
@@ -343,7 +470,6 @@ void G16LOGfile::setDipole()
         {
             istringstream iss(line);
             vector<string> results((istream_iterator<string>(iss)), istream_iterator<string>());
-            // extract the dipole moment components and convert them to the correct type
             this->dipoleX = stod(results[1]);
             this->dipoleY = stod(results[3]);
             this->dipoleZ = stod(results[5]);
@@ -407,13 +533,23 @@ Molecule G16LOGfile::getMolecule()
 
 // Function to user get the orbitals
 map<string, vector<string>> G16LOGfile::getOrbitals() 
-{
-    return this->Orbitals;
+{   
+    if (this->bOccupied.size() > 0 && this->bUnoccupied.size() > 0)
+    {   
+        //throw an warning
+        cerr << "WARNING in G16LOGfile::getOrbitals(): Your job is an open shell. Please, use getOrbitals()['Alpha_Occupied'] or ['Beta_Occupied']" << endl;
+        return this->bOrbitals;
+    }
+    else
+    {
+        return this->Orbitals;
+
+    }
 };
 
 // Function to user get the HOMO value;
-double G16LOGfile::getHOMO(int index) 
-{
+vector<double> G16LOGfile::getHOMO(int index) 
+{   
     if (index > 0)
     {
         // If the index is positive, throw an exception
@@ -429,20 +565,40 @@ double G16LOGfile::getHOMO(int index)
     else if (index == 0)
     {
         // If the index is 0, return the last value in the temp vector
-        this->homoValue = stod(this->Occupied[this->Occupied.size() - 1]);
+        if (this->bOccupied.size() > 0)
+        {
+            this->bHomoValue = stod(this->bOccupied[this->bOccupied.size() - 1]);
+        }
+        this->aHomoValue = stod(this->Occupied[this->Occupied.size() - 1]);
     }
 
     else
     {
         // subtract 1 from the index, the default one is zero then the index will be -1 [Highest occ molecular orbital], so if the user puts the -1, in C++ we'll look for the index -2 that will be the HOMO-1 orbital. Then return the value at that index in the temp vector
         index += -1;
-        this->homoValue = stod(this->Occupied[this->Occupied.size() + index]);
+
+        if (this->bOccupied.size() > 0)
+        {
+            this->bHomoValue = stod(this->bOccupied[this->bOccupied.size() + index]);
+        }
+        
+        this->aHomoValue = stod(this->Occupied[this->Occupied.size() + index]);
     };
-    return this->homoValue;
+
+    if (this->bOccupied.size() > 0)
+    {   
+        cerr << "WARNING in G16LOGfile::getHOMO(). Your job is an Open Shell. Please, use as alpha_HOMO, beta_HOMO = getHOMO()." << endl;
+        return {this->aHomoValue, this->bHomoValue};
+    } 
+
+    else 
+    {
+        return {this->aHomoValue};
+    }
 };
 
 // Function to user get the LUMO value;
-double G16LOGfile::getLUMO(int index)
+vector<double> G16LOGfile::getLUMO(int index)
 {
     if (index < 0)
     {
@@ -459,9 +615,23 @@ double G16LOGfile::getLUMO(int index)
     else
     {
         // If the index is valid, return the value at that index in the temp vector
-        this->lumoValue = stod(this->Unoccupied[index]);
+        if (this->bUnoccupied.size() > 0)
+        {
+            this->bLumoValue = stod(this->bUnoccupied[index]);
+        }
+        this->aLumoValue = stod(this->Unoccupied[index]);
     };
-    return this->lumoValue;
+
+    if (this->bUnoccupied.size() > 0)
+    {   
+        cerr << "WARNING in G16LOGfile::getLUMO(). Your job is an Open Shell. Please, use as alpha_LUMO, beta_LUMO = getLUMO()." << endl;
+        return {this->aLumoValue, this->bLumoValue};
+    } 
+
+    else 
+    {
+        return {this->aLumoValue};
+    }
 };
 
 // get Transitions
@@ -555,8 +725,8 @@ G16LOGfile::~G16LOGfile()
     this->dipoleFinder = 0;
     this->scf = 0;
     this->scfC = 0;
-    this->homoFinder = 0;
-    this->lumoFinder = 0;
+    this->aHomoFinder = 0;
+    this->aLumoFinder = 0;
     this->tdFinder = 0;
     this->normalT = 0;
     this->stdT = 0;
@@ -570,8 +740,8 @@ G16LOGfile::~G16LOGfile()
 
     // clear the doubless
     this->scfValue = 0;
-    this->homoValue = 0;
-    this->lumoValue = 0;
+    this->aHomoValue = 0;
+    this->aLumoValue = 0;
     this->dipoleTot = 0;
     this->dipoleX = 0;
     this->dipoleY = 0;

@@ -59,6 +59,3 @@ class TestMolecule():
         mol = Molecule()
         mol.setVDWRatio(2)
         assert mol.getVDWRatio() == 2
-
-
-        

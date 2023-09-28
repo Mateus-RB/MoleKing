@@ -231,9 +231,23 @@ PYBIND11_MODULE(MoleKing, m) {
         .def("getOrbitals", &G16LOGfile::getOrbitals)
         .def("getTransitions", &G16LOGfile::getTransitions, py::arg("index") = 0)
         .def("getDipole", &G16LOGfile::getDipole, py::arg("axis") = "tot")
-        .def("getHOMO", &G16LOGfile::getHOMO, py::arg("index") = 0)
-        .def("getLUMO", &G16LOGfile::getLUMO, py::arg("index") = 0)
-        .def("__str__", &G16LOGfile::toStr);
+        .def("getHOMO", [](G16LOGfile &self, int index) {
+            auto values = self.getHOMO(index);
+            if (values.size() == 1)
+            {
+                return py::cast(values[0]);
+            }
+            return py::cast(values);
+        }, py::arg("index") = 0)
+        .def("getLUMO", [](G16LOGfile &self, int index) {
+            auto values = self.getLUMO(index);
+            if (values.size() == 1)
+            {
+                return py::cast(values[0]);
+            }
+            return py::cast(values);
+        }, py::arg("index") = 0)
+        .def("__str__", &G16LOGfile::toStr);    
 
     py::class_<Psi4OUTfile>(m, "Psi4OUTfile", "This class is experimental and under development.")
         .def(py::init< string >(), py::arg("filePath"))
@@ -241,5 +255,4 @@ PYBIND11_MODULE(MoleKing, m) {
         .def("getMul", &Psi4OUTfile::getMul)
         .def("getCharge", &Psi4OUTfile::getCharge)
         .def("__str__", &Psi4OUTfile::toStr);    
-    
 };
