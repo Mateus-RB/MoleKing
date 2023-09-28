@@ -139,4 +139,15 @@ setup(
     zip_safe=False,
     extras_require={"test": ["pytest>=6.0"]},
     python_requires=">=3.7",
+    classifiers=[
+        "License :: OSI Approved :: MIT License",
+        "Programming Language :: C++",
+        "Programming Language :: Python :: 3",
+        "Operating System :: OS Independent",
+        "Development Status :: 5 - Production/Stable",
+        "Intended Audience :: Science/Research",
+        "Topic :: Scientific/Engineering :: Chemistry",
+    ],
+    readme="README.md",
+    license="LICENSE",
 )
