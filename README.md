@@ -43,7 +43,7 @@ cmake --build .
 
 ---
 
-**Please feel free to report any issues or suggestions to mateus_barbosa@ufg.discente.br**
+**Please feel free to report any issues or suggestions to mateus_barbosa@ufg.br**
 
 ![MoleKing_Grad](https://user-images.githubusercontent.com/71854729/213286170-38170b42-8e1b-4bfb-9b9b-80aa8308444e.png)
 

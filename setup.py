@@ -129,11 +129,11 @@ class CMakeBuild(build_ext):
 # logic and declaration, and simpler if you include description/version in a file.
 setup(
     name="MoleKing",
-    version="1.4.4",
+    version="1.5.0",
     author="LEEDMOL Research Group",
-    author_email="mateus_barbosa@discente.ufg.br",
-    description="A test build of MoleKing using pybind11 and CMake use with caution!",
-    long_description="",
+    author_email="mateus_barbosa@ufg.br",
+    description="MoleKing is a python module for chemists aiming to add common principles to python. This module adds new types of python variables, MoleKing_Molecule; MoleKing_Atom; MoleKing_SupraMolecule, and MoleKing_Output, alongside many features considered common knowledge among chemists.",
+    long_description="MoleKing is a Python module written in C++ with pybind11 Linkage under LEEDMOL Research Group. This module contains several useful classes for those who program python scripts aimed at theoretical chemistry. This package's main goal is to introduce chemistry concepts, such as Molecules, Atoms, and Geometries, to python, making programming more intuitive and understandable to chemists. Additionally, MoleKing is capable of reading and writing inputs and outputs files for several theoretical chemistry programs.",
     ext_modules=[CMakeExtension("MoleKing")],
     cmdclass={"build_ext": CMakeBuild},
     zip_safe=False,
