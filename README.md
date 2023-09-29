@@ -1,4 +1,4 @@
-# This is a working in progress fell free to use as a learning tool but don't trust the results. This module is a working in progress at LEEDMOL-UFG under manitence of Mateus Rodrigues Barbosa, Pedro H. F. Matias and Rafael F. Veríssimo.
+# This is a working in progress fell free to use as a learning tool but don't trust the results. This module is a working in progress at LEEDMOL-UFG under manitence of Mateus Rodrigues Barbosa.
 # MoleKing
 MoleKing is a Python module written in C++ with pybind11 Linkage under [LEEDMOL](leedmol.com) Research Group. This module contains several useful classes for those who program python scripts aimed at theoretical chemistry. This package's main goal is to introduce chemistry concepts, such as Molecules, Atoms, and Geometries, to python, making programming more intuitive and understandable to chemists. Additionally, MoleKing is capable of reading and writing inputs and outputs files for several theoretical chemistry programs.
 
@@ -43,7 +43,7 @@ cmake --build .
 
 ---
 
-**Please feel free to report any issues or suggestions to mateus_barbosa@ufg.br or phfmatias@discente.ufg.br**
+**Please feel free to report any issues or suggestions to mateus_barbosa@ufg.br**
 
 ![MoleKing_Grad](https://user-images.githubusercontent.com/71854729/213286170-38170b42-8e1b-4bfb-9b9b-80aa8308444e.png)
 
