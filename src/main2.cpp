@@ -70,6 +70,7 @@ int main(int argc, char* argv[]){
         met.addAtom(A4);
         met.addAtom(A5);
         met.addAtom(A6);
+        
         vector < vector <int> > b = met.getIRCAngles();
         for ( auto i = 0; i < b.size(); i++ ){
             cout << b[i][0] << " " << b[i][1] << " " << b[i][2] << endl;
