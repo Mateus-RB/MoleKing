@@ -675,6 +675,7 @@ map<int, map<string, double>> G16LOGfile::getTransitions(int index)
 };
 
 // Function to user get the Dipole Value
+
 double G16LOGfile::getDipole(string axis)
 {   
     if (this->dipoleStorage.size() == 0)
