@@ -34,7 +34,9 @@ G16LOGfile::G16LOGfile(string filePath, bool polarAsw, bool tdAsw)
 
     if (polarAsw)
     {
-        cout << "Need to do!" << endl;
+        this->vecFrec = {0.000};
+        setNLO();
+        setFrequency();
     };
     
 };
@@ -70,6 +72,7 @@ void G16LOGfile::readLOGFile()
         bLumoFinder = line.find(" Beta virt. eigenvalues --");
         dipoleFinder = line.find("Tot=");
         tdFinder = line.find("Excited State ");
+        polarFinder = line.find(" Dipole moment:");
         chargeMultiFinder = line.find(" Charge =");       
         // If the line contains "Normal termination of Gaussian", set ntFound to true
 
@@ -238,6 +241,23 @@ void G16LOGfile::readLOGFile()
                 {
                     this->tdStorage.emplace_back(line);
                 };
+            };
+        };
+        if (polarAsw)
+        {
+            if (line.find(" Dipole orientation:") != string::npos)
+            {
+                polarSTR += line + "\n";
+                while (getline(log_file, line))
+                {
+                    if (line.find(" ----------------------------------------------------------------------") != string::npos)
+                    {
+                        break;
+                    };
+                    polarSTR += line + "\n";
+                };
+                polarStorage.emplace_back(polarSTR);
+                polarSTR = "";
             };
         };
     };
@@ -674,8 +694,6 @@ map<int, map<string, double>> G16LOGfile::getTransitions(int index)
     };
 };
 
-// Function to user get the Dipole Value
-
 double G16LOGfile::getDipole(string axis)
 {   
     if (this->dipoleStorage.size() == 0)
@@ -709,6 +727,56 @@ double G16LOGfile::getDipole(string axis)
     };
 };
 
+// Function to user get the frequency of the calculation
+
+void G16LOGfile::setNLO()
+{
+    // get the last element of the polarStorage vector
+    this->polarAuxiliary = this->polarStorage[this->polarStorage.size() - 1];
+    // create a stringstream object with polarAuxiliary
+    stringstream ss(polarAuxiliary);
+    // Store each line of the stringstream in the lines vector
+    while (getline(ss, line))
+    {
+        this->vecPolar.emplace_back(line);
+    };
+    //check if the last element of the vector lines is equal to "" or " " or "\n"
+    if (this->vecPolar[vecPolar.size() - 1] == "" || this->vecPolar[vecPolar.size() - 1] == " " || this->vecPolar[vecPolar.size() - 1] == "\n")
+    {
+        // if true, remove the last element of the vector lines
+        this->vecPolar.pop_back();
+    };
+
+    
+};
+
+
+void G16LOGfile::setFrequency()
+{    
+    for (int i = 0; i < this->vecPolar.size(); i++)
+    {
+        if (this->vecPolar[i].find("Alpha(-w;w)") != string::npos)
+        {
+            this->Freq = this->vecPolar[i].substr(this->vecPolar[i].find("Alpha(-w;w)") + 16);
+            this->Freq = this->Freq.substr(0, this->Freq.find("nm"));
+            //convert Freq to double
+            this->FreqDouble = stod(this->Freq);
+            // add the frequency to the vecFrec vector
+            this->vecFrec.emplace_back(this->FreqDouble);
+        };
+    };
+};
+
+vector<double> G16LOGfile::getFrequency()
+{   
+    if (!this->polarAsw)
+    {
+        throw runtime_error("ERROR in G16LOGfile::getFrequency(): No frequency found in the log file., Try using polarAsw=1.");
+    }
+    return this->vecFrec;
+    
+};
+
 string G16LOGfile::toStr()
 {
     return "G16LOGFile: Calculation of " + this->str_filePath.substr(this->str_filePath.find_last_of("/") + 1) + " done in " + this->info + ", with the level of theory " + this->method + "/" + this->basisValue + " and " + "SCF energy of " + to_string(this->scfValue) + " Hartrees.";
@@ -729,6 +797,7 @@ G16LOGfile::~G16LOGfile()
     this->aHomoFinder = 0;
     this->aLumoFinder = 0;
     this->tdFinder = 0;
+    this->polarFinder = 0;
     this->normalT = 0;
     this->stdT = 0;
     this->starterSCF = 0;
@@ -738,6 +807,7 @@ G16LOGfile::~G16LOGfile()
 
     // clear the strings
     this->moleculeSTR.clear();
+    //this->polarAuxiliary.clear();
 
     // clear the doubless
     this->scfValue = 0;
@@ -767,12 +837,8 @@ G16LOGfile::~G16LOGfile()
 // TODO:getBeta
 // TODO:getGamma
 // TODO:getGradient
-// TODO:getTransitions_str
+// TODO:getTransitions_str    // Create a vector to store the lines of the stringstream
 
-// IDK WHAT IS THIS BELOW
-
-// TODO:getWavelength
-// TODO:getOscillatorForces
 // TODO:getWavelengths
 // TODO:getSymmetries
 // TODO:getSymmetry
