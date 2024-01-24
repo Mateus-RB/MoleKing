@@ -16,10 +16,49 @@
 
 //!----------------------- G16LOGfile -----------------------//
 
-G16LOGfile::G16LOGfile(string filePath, bool polarAsw, bool tdAsw)
+G16LOGfile::G16LOGfile(string filePath, bool polarAsw, bool tdAsw, int link)
     : ntFound(false), stdFound(false), scfConvergence(true),str_filePath(filePath), polarAsw(polarAsw), tdAsw(tdAsw)
 {
     // SET FUNCTIONS
+
+    detectLink();
+
+    if (this->linkStorage.size() == 1)
+    {
+       this->logfile.str(this->linkStorage[0]);
+    }
+
+    else if (this->linkStorage.size() > 1)
+    {
+        if (link > int(this->linkStorage.size()))
+        {   
+            throw runtime_error("ERROR in G16LOGfile::G16LOGfile(): Invalid log number. The number of link calculation(s) found in the log file is " + to_string(this->linkStorage.size()) + ".");
+        }
+
+        else if (link == 0)
+        {
+            cerr << "WARNING in G16LOGfile::G16LOGfile(): We detected " << this->linkStorage.size() << " link calculation(s) in your log file. As default, we will use the last one. To change it use: G16LOGfile(filename, link=n)" << endl;
+            this->logfile.str(this->linkStorage[0]);
+        }
+
+        else if (link == -1)
+        {
+            this->logfile.str(this->linkStorage[this->linkStorage.size() - 1]);
+            cerr << "WARNING in G16LOGfile::G16LOGfile(): Using the last link calculation found in the log file." << endl;
+        }
+
+        else if (link < 0 && link != -1)
+        {
+            throw runtime_error("ERROR in G16LOGfile::G16LOGfile(): Invalid log number. Log number can't be a negative number, except -1.");
+        }
+
+        else
+        {
+            this->logfile.str(this->linkStorage[link - 1]);
+            cerr << "WARNING in G16LOGfile::G16LOGfile(): Using the link calculation number " << link << " found in the log file." << endl;
+        };
+    };
+
     readLOGFile();
     setMolecule();
     setDipole();
@@ -41,26 +80,56 @@ G16LOGfile::G16LOGfile(string filePath, bool polarAsw, bool tdAsw)
 
 //!----------------------- Set Functions -----------------------//
 
-// Function to read file and extract the information
-void G16LOGfile::readLOGFile()
-{
-    // Open the file at the given file path
 
+// Function to detect if the log have a link calculation
+
+void G16LOGfile::detectLink()
+{   
+
+    normalT = line.find(" Normal termination of Gaussian ");
+    
     //check if the file exist
-    ifstream check_file(this->str_filePath);
-    if (!check_file)
+
+    ifstream log_file(this->str_filePath);
+
+    if (!log_file.is_open())
     {
         throw runtime_error("ERROR in G16LOGfile::readLOGFile(): File not found. Please check your file path.");
     };
 
-    ifstream log_file(this->str_filePath);
-
-    // Loop through each line in the file
     while (getline(log_file, line))
+    {
+        linkStorageSTD += line + "\n";
+        while (getline(log_file, line))
+        {   
+            if (line.find(" Normal termination") != string::npos)
+            {
+                linkStorageSTD += line + "\n";
+                ntFound = true;
+                break;
+            };
+            linkStorageSTD += line + "\n";
+        };
+        this->linkStorage.emplace_back(linkStorageSTD);
+        linkStorageSTD = "";
+    };
+
+    // If ntFound is false, throw an error
+    if (!ntFound)
+    {
+        throw runtime_error("Normal termination of Gaussian not found in the log. Please check your log file.");
+    };
+
+    log_file.close();
+}
+
+// Function to read file and extract the information
+void G16LOGfile::readLOGFile()
+{
+    while (getline(this->logfile, line))
     {
         // Check if the line contains certain keywords
         scf = line.find("SCF Done:");
-        normalT = line.find(" Normal termination of Gaussian ");
         stdT = line.find("Standard orientation:");
         scfC = line.find("Convergence criterion not met");
         basis = line.find("Standard basis:");
@@ -71,12 +140,6 @@ void G16LOGfile::readLOGFile()
         dipoleFinder = line.find("Tot=");
         tdFinder = line.find("Excited State ");
         chargeMultiFinder = line.find(" Charge =");       
-        // If the line contains "Normal termination of Gaussian", set ntFound to true
-
-        if (normalT != string::npos)
-        {
-            ntFound = true;
-        };
         // If the line contains "Standard orientation:", set stdFound to true
         if (stdT != string::npos)
         {
@@ -119,7 +182,7 @@ void G16LOGfile::readLOGFile()
         if (aHomoFinder != string::npos)
         {
             aHomoStorageSTR += line + "\n";
-            while (getline(log_file, line))
+            while (getline(this->logfile, line))
             {   
                 if (line.find(" Alpha virt. eigenvalues --") != string::npos)
                 {
@@ -134,7 +197,7 @@ void G16LOGfile::readLOGFile()
         if (aLumoFinder != string::npos)
         {
             aLumoStorageSTR += line + "\n";
-            while (getline(log_file, line))
+            while (getline(this->logfile, line))
             {   
                 if (line.find("          Condensed to atoms (all electrons):") != string::npos || line.find("     Molecular Orbital Coefficients:") != string::npos || line.find(" Electronic spatial extent (au):") != string::npos || line.find("  Beta  occ. eigenvalues --") != string::npos)
                 {
@@ -150,7 +213,7 @@ void G16LOGfile::readLOGFile()
         if (bHomoFinder != string::npos)
         {
             bHomoStorageSTR += line + "\n";
-            while (getline(log_file, line))
+            while (getline(this->logfile, line))
             {   
                 if (line.find(" Beta virt. eigenvalues --") != string::npos)
                 {
@@ -165,7 +228,7 @@ void G16LOGfile::readLOGFile()
         if (bLumoFinder != string::npos)
         {
             bLumoStorageSTR += line + "\n";
-            while (getline(log_file, line))
+            while (getline(this->logfile, line))
             {   
                 if (line.find("          Condensed to atoms (all electrons):") != string::npos || line.find("     Molecular Orbital Coefficients:") != string::npos || line.find(" Electronic spatial extent (au):") != string::npos)
                 {
@@ -191,7 +254,7 @@ void G16LOGfile::readLOGFile()
         // If the line contains "Input orientation:", extract the molecule's geometry in Input Orientation
         if (line.find("Input orientation:") != string::npos)
         {
-            while (getline(log_file, line))
+            while (getline(this->logfile, line))
             {
                 if (line.find("Distance matrix (angstroms):") != string::npos)
                 {
@@ -211,7 +274,7 @@ void G16LOGfile::readLOGFile()
         // If the line contains "Standard orientation:", extract the molecule's geometry in Standard Orientation
         if (line.find("Standard orientation:") != string::npos)
         {
-            while (getline(log_file, line))
+            while (getline(this->logfile, line))
             {
                 if (line.find(" Rotational constants (GHZ): ") != string::npos)
                 {
@@ -243,13 +306,7 @@ void G16LOGfile::readLOGFile()
     };
 
     // Close the file
-    log_file.close();
-
-    // If ntFound is false, throw an error
-    if (!ntFound)
-    {
-        throw runtime_error("Normal termination of Gaussian not found in the log. Please check your log file.");
-    };
+    // log_file.close();
 
     // If stdFound is true, set the molecule string to the last geometry in stdStorage, as default molecule geometry is always be standard orientation if it is available
     if (stdFound)

@@ -32,10 +32,16 @@ using namespace std;
 class G16LOGfile{
 private:
 
+    //* istringstream
+
+    istringstream logfile;
+
     //* int
 
     int charge;
     int multiplicity;
+    int link;
+    int countNormal;
 
     //* size_t
     size_t dipoleFinder;
@@ -65,6 +71,7 @@ private:
     string moleculeSTR = "";
     string mullikenSTR = "";
     string str_filePath;
+    string linkStorageSTD = "";
     vector <string> iptStorage;
     vector <string> stdStorage;
     vector <string> aHomoStorage;
@@ -73,6 +80,7 @@ private:
     vector <string> bLumoStorage;
     vector <string> dipoleStorage;
     vector <string> tdStorage;
+    vector <string> linkStorage;
 
     vector<string> elstDipoleStorage;
     vector<string> alphaStorage;
@@ -120,6 +128,7 @@ private:
     string bHomoStorageSTR = "";
 
     //* set functions
+    void detectLink();
     void readLOGFile();
     void setMolecule();
     void setOrbitals();
@@ -131,7 +140,7 @@ private:
     void setNLO();
 
 public:
-    G16LOGfile(string filePath, bool polarAsw = 0, bool tdAsw = 0);   
+    G16LOGfile(string filePath, bool polarAsw = 0, bool tdAsw = 0, int  link = 0);   
     ~G16LOGfile();      
     map<string, vector<string>> getOrbitals(); 
     map<int, map<string, double>> getTransitions(const int index = 0);

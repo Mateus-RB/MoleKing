@@ -222,7 +222,7 @@ PYBIND11_MODULE(MoleKing, m) {
         .def("__str__", &Matrix::toStr);
 
     py::class_<G16LOGfile>(m, "G16LOGfile", "This class is experimental and under development.")
-        .def(py::init< string, bool, bool>(), py::arg("filePath"), py::arg("polarAsw") = 0, py::arg("tdAsw") = 0)
+        .def(py::init< string, bool, bool, int>(), py::arg("filePath"), py::arg("polarAsw") = 0, py::arg("tdAsw") = 0, py::arg("link") = 0)
         .def("getDate", &G16LOGfile::getDate)
         .def("getEnergy", &G16LOGfile::getEnergy)
         .def("getBasis", &G16LOGfile::getBasis)
