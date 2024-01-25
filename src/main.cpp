@@ -104,7 +104,6 @@ PYBIND11_MODULE(MoleKing, m) {
         .def("removeAtom", (void (Molecule::*)(Atom)) &Molecule::removeAtom)
         .def("getAtom", &Molecule::getAtom, py::arg("number")=0, py::arg("symbol")=0)
         .def("__getitem__", &Molecule::getAtomObj, py::return_value_policy::reference)
-        //.def("__getitem__", &Molecule::getAtomObj)
         .def("__str__", &Molecule::toStr)
         .def("setCharge", &Molecule::setCharge)
         .def("getCharge", &Molecule::getCharge)
