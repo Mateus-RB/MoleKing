@@ -42,7 +42,7 @@ class Atom{
     void setX(double newX);
     void setY(double newY);
     void setZ(double newZ);
-    void setCharge(double newCharge);
+    void setAtomicCharge(double newCharge);
     double getX();
     double getY();
     double getZ();

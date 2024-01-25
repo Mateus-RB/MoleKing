@@ -235,8 +235,8 @@ void Atom::setNewPos(double newX, double newY, double newZ){
     this->point.setCoords(vector <double> {newX, newY, newZ}, 'c');
 };
 
-void Atom::setCharge(double newCharge){
-    this->charge = newCharge;
+void Atom::setAtomicCharge(double newCharge){
+    this->charge = newCharge;    
 };
 
 void Atom::translation(Vector3D traslationVector){
@@ -250,7 +250,6 @@ void Atom::rotationAxis(double tetha, Vector3D unitAxis){
 vector<double> Atom::getPos(){
     return this->point.getCoords('c');
 };
-
 
 bool Atom::operator<(Atom atom){
     if (this->atomicRadio < atom.getAtomicRadio()){

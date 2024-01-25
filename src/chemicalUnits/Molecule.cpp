@@ -149,6 +149,7 @@ vector<double> Molecule::minNmaxValue(vector <double> v){
 };
 
 Molecule::Molecule(){
+    this->molecule = AtomList();
     this->multiplicity = 1;
     this->VDWRatio = 1.3;
     this->charge = 0;
@@ -190,6 +191,7 @@ void Molecule::addAtom(Atom atom){
 vector <string> Molecule::getAtom(int number, bool symbol){
     vector<string> atomString(4);
     Atom atom = this->molecule.at(number-1);
+
     if(symbol == 0){
         atomString.at(0) = to_string(atom.getAtomicNumber());
     }else{
@@ -203,7 +205,7 @@ vector <string> Molecule::getAtom(int number, bool symbol){
     return atomString;
 };
 
-Atom Molecule::getAtomObj(int number){
+Atom& Molecule::getAtomObj(int number){
     return this->molecule[number];
 }
 
@@ -467,7 +469,6 @@ void Molecule::stdOrientation(){
     return;
 }
 
-
 vector <int> Molecule::molecularAxis(){
     int j = 0;
     vector <int> temp;
@@ -665,6 +666,14 @@ void Molecule::removeAtom(Atom atom){
         };
     };
 };
+
+
+void Molecule::detectFunctionExecution()
+{
+    //detect if any Atom class function was executed;
+    
+;
+}
 
 string Molecule::toStr(){
     vector <pair <string, int> > s;

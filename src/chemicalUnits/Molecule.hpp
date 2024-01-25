@@ -52,6 +52,8 @@ private:
     vector<int> getBonded(int atomIndex);
 
 
+    void detectFunctionExecution();
+
 public:
     typedef AtomList::iterator iterator;
     typedef AtomList::const_iterator const_iterator;
@@ -70,7 +72,7 @@ public:
     void addAtom(int atomNumber, double xPos, double yPos, double zPos, double atomicCharge = 0.0, bool freezeCode_ = 0);
     void addAtom(Atom atom);
     vector <string> getAtom(int number, bool symbol = 0);
-    Atom getAtomObj(int number);
+    Atom& getAtomObj(int number);
     ChargePoint getChargePointsObj(int number);
     void setCharge(int charge);
     double getCharge();
