@@ -89,6 +89,22 @@ int main(int argc, char* argv[]){
             };
             return 0;
       }   
+
+      else if ((string) argv[1] == "charges")
+      {
+            Atom A1("C",-3.89100000, 0.48400000, 0.00000000);            
+            cout << "Charge of atom B4 -> " << A1.getAtomicCharge() << endl;
+            A1.setAtomicCharge(1.0);
+            cout << "Charge of atom After -> " << A1.getAtomicCharge() << endl;
+
+            cout << "\n" << endl;
+
+            Molecule M1 = Molecule();
+            M1.addAtom("H", -3.50500000, 0.96700000, 0.87200000);
+            cout << "Charge of atom B4 -> " << M1.getAtomObj(0).getAtomicCharge() << endl;
+            M1.getAtomObj(0).setAtomicCharge(1.0);
+            cout << "Charge of atom After -> " << M1.getAtomObj(0).getAtomicCharge() << endl;
+      }
  
       else{
             int AN1, AN2, AN3;
