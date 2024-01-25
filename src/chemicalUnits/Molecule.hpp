@@ -52,6 +52,8 @@ private:
     vector<int> getBonded(int atomIndex);
 
 
+    void detectFunctionExecution();
+
 public:
     typedef AtomList::iterator iterator;
     typedef AtomList::const_iterator const_iterator;
