@@ -149,6 +149,7 @@ vector<double> Molecule::minNmaxValue(vector <double> v){
 };
 
 Molecule::Molecule(){
+    this->molecule = AtomList();
     this->multiplicity = 1;
     this->VDWRatio = 1.3;
     this->charge = 0;
@@ -204,7 +205,7 @@ vector <string> Molecule::getAtom(int number, bool symbol){
     return atomString;
 };
 
-Atom Molecule::getAtomObj(int number){
+Atom& Molecule::getAtomObj(int number){
     return this->molecule[number];
 }
 
@@ -671,10 +672,7 @@ void Molecule::detectFunctionExecution()
 {
     //detect if any Atom class function was executed;
     
-
-    ;
-
-
+;
 }
 
 string Molecule::toStr(){
