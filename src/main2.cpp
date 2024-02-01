@@ -58,6 +58,7 @@ int main(int argc, char* argv[]){
                         cout << b[i][j] << endl;
                   }
             }
+        
             return 0;
       } 
   

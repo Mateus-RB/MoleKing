@@ -9,7 +9,9 @@ add_library(chemicalUnits
         SupraMolecule.hpp
         SupraMolecule.cpp
         OPLSff.hpp
-        OPLSff.cpp) 
+        OPLSff.cpp
+        pov.cpp
+        pov.hpp) 
 target_include_directories(chemicalUnits PRIVATE 
         "${CMAKE_CURRENT_SOURCE_DIR}"
         "${CMAKE_CURRENT_SOURCE_DIR}/../myMath"
