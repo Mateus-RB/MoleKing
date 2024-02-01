@@ -28,6 +28,8 @@
 #include "myMath/Vectors.hpp"
 #include "outputProcess/G16Process.hpp"
 #include "outputProcess/Psi4Process.hpp"
+#include "chemicalUnits/pov.cpp"
+#include "chemicalUnits/pov.hpp"
 using namespace std;
 
 #include <pybind11/pybind11.h>
@@ -221,6 +223,10 @@ PYBIND11_MODULE(MoleKing, m) {
         .def("show", &Matrix::print)
         .def("__str__", &Matrix::toStr);
 
+    py::class_<PovRay>(m, "PovRay", "This class creates a PovRay file.")
+        .def(py::init<const Molecule&>(), py::arg("mol"));
+        
+
     py::class_<G16LOGfile>(m, "G16LOGfile", "This class is experimental and under development.")
         .def(py::init< string, bool, bool, int>(), py::arg("filePath"), py::arg("polarAsw") = 0, py::arg("tdAsw") = 0, py::arg("link") = 0)
         .def("getDate", &G16LOGfile::getDate)
@@ -231,6 +237,7 @@ PYBIND11_MODULE(MoleKing, m) {
         .def("getOrbitals", &G16LOGfile::getOrbitals)
         .def("getTransitions", &G16LOGfile::getTransitions, py::arg("index") = 0)
         .def("getDipole", &G16LOGfile::getDipole, py::arg("axis") = "tot")
+        .def("getFrequency", &G16LOGfile::getFrequency)
         .def("getHOMO", [](G16LOGfile &self, int index) {
             auto values = self.getHOMO(index);
             if (values.size() == 1)
@@ -247,7 +254,7 @@ PYBIND11_MODULE(MoleKing, m) {
             }
             return py::cast(values);
         }, py::arg("index") = 0)
-        .def("__str__", &G16LOGfile::toStr);    
+        .def("__str__", &G16LOGfile::toStr);   
 
     py::class_<Psi4OUTfile>(m, "Psi4OUTfile", "This class is experimental and under development.")
         .def(py::init< string >(), py::arg("filePath"))

@@ -60,6 +60,7 @@ private:
     size_t starterMethod;  
     size_t basis; 
     size_t chargeMultiFinder;
+    size_t polarFinder;
 
     //* string
     string basisValue;    
@@ -69,9 +70,12 @@ private:
     string info;
     string method;
     string moleculeSTR = "";
+    string polarSTR = "";
     string mullikenSTR = "";
     string str_filePath;
     string linkStorageSTD = "";
+    string polarAuxiliary;
+    string Freq;
     vector <string> iptStorage;
     vector <string> stdStorage;
     vector <string> aHomoStorage;
@@ -80,8 +84,8 @@ private:
     vector <string> bLumoStorage;
     vector <string> dipoleStorage;
     vector <string> tdStorage;
-    vector <string> linkStorage;
-
+    vector <string> polarStorage;
+    vector <string> vecPolar;
     vector<string> elstDipoleStorage;
     vector<string> alphaStorage;
     vector<string> betaStorage;
@@ -96,7 +100,8 @@ private:
     double dipoleTot;
     double dipoleX;
     double dipoleY;
-    double dipoleZ;   
+    double dipoleZ;
+    double FreqDouble;   
 
     //* molecule
     Molecule mol;
@@ -119,6 +124,7 @@ private:
     vector<string> bOccupied;
     vector<string> Unoccupied;
     vector<string> bUnoccupied;
+    vector<double> vecFrec;
 
     //* teste
 
@@ -138,6 +144,7 @@ private:
     void setDipole();
     void splitter();
     void setNLO();
+    void setFrequency();
 
 public:
     G16LOGfile(string filePath, bool polarAsw = 0, bool tdAsw = 0, int  link = 0);   
@@ -152,5 +159,6 @@ public:
     string getBasis();
     string getMethod();
     string toStr();
-    Molecule getMolecule();  
+    Molecule getMolecule();
+    vector<double> getFrequency();  
 };
