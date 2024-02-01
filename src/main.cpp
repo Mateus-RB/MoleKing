@@ -28,6 +28,8 @@
 #include "myMath/Vectors.hpp"
 #include "outputProcess/G16Process.hpp"
 #include "outputProcess/Psi4Process.hpp"
+#include "chemicalUnits/pov.cpp"
+#include "chemicalUnits/pov.hpp"
 using namespace std;
 
 #include <pybind11/pybind11.h>
@@ -220,6 +222,10 @@ PYBIND11_MODULE(MoleKing, m) {
         .def("elem", &Matrix::element)
         .def("show", &Matrix::print)
         .def("__str__", &Matrix::toStr);
+
+    py::class_<PovRay>(m, "PovRay", "This class creates a PovRay file.")
+        .def(py::init<const Molecule&>(), py::arg("mol"));
+        
 
     py::class_<G16LOGfile>(m, "G16LOGfile", "This class is experimental and under development.")
         .def(py::init< string, bool, bool>(), py::arg("filePath"), py::arg("polarAsw") = 0, py::arg("tdAsw") = 0)
