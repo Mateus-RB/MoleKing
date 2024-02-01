@@ -311,7 +311,7 @@ void G16LOGfile::readLOGFile()
             if (line.find(" Dipole orientation:") != string::npos)
             {
                 polarSTR += line + "\n";
-                while (getline(log_file, line))
+                while (getline(this->logfile, line))
                 {
                     if (line.find(" ----------------------------------------------------------------------") != string::npos)
                     {

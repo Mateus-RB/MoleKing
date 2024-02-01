@@ -86,6 +86,7 @@ private:
     vector <string> tdStorage;
     vector <string> polarStorage;
     vector <string> vecPolar;
+    vector <string> linkStorage;
     vector<string> elstDipoleStorage;
     vector<string> alphaStorage;
     vector<string> betaStorage;
