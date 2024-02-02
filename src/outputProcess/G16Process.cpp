@@ -44,7 +44,6 @@ G16LOGfile::G16LOGfile(string filePath, bool polarAsw, bool tdAsw, int link)
         else if (link == -1)
         {
             this->logfile.str(this->linkStorage[this->linkStorage.size() - 1]);
-            cerr << "WARNING in G16LOGfile::G16LOGfile(): Using the last link calculation found in the log file." << endl;
         }
 
         else if (link < 0 && link != -1)
@@ -55,7 +54,6 @@ G16LOGfile::G16LOGfile(string filePath, bool polarAsw, bool tdAsw, int link)
         else
         {
             this->logfile.str(this->linkStorage[link - 1]);
-            cerr << "WARNING in G16LOGfile::G16LOGfile(): Using the link calculation number " << link << " found in the log file." << endl;
         };
     };
 
@@ -88,7 +86,7 @@ G16LOGfile::G16LOGfile(string filePath, bool polarAsw, bool tdAsw, int link)
 void G16LOGfile::detectLink()
 {   
 
-    normalT = line.find(" Normal termination of Gaussian ");
+    normalT = line.find(" Normal termination of Gaussian");
     
     //check if the file exist
 
@@ -114,7 +112,7 @@ void G16LOGfile::detectLink()
         };
         this->linkStorage.emplace_back(linkStorageSTD);
         linkStorageSTD = "";
-    };
+    };    
 
     // If ntFound is false, throw an error
     if (!ntFound)
@@ -129,7 +127,7 @@ void G16LOGfile::detectLink()
 void G16LOGfile::readLOGFile()
 {
     while (getline(this->logfile, line))
-    {
+    {   
         // Check if the line contains certain keywords
         scf = line.find("SCF Done:");
         stdT = line.find("Standard orientation:");
@@ -142,7 +140,8 @@ void G16LOGfile::readLOGFile()
         dipoleFinder = line.find("Tot=");
         tdFinder = line.find("Excited State ");
         polarFinder = line.find(" Dipole moment:");
-        chargeMultiFinder = line.find(" Charge =");       
+        chargeMultiFinder = line.find(" Charge =");
+        normalT = line.find(" Normal termination of Gaussian");       
         // If the line contains "Standard orientation:", set stdFound to true
         if (stdT != string::npos)
         {
@@ -245,14 +244,14 @@ void G16LOGfile::readLOGFile()
         
         // If the line contains "Standard basis:", extract the basis set used
         if (basis != string::npos)
-        {
+        {   
             this->basisValue = line.substr(basis + 16);
         };
         // If the line contains "Normal termination of Gaussian", extract the date and time of the calculation
         if (normalT != string::npos)
-        {
-            this->info = line.substr(normalT + 31);
-            this->info.pop_back(); // this remove the '.' of the string, wich is the last char in the string.
+        {   
+            this->info = line.substr(line.size() - 5);
+            this->info.pop_back(); // this remove the '.' of the string, wich is the last char in the string.            
         };
         // If the line contains "Input orientation:", extract the molecule's geometry in Input Orientation
         if (line.find("Input orientation:") != string::npos)
