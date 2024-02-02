@@ -1,0 +1,18 @@
+critical:
+    - '(critical|urgent|broken)'
+bug:
+    - '(bug|unusual|this issue|fix)'
+enhancement:
+    - '(enhancement|improvment|well made|better made|development|Add suport|add suport|Add)'
+documentation:
+    - '(Latex|Documentation|user guide|README)'
+interface:
+    - '(interface|image|front end)'
+instalation:
+    - '(instalation|cmake)'
+windows:
+  - '(windows|Windows)'
+aesthetic:
+  - '(aesthetic)'
+test:
+  - '(ctest|pytest)'
