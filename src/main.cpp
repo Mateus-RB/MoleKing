@@ -133,13 +133,12 @@ PYBIND11_MODULE(MoleKing, m) {
         .def("bondLength", &Molecule::bondLength)
         .def("valenceAngle", &Molecule::valenceAngle)
         .def("torsion", &Molecule::torsion)
-        .def("doIRC", &Molecule::doIRC)
         .def("getIRCBonds", &Molecule::getIRCBonds)
         .def("getIRCAngles", &Molecule::getIRCAngles)
         .def("getIRCDihedrals", &Molecule::getIRCDihedrals)
         .def("removeElement", &Molecule::removeElement)
         .def("toXYZ", &Molecule::toXYZ, py::arg("fileName") = "MK_Molecule.xyz")
-        .def("toGJF", &Molecule::toGJF, py::arg("fileName") = "MK_Molecule.gjf", py::arg("method") = "B3LYP", py::arg("basis") = "6-311g(d)", py::arg("addKeywords") = "", py::arg("endKeywords") = "", py::arg("charge") = 0, py::arg("multiplicity") = 1)
+        .def("toGJF", &Molecule::toGJF, py::arg("fileName") = "MK_Molecule.gjf", py::arg("method") = "B3LYP", py::arg("basis") = "6-311g(d)", py::arg("addKeywords") = "", py::arg("endKeywords") = "", py::arg("charge") = 0, py::arg("multiplicity") = 1, py::arg("zmatrix") = 0)
         .def("getMM", &Molecule::getMolecularMass);
     
     py::class_<SupraMolecule>(m, "SupraMolecule", "This class creates a set of molecules variable type allowing for the usage in python like a primitive type.")

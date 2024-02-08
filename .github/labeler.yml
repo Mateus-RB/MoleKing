@@ -8,8 +8,8 @@ documentation:
     - '(Latex|Documentation|user guide|README)'
 interface:
     - '(interface|image|front end)'
-instalation:
-    - '(instalation|cmake)'
+installation:
+    - '(installation|cmake)'
 windows:
   - '(windows|Windows)'
 aesthetic:
