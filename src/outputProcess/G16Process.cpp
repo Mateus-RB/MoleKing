@@ -933,6 +933,19 @@ map<string,double> G16LOGfile::getAlpha(string unit, double frequency)
     {
         throw runtime_error("ERROR in G16LOGfile::getAlpha(): No NLO found in the log file., Try using polarAsw=1.");
     }
+
+    //check if frequency is in the vecFrec vector
+    if (find(this->vecFrec.begin(), this->vecFrec.end(), frequency) == this->vecFrec.end())
+    {   
+        string temp = "";
+
+        for (int i = 0; i < this->vecFrec.size(); i++)
+        {
+            temp += to_string(this->vecFrec[i]) + ", ";
+        }
+        
+        throw runtime_error("ERROR in G16LOGfile::getAlpha(): Frequency not found in the log file. Try: " + temp + "instead.");
+    }
     
     //get the element with the frequency key from map this->Alpha
     this->Alpha[frequency];

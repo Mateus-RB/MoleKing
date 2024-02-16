@@ -225,7 +225,6 @@ PYBIND11_MODULE(MoleKing, m) {
     py::class_<PovRay>(m, "PovRay", "This class creates a PovRay file.")
         .def(py::init<const Molecule&>(), py::arg("mol"));
         
-
     py::class_<G16LOGfile>(m, "G16LOGfile", "This class is experimental and under development.")
         .def(py::init< string, bool, bool, int>(), py::arg("filePath"), py::arg("polarAsw") = 0, py::arg("tdAsw") = 0, py::arg("link") = 0)
         .def("getDate", &G16LOGfile::getDate)
