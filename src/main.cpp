@@ -237,6 +237,8 @@ PYBIND11_MODULE(MoleKing, m) {
         .def("getTransitions", &G16LOGfile::getTransitions, py::arg("index") = 0)
         .def("getDipole", &G16LOGfile::getDipole, py::arg("axis") = "tot")
         .def("getFrequency", &G16LOGfile::getFrequency)
+        .def("getNLO", &G16LOGfile::getNLO, py::arg("Orientation") = "input")
+        .def("getAlpha", &G16LOGfile::getAlpha, py::arg("unit") = "esu", py::arg("frequency") = 0)
         .def("getHOMO", [](G16LOGfile &self, int index) {
             auto values = self.getHOMO(index);
             if (values.size() == 1)
