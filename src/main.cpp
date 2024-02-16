@@ -7,7 +7,7 @@
 //   Email(s):    ['heibbe@ufg.br']
 //   Credits:     ['Copyright © 2023 LEEDMOL. All rights reserved.']
 //   Date:        ['17.01.2023']
-//   Version:     ['1.5.0']
+//   Version:     ['1.5.1']
 //   Status:      ['Development']
 //   Language:    ['C++','Python']
 //   Description: ['A python module written in C++ for theoretical chemestry']
@@ -225,7 +225,6 @@ PYBIND11_MODULE(MoleKing, m) {
     py::class_<PovRay>(m, "PovRay", "This class creates a PovRay file.")
         .def(py::init<const Molecule&>(), py::arg("mol"));
         
-
     py::class_<G16LOGfile>(m, "G16LOGfile", "This class is experimental and under development.")
         .def(py::init< string, bool, bool, int>(), py::arg("filePath"), py::arg("polarAsw") = 0, py::arg("tdAsw") = 0, py::arg("link") = 0)
         .def("getDate", &G16LOGfile::getDate)
@@ -237,6 +236,8 @@ PYBIND11_MODULE(MoleKing, m) {
         .def("getTransitions", &G16LOGfile::getTransitions, py::arg("index") = 0)
         .def("getDipole", &G16LOGfile::getDipole, py::arg("axis") = "tot")
         .def("getFrequency", &G16LOGfile::getFrequency)
+        .def("getNLO", &G16LOGfile::getNLO, py::arg("Orientation") = "input")
+        .def("getAlpha", &G16LOGfile::getAlpha, py::arg("unit") = "esu", py::arg("frequency") = 0)
         .def("getHOMO", [](G16LOGfile &self, int index) {
             auto values = self.getHOMO(index);
             if (values.size() == 1)

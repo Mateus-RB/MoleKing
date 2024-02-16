@@ -7,7 +7,7 @@
 //   Email(s):    ['heibbe@ufg.br']
 //   Credits:     ['Copyright © 2023 LEEDMOL. All rights reserved.']
 //   Date:        ['17.01.2023']
-//   Version:     ['1.5.0']
+//   Version:     ['1.5.1']
 //   Status:      ['Development']
 //   Language:    ['C++','Python']
 //   Description: ['A python module written in C++ for theoretical chemestry']
@@ -43,6 +43,7 @@ private:
     int link;
     int countNormal;
 
+
     //* size_t
     size_t dipoleFinder;
     size_t mullikenFinder;
@@ -74,7 +75,8 @@ private:
     string mullikenSTR = "";
     string str_filePath;
     string linkStorageSTD = "";
-    string polarAuxiliary;
+    string polarAuxiliaryDip;
+    string polarAuxiliaryInp;
     string Freq;
     vector <string> iptStorage;
     vector <string> stdStorage;
@@ -84,8 +86,10 @@ private:
     vector <string> bLumoStorage;
     vector <string> dipoleStorage;
     vector <string> tdStorage;
-    vector <string> polarStorage;
-    vector <string> vecPolar;
+    vector <string> polarStorageDip;
+    vector <string> polarStorageInp;
+    vector <string> vecPolarDip;
+    vector <string> vecPolarInp;
     vector <string> linkStorage;
     vector<string> elstDipoleStorage;
     vector<string> alphaStorage;
@@ -120,6 +124,7 @@ private:
     map<string, vector<string>> Orbitals;
     map<string, vector<string>> bOrbitals;
     map<int, map<string, double>> transitions;
+    map<double,map<string,vector<string>>> Alpha;
 
     vector<string> Occupied;
     vector<string> bOccupied;
@@ -146,6 +151,8 @@ private:
     void splitter();
     void setNLO();
     void setFrequency();
+    void setAlpha();
+    vector<string> customSplit(string str, char separator = ' ');
 
 public:
     G16LOGfile(string filePath, bool polarAsw = 0, bool tdAsw = 0, int  link = 0);   
@@ -159,7 +166,10 @@ public:
     string getDate();    
     string getBasis();
     string getMethod();
+    map<string,double> getAlpha(string unit = "esu", double frequency = 0);
     string toStr();
     Molecule getMolecule();
     vector<double> getFrequency();  
+    vector<string> getNLO(string orientation = "input");
+    
 };
