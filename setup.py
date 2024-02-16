@@ -127,9 +127,10 @@ class CMakeBuild(build_ext):
 
 # The information here can also be placed in setup.cfg - better separation of
 # logic and declaration, and simpler if you include description/version in a file.
+
 setup(
     name="MoleKing",
-    version="1.5.0",
+    version=os.popen('grep "MoleKing VERSION" CMakeLists.txt', 'r').read().split(' ')[-1].split(')')[0],
     author="LEEDMOL Research Group",
     author_email="mateus_barbosa@ufg.br",
     description="MoleKing is a python module for chemists aiming to add common principles to python. This module adds new types of python variables, MoleKing_Molecule; MoleKing_Atom; MoleKing_SupraMolecule, and MoleKing_Output, alongside many features considered common knowledge among chemists.",
