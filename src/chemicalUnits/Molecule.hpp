@@ -53,7 +53,7 @@ private:
     void doIRC();
     string zmatrix = "";
     void detectFunctionExecution();
-    void doZMatrix();
+    void reorderMolecule();
 
 public:
     typedef AtomList::iterator iterator;
