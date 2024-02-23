@@ -307,7 +307,7 @@ void G16LOGfile::readLOGFile()
             };
         };
         if (polarAsw)
-        {
+        {   
             if (line.find("Electric dipole moment (input orientation):") != string::npos)
             {
                 polarSTR += line + "\n";
@@ -337,7 +337,6 @@ void G16LOGfile::readLOGFile()
                 polarStorageDip.emplace_back(polarSTR);
                 polarSTR = "";
             };
-            
         };
     };
 
@@ -803,24 +802,36 @@ double G16LOGfile::getDipole(string axis)
 // Function to user get the frequency of the calculation
 
 void G16LOGfile::setNLO()
-{
-    
-    // get the last element of the polarStorage vector
-    this->polarAuxiliaryDip = this->polarStorageDip[this->polarStorageDip.size() - 1];
-    // create a stringstream object with polarAuxiliary
-    stringstream sdip(polarAuxiliaryDip);
-    // Store each line of the stringstream in the lines vector
-    while (getline(sdip, line))
+{   
+    if ( this->polarStorageDip.size() == 0 )
     {
-        this->vecPolarDip.emplace_back(line);
+        cerr << "WARNING in G16LOGfile: Your molecule is symmetric. So your dipole is zero, and there is no dipole orientation." << endl;
     };
-    //check if the last element of the vector lines is equal to "" or " " or "\n"
-    if (this->vecPolarDip[vecPolarDip.size() - 1] == "" || this->vecPolarDip[vecPolarDip.size() - 1] == " " || this->vecPolarDip[vecPolarDip.size() - 1] == "\n")
+
+    if ( (this->polarStorageDip.size() == 0) && (this->polarStorageInp.size() ==0) )
     {
-        // if true, remove the last element of the vector lines
-        this->vecPolarDip.pop_back();
+        throw runtime_error("ERROR in G16LOGfile::setNLO(): No NLO found in the log file.");
     };
     
+    if (this->polarStorageDip.size() > 0) 
+    {
+        // get the last element of the polarStorage vector
+        this->polarAuxiliaryDip = this->polarStorageDip[this->polarStorageDip.size() - 1];
+        // create a stringstream object with polarAuxiliary
+        stringstream sdip(polarAuxiliaryDip);
+        // Store each line of the stringstream in the lines vector
+        while (getline(sdip, line))
+        {
+            this->vecPolarDip.emplace_back(line);
+        };
+        //check if the last element of the vector lines is equal to "" or " " or "\n"
+        if (this->vecPolarDip[vecPolarDip.size() - 1] == "" || this->vecPolarDip[vecPolarDip.size() - 1] == " " || this->vecPolarDip[vecPolarDip.size() - 1] == "\n")
+        {
+            // if true, remove the last element of the vector lines
+            this->vecPolarDip.pop_back();
+        };
+    };
+
     this->polarAuxiliaryInp = this->polarStorageInp[this->polarStorageInp.size() - 1];
     stringstream sinp(polarAuxiliaryInp);
     
@@ -831,7 +842,9 @@ void G16LOGfile::setNLO()
     if (this->vecPolarInp[vecPolarInp.size() - 1] == "" || this->vecPolarInp[vecPolarInp.size() - 1] == " " || this->vecPolarInp[vecPolarInp.size() - 1] == "\n")
     {
         this->vecPolarInp.pop_back();
+
     };
+
 };
 
 vector<string> G16LOGfile::getNLO(string Orientation)
