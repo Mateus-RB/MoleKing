@@ -238,6 +238,7 @@ PYBIND11_MODULE(MoleKing, m) {
         .def("getFrequency", &G16LOGfile::getFrequency)
         .def("getNLO", &G16LOGfile::getNLO, py::arg("Orientation") = "input")
         .def("getAlpha", &G16LOGfile::getAlpha, py::arg("unit") = "esu", py::arg("frequency") = 0)
+        .def("getBeta", &G16LOGfile::getBeta, py::arg("unit") = "esu", py::arg("frequency") = 0, py::arg("BSHG") = 0)
         .def("getHOMO", [](G16LOGfile &self, int index) {
             auto values = self.getHOMO(index);
             if (values.size() == 1)

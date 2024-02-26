@@ -125,6 +125,8 @@ private:
     map<string, vector<string>> bOrbitals;
     map<int, map<string, double>> transitions;
     map<double,map<string,vector<string>>> Alpha;
+    map<double,map<string,vector<string>>> Beta;
+    map<double,map<string,vector<string>>> Beta2;
 
     vector<string> Occupied;
     vector<string> bOccupied;
@@ -152,6 +154,7 @@ private:
     void setNLO();
     void setFrequency();
     void setAlpha();
+    void setBeta();
     vector<string> customSplit(string str, char separator = ' ');
 
 public:
@@ -167,6 +170,7 @@ public:
     string getBasis();
     string getMethod();
     map<string,double> getAlpha(string unit = "esu", double frequency = 0);
+    map<string,double> getBeta(string unit = "esu", double frequency = 0, bool BSHG = 0);
     string toStr();
     Molecule getMolecule();
     vector<double> getFrequency();  
