@@ -114,6 +114,7 @@ public:
     Molecule copy();
     double getMolecularMass();
     void clear();    
+    double RMSD(Molecule MOL2);
     //void doOPLS();
 };
 

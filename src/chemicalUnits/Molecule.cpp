@@ -165,6 +165,18 @@ Molecule::~Molecule(){
     charge = 0;
 };
 
+double Molecule::RMSD(Molecule MOL2)
+{
+    double rmsd = 0.0;
+    for (int i = 0; i < (int) this->molecule.size(); i++)
+    {
+        rmsd += pow(this->molecule[i].getPos()[0] - MOL2.getAtomObj(i).getPos()[0], 2);
+        rmsd += pow(this->molecule[i].getPos()[1] - MOL2.getAtomObj(i).getPos()[1], 2);
+        rmsd += pow(this->molecule[i].getPos()[2] - MOL2.getAtomObj(i).getPos()[2], 2);
+    }
+    return sqrt(rmsd / this->molecule.size());
+}
+
 void Molecule::addChargePoints(double xPos, double yPos, double zPos, double charge){
     ChargePoint cp(xPos, yPos, zPos, charge);
     this->chargePoint.push_back(cp);
