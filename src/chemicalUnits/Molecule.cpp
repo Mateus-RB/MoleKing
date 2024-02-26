@@ -166,7 +166,15 @@ Molecule::~Molecule(){
 };
 
 double Molecule::RMSD(Molecule MOL2)
-{
+{   
+    if (this->molecule.size() != MOL2.molecule.size()){
+        throw invalid_argument("The molecules have different sizes");
+        return 0;
+    }
+
+    this->moveMassCenter(0,0,0);
+    MOL2.moveMassCenter(0,0,0);
+
     double rmsd = 0.0;
     for (int i = 0; i < (int) this->molecule.size(); i++)
     {
