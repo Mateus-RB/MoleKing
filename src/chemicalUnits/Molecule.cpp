@@ -588,6 +588,7 @@ void Molecule::toGJF(string fileName, string method, string basis, string addKey
     }
     else 
     {
+        this->reorderMolecule();
         this->doIRC();
         int sizeMolecule = this->molecule.size();
 
@@ -649,38 +650,38 @@ void Molecule::toGJF(string fileName, string method, string basis, string addKey
     file << endl;    
     file.close();
 }
+void Molecule::reorderMolecule()
+{
+    //create a function that reorders the molecule based on the distance with the first atom
 
-void Molecule::doZMatrix()
-{   
-    this->doIRC();
-    int sizeMolecule = this->molecule.size();
-
-    if (sizeMolecule > 0)
-    {
-        zmatrix += this->molecule[0].getAtomicSymbol() + "\n";
-
-        if (sizeMolecule > 1)
-        {
-            zmatrix += this->molecule[1].getAtomicSymbol() + " 1 " + to_string(this->bondLength(0, 1)) + "\n";
-
-            if (sizeMolecule > 2)
-            {
-                zmatrix += this->molecule[2].getAtomicSymbol() + " 1 " + to_string(this->bondLength(0, 2)) + " 2 " + to_string(this->valenceAngle(1, 0, 2)) + "\n";
-
-                if (sizeMolecule > 3)
-                {
-                    for (int i = 3; (int) i < sizeMolecule; i++)
-                    {   
-                        zmatrix += this->molecule[i].getAtomicSymbol() + " " + to_string(i-2) + " " + to_string(this->bondLength(i-3,i)) + " " + to_string(i-1) + " " + to_string(this->valenceAngle(i, i-3, i-2)) + " " + to_string(i) + " " + to_string(this->torsion(i, i-3, i-2,i-1)) + "\n";
-                    }
-                }
+    vector <int> temp;
+    vector <double> distances;
+    vector <double> atom1 = this->molecule[0].getPos();
+    for (int i = 1; i < (int) this->molecule.size(); i++){
+        vector <double> atom2 = this->molecule[i].getPos();
+        distances.push_back(Vector3D(atom1, atom2).magnitude());
+    }
+    vector <double> distancesCopy = distances;
+    sort(distances.begin(), distances.end());
+    for (int i = 0; i < (int) distances.size(); i++){
+        for (int j = 0; j < (int) distancesCopy.size(); j++){
+            if (distances[i] == distancesCopy[j]){
+                temp.push_back(j+1);
+                distancesCopy[j] = -1;
+                break;
             }
         }
     }
-    
-    this->zmatrix = zmatrix;
+    AtomList tempMolecule;
+    tempMolecule.push_back(this->molecule[0]);
+    for (int i = 0; i < (int) temp.size(); i++){
+        tempMolecule.push_back(this->molecule[temp[i]]);
+    }
+    this->molecule = tempMolecule;
+
 };
 
+// Define the method doZMatrix for the Molecule class
 void Molecule::doIRC(){
     this->bonds.clear();
     this->angles.clear();
