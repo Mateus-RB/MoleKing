@@ -34,6 +34,9 @@
 class Molecule{
 
 private:
+    Vector3D unitVector(Vector3D vector);
+    Quaternion from_axis_angle(Vector3D axis, double angle);
+    Eigen::Matrix<double, 3,3> Q_RotMatrix(Quaternion q);
     typedef vector<Atom> AtomList;
     double VDWRatio;
     AtomList molecule;
@@ -54,6 +57,7 @@ private:
     string zmatrix = "";
     void detectFunctionExecution();
     void reorderMolecule();
+    void stdOrientation_Axis(char Axis);
 
 public:
     typedef AtomList::iterator iterator;
@@ -62,9 +66,8 @@ public:
     Molecule();
     ~Molecule();
     void orderMolecule();
-    
-    Eigen::Matrix<double, 3, 3> moleculeTensor();
     void stdOrientation();
+    Eigen::Matrix<double, 3, 3> moleculeTensor();
     void toXYZ(string fileName = "MK_Molecule.xyz");
     void toGJF(string fileName = "MK_Molecule.gjf", string method = "B3LYP", string basis = "6-311g(d)", string addKeywords = "", string endKeywords = "", int charge = 0, int multiplicity = 1, bool zmatrix=0);
     void addChargePoints(double xPos, double yPos, double zPos, double charge);
@@ -92,8 +95,6 @@ public:
     void translation(Vector3D traslationVector);
     void moveMassCenter(double x = 0.0, double y = 0.0, double z= 0.0);
     void moveTail(int atomNumber, double x = 0.0, double y = 0.0, double z= 0.0);
-    void standardOrientation();
-    vector <double> standardOrientationPath();
     double bondLength(int atomN1, int atomN2);
     double valenceAngle(int atomN1, int atomN2, int atomN3);
     double torsion(int atomN1, int atomN2, int atomN3, int atomN4);
