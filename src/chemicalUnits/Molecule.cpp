@@ -558,12 +558,41 @@ void Molecule::toXYZ(string fileName){
     file.close();
 }
 
-void Molecule::toGJF(string fileName, string method, string basis, string addKeywords,  string endKeywords, int charge, int multiplicity, bool zmatrix){
-    
-    if (fileName.substr(fileName.find_last_of(".") + 1) != "gjf" && fileName.substr(fileName.find_last_of(".") + 1) != "com"){
+string toLower(const std::string& str) {
+    std::string result = str;
+    std::transform(result.begin(), result.end(), result.begin(), ::tolower);
+    return result;
+}
+
+void Molecule::toGJF(string fileName, string method, string basis, string addKeywords, string midKeywords, string endKeywords, int charge, int multiplicity, bool zmatrix, vector<double> EField)
+{    
+    auto extension = fileName.substr(fileName.find_last_of(".") + 1);
+    if (extension != "gjf" && extension != "com") {
         fileName = fileName.substr(0, fileName.find_last_of(".")) + ".gjf";
-    };
+    }
+
+    if ( (this->chargePoint.size() == 0) && (midKeywords != ""))
+    {
+        throw invalid_argument("Please, just use midKeywords if you have charge points, polarizability and electric field.");
+    }
     
+    if ( (EField.size() > 0) && (toLower(addKeywords).find(toLower("polar")) == string::npos) && (midKeywords != ""))
+    {
+        throw invalid_argument("Please, just use midKeywords if you have charge points, polarizability and electric field.");
+    }
+
+    if (EField.size() > 0) {
+        if (!zmatrix) 
+        {
+            throw invalid_argument("Electric field can only be applied to zmatrix. Set zmatrix=True");
+        }
+
+        if (toLower(addKeywords).find(toLower("Field=Read")) == string::npos) 
+        {
+            addKeywords += " Field=Read";
+        }
+    }
+        
     if (charge != 0){
         this->charge = charge;
     };
@@ -594,6 +623,7 @@ void Molecule::toGJF(string fileName, string method, string basis, string addKey
                 << setw(12) << this->molecule[i].getZ() << endl;
         }
     }
+    
     else 
     {
         this->reorderMolecule();
@@ -636,23 +666,73 @@ void Molecule::toGJF(string fileName, string method, string basis, string addKey
         }
     };
     
-    if (this->chargePoint.size() != 0){
-        if (endKeywords != ""){
-            file << endl << " " << endKeywords << endl << endl;
+    if (this->chargePoint.size() != 0)
+    {   
+        if ( (EField.size() > 0) && (toLower(addKeywords).find("polar") != string::npos) && (midKeywords != ""))
+        {
+            file << endl << " " << midKeywords << endl << endl;
+
+            for (int i = 0; i < static_cast<int>(this->chargePoint.size()); i++){
+                file << " " <<fixed << setw(12) << this->chargePoint[i].getX()
+                    << " " <<fixed << setw(12) << this->chargePoint[i].getY()
+                    << " " <<fixed << setw(12) << this->chargePoint[i].getZ() 
+                    << " " <<fixed << setw(12) << this->chargePoint[i].getCharge() << endl;
+            }
+
+            endKeywords += " " + to_string(EField[0]) + " " + to_string(EField[1]) + " " + to_string(EField[2]);
+            file << endl << " " << endKeywords << endl;
         }
-        else {
+
+        else 
+        {
+            
             file << endl;
-        }
-        for (int i = 0; i < static_cast<int>(this->chargePoint.size()); i++){
-            file << " " <<fixed << setw(12) << this->chargePoint[i].getX()
-                 << " " <<fixed << setw(12) << this->chargePoint[i].getY()
-                 << " " <<fixed << setw(12) << this->chargePoint[i].getZ() 
-                 << " " <<fixed << setw(12) << this->chargePoint[i].getCharge() << endl;
+
+            for (int i = 0; i < static_cast<int>(this->chargePoint.size()); i++)
+            {
+                file << " " <<fixed << setw(12) << this->chargePoint[i].getX()
+                    << " " <<fixed << setw(12) << this->chargePoint[i].getY()
+                    << " " <<fixed << setw(12) << this->chargePoint[i].getZ() 
+                    << " " <<fixed << setw(12) << this->chargePoint[i].getCharge() << endl;
+            }
+
+            if (endKeywords != "")
+            {
+                if (EField.size() > 0)
+                {   
+                    endKeywords += " " + to_string(EField[0]) + " " + to_string(EField[1]) + " " + to_string(EField[2]);
+                    file << endl << " " << endKeywords << endl;
+                }
+                else
+                {
+                    file << endl << " " << endKeywords << endl;
+                }
+            }
+            else
+            {
+                if (EField.size() > 0)
+                {
+                    endKeywords += " " + to_string(EField[0]) + " " + to_string(EField[1]) + " " + to_string(EField[2]);
+                    file << endl << " " << endKeywords << endl;
+                }
+                else
+                {
+                    file << endl;
+                }
+            }
         }
     }
-
-    else {
-        file << endl << " " << endKeywords << endl;
+    else
+    {   
+        if(EField.size() > 0)
+        {
+            endKeywords += " " + to_string(EField[0]) + " " + to_string(EField[1]) + " " + to_string(EField[2]);
+            file << endl << " " << endKeywords << endl;
+        }
+        else
+        {
+            file << endl << " " << endKeywords << endl;
+        }
     }
 
     file << endl;    
