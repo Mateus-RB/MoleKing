@@ -59,10 +59,10 @@ G16LOGfile::G16LOGfile(string filePath, bool polarAsw, bool tdAsw, int link)
 
     readLOGFile();
     setMolecule();
-    setDipole();
-    setHOMO();
-    setLUMO();
-    setOrbitals();
+    //setDipole();
+    //setHOMO();
+    //setLUMO();
+    //setOrbitals();
 
     if (tdAsw)
     {   
@@ -259,7 +259,7 @@ void G16LOGfile::readLOGFile()
         {
             while (getline(this->logfile, line))
             {
-                if (line.find("Distance matrix (angstroms):") != string::npos)
+                if (line.find("Distance matrix (angstroms):") != string::npos || line.find(" Rotational constants (GHZ): ") != string::npos)
                 {
                     break;
                 };
@@ -279,7 +279,7 @@ void G16LOGfile::readLOGFile()
         {
             while (getline(this->logfile, line))
             {
-                if (line.find(" Rotational constants (GHZ): ") != string::npos)
+                if (line.find("Distance matrix (angstroms):") != string::npos || line.find(" Rotational constants (GHZ): ") != string::npos)
                 {
                     break;
                 };
@@ -360,6 +360,7 @@ void G16LOGfile::readLOGFile()
 // Function to set the molecule object using the extracted geometry
 void G16LOGfile::setMolecule()
 {   
+    //cout << this->moleculeSTR << endl;
     stringstream ss(this->moleculeSTR);
     string line;
     int i = 0;
