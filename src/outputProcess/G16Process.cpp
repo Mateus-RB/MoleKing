@@ -59,10 +59,10 @@ G16LOGfile::G16LOGfile(string filePath, bool polarAsw, bool tdAsw, int link)
 
     readLOGFile();
     setMolecule();
-    //setDipole();
-    //setHOMO();
-    //setLUMO();
-    //setOrbitals();
+    setDipole();
+    setHOMO();
+    setLUMO();
+    setOrbitals();
 
     if (tdAsw)
     {   
@@ -932,10 +932,9 @@ void G16LOGfile::setAlpha()
             NLOInfo.insert(make_pair(T[0], vector<string>({T[1], T[2], T[3]})));
         };
         FrequencyInfo.insert(make_pair(it->first, NLOInfo));
+        NLOInfo.clear();
     }    
-    
     this->Alpha = FrequencyInfo;
-
 };
 
 
