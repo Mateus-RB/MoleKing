@@ -118,6 +118,7 @@ private:
     bool scfConvergence;
     bool polarAsw;
     bool tdAsw;
+    bool dipFinder = false;
 
     //* map and vectors
 
@@ -131,6 +132,8 @@ private:
     vector<string> Unoccupied;
     vector<string> bUnoccupied;
     vector<double> vecFrec;
+    vector<double> vecFrecDip;
+    vector<double> vecFrecInp;
 
     //* teste
 
