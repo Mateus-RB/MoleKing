@@ -43,7 +43,8 @@ PYBIND11_MODULE(MoleKing, m) {
         .def("getAtomicNumber", &PeriodicTable::getAtomicNumber)
         .def("getAtomicMass", &PeriodicTable::getAtomicMass)
         .def("getSymbol", &PeriodicTable::getSymbol)
-        .def("getCovalentRadii", &PeriodicTable::getCovalentRadii);
+        .def("getCovalentRadii", &PeriodicTable::getCovalentRadii)
+        .def("getColor", &PeriodicTable::getColor);
     
     py::class_<Atom>(m, "Atom", "This class creates a atom variable type allowing for the usage in python like a primitive type.")
         .def(py::init<int, double, double, double, double, bool>(), py::arg("atomicNumber"), py::arg("xPos"), py::arg("yPos"), py::arg("zPos"), py::arg("atomicCharge") = 0.0, py::arg("freezeCode_") = 0)
