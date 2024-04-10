@@ -149,26 +149,26 @@ void SupraMolecule::getMoleculeTorsions(){
     };
 };
 
-void SupraMolecule::standardOrientation(int molNumber){
-    vector <int> molAxis = this->supraMolecule[molNumber].molecularAxis();
-    Vector3D moveTailVec = Vector3D({0, 0, 0}, this->supraMolecule[molNumber].getAtomObj(molAxis[0]).getPos());
-    for (int i = 0; i < (int) this->supraMolecule.size(); i++){
-        this->supraMolecule[i].translation(moveTailVec);
-    };
-    vector <double> angles = this->supraMolecule[molNumber].standardOrientationPath();
-    Vector3D mMassCent = Vector3D({0, 0, 0}, this->supraMolecule[molNumber].getMassCenter().getCoords('c'));
-    this->supraMolecule[molNumber].translation(mMassCent);
-    for (int i = 0; i < (int) this->supraMolecule.size(); i++){
-        if (i != molNumber){
-            this->supraMolecule[i].spinMolecule(angles[0], 'y');
-            this->supraMolecule[i].spinMolecule(angles[1], 'z');
-            this->supraMolecule[i].spinMolecule(angles[2], 'x');
-            this->supraMolecule[i].spinMolecule(90, 'z');
-            this->supraMolecule[i].spinMolecule(90, 'y');
-            this->supraMolecule[i].translation(mMassCent);
-        };
-    };
-};
+// void SupraMolecule::standardOrientation(int molNumber){
+//     vector <int> molAxis = this->supraMolecule[molNumber].molecularAxis();
+//     Vector3D moveTailVec = Vector3D({0, 0, 0}, this->supraMolecule[molNumber].getAtomObj(molAxis[0]).getPos());
+//     for (int i = 0; i < (int) this->supraMolecule.size(); i++){
+//         this->supraMolecule[i].translation(moveTailVec);
+//     };
+//     vector <double> angles = this->supraMolecule[molNumber].standardOrientationPath();
+//     Vector3D mMassCent = Vector3D({0, 0, 0}, this->supraMolecule[molNumber].getMassCenter().getCoords('c'));
+//     this->supraMolecule[molNumber].translation(mMassCent);
+//     for (int i = 0; i < (int) this->supraMolecule.size(); i++){
+//         if (i != molNumber){
+//             this->supraMolecule[i].spinMolecule(angles[0], 'y');
+//             this->supraMolecule[i].spinMolecule(angles[1], 'z');
+//             this->supraMolecule[i].spinMolecule(angles[2], 'x');
+//             this->supraMolecule[i].spinMolecule(90, 'z');
+//             this->supraMolecule[i].spinMolecule(90, 'y');
+//             this->supraMolecule[i].translation(mMassCent);
+//         };
+//     };
+// };
 
 vector <VectorsInt> SupraMolecule::getIRCBonds(){
     vector <VectorsInt> irc;

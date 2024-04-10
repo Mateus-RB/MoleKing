@@ -55,10 +55,19 @@ class Quaternion{
 
     public:
     Quaternion(double u, vector <double> vectorA, vector <double> vectorB);
+    Quaternion(double u, Vector3D vectorA);
+    Quaternion(double u, double s_i, double s_j, double s_k);
     ~Quaternion();
     double magnitude();
     vector <double> getQuaternion();
+    double dotProduct(Quaternion qA);
+    Quaternion operator/ (double mag);
+    Quaternion operator* (double mag);
+    Quaternion operator+ (Quaternion qA);
+    Quaternion operator- (Quaternion qA);
+    Quaternion normalizeQ();
     void show();
+    string toStr();
 };
 
 #endif /* Vectors_hpp */

@@ -56,7 +56,7 @@ public:
     void moveTail(int molNumber, int atomNumber, double x = 0.0, double y = 0.0, double z = 0.0);
     void spinSupraMolecule(double angle, char axis);
     void spinSupraMolecule(double angle, Vector3D spinVector);
-    void standardOrientation(int molNumber);
+    //void standardOrientation(int molNumber);
     vector <VectorsInt> getIRCBonds();
     vector <VectorsInt> getIRCAngles();
     vector <VectorsInt> getIRCDihedrals();
