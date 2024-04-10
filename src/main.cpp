@@ -141,8 +141,8 @@ PYBIND11_MODULE(MoleKing, m) {
         .def("molecularAxis", &Molecule::molecularAxis)
         .def("toXYZ", &Molecule::toXYZ, py::arg("fileName") = "MK_Molecule.xyz")
         .def("RMSD", &Molecule::RMSD, py::arg("MOL2"))
-        .def("toGJF", &Molecule::toGJF, py::arg("fileName") = "MK_Molecule.gjf", py::arg("method") = "B3LYP", py::arg("basis") = "6-311g(d)", py::arg("addKeywords") = "", py::arg("midKeywords") = "", py::arg("endKeywords") = "", py::arg("charge") = 0, py::arg("multiplicity") = 1, py::arg("zmatrix") = 0, py::arg("EField") = vector<double> {});
-        // .def("getMM", &Molecule::getMolecularMass);
+        .def("toGJF", &Molecule::toGJF, py::arg("fileName") = "MK_Molecule.gjf", py::arg("method") = "B3LYP", py::arg("basis") = "6-311g(d)", py::arg("addKeywords") = "", py::arg("midKeywords") = "", py::arg("endKeywords") = "", py::arg("charge") = 0, py::arg("multiplicity") = 1, py::arg("zmatrix") = 0, py::arg("EField") = vector<double> {})
+        .def("getMM", &Molecule::getMolecularMass);
 
     py::class_<SupraMolecule>(m, "SupraMolecule", "This class creates a set of molecules variable type allowing for the usage in python like a primitive type.")
         .def(py::init())
