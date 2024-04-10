@@ -1057,6 +1057,128 @@ map<string,double> G16LOGfile::getAlpha(string unit, double frequency)
     return temp;
 };
 
+void G16LOGfile::setBeta()
+{   
+    map<double, int> start, end, start2, end2;
+    for (int f = 0; f < this->vecFrec.size(); f++)
+    {
+        double freqPrincipal = this->vecFrec[f];
+        for (int i = 0; i < this->vecPolarInp.size(); i++)
+        {
+            if (vecPolarInp[i].find("Beta(0;0,0)") != string::npos)
+            { 
+                start.insert(make_pair(this->vecFrec[0],i+2));
+                end.insert(make_pair(this->vecFrec[0],i+17));
+                start2.insert(make_pair(this->vecFrec[0],i+2));
+                end2.insert(make_pair(this->vecFrec[0],i+17));
+            }
+            else if (vecPolarInp[i].find("Beta(-w;w,0) w= ") != string::npos)
+            { 
+                string Freq = this->vecPolarInp[i].substr(this->vecPolarInp[i].find("Beta(-w;w,0)") + 15);
+                Freq = Freq.substr(0, Freq.find("nm"));
+                //convert Freq to double
+                double FreqDouble = stod(Freq);
+                if(freqPrincipal == FreqDouble)
+                {
+                    start.insert(make_pair(FreqDouble,i+2));
+                    end.insert(make_pair(FreqDouble,i+25));
+                }
+            }
+            else if (vecPolarInp[i].find("Beta(-2w;w,w) w= ") != string::npos)
+            { 
+                string Freq = this->vecPolarInp[i].substr(this->vecPolarInp[i].find("Beta(-2w;w,w)") + 16);
+                Freq = Freq.substr(0, Freq.find("nm"));
+                //convert Freq to double
+                double FreqDouble = stod(Freq);
+                if(freqPrincipal == FreqDouble)
+                {
+                    start2.insert(make_pair(FreqDouble,i+2));
+                    end2.insert(make_pair(FreqDouble,i+25));
+                }
+            }
+
+        }
+    };
+    map<double,map<string,vector<string>>> FrequencyInfo, FrequencyInfo2;
+    map<string,vector<string>> NLOInfo, NLOInfo2;
+    vector<vector<string>> Beta_0, Beta_w, Beta_2w;
+    for (auto it = start.begin(); it != start.end(); ++it) 
+    {   
+        for(int i = start[it->first]; i < end[it->first]; i++)
+        {   vector<string> T = this->customSplit(vecPolarInp[i]);         
+            NLOInfo.insert(make_pair(T[0], vector<string>({T[1], T[2], T[3]})));
+        };
+        FrequencyInfo.insert(make_pair(it->first, NLOInfo));
+    }    
+    this->Beta = FrequencyInfo;
+
+    for (auto it = start2.begin(); it != start2.end(); ++it) 
+    {   
+        for(int i = start2[it->first]; i < end2[it->first]; i++)
+        {   vector<string> T = this->customSplit(vecPolarInp[i]);         
+            NLOInfo2.insert(make_pair(T[0], vector<string>({T[1], T[2], T[3]})));
+        };
+        FrequencyInfo2.insert(make_pair(it->first, NLOInfo2));
+    }    
+    this->Beta2 = FrequencyInfo2;
+
+
+};
+
+map<string,double> G16LOGfile::getBeta(string unit, double frequency, bool BSHG)
+{   
+    map<double,map<string,vector<string>>> beta;
+    if (BSHG){
+       beta = this->Beta2;
+    }
+    else
+    {
+        cout << BSHG << endl;
+        beta = this->Beta;
+    }
+    map<string,double> temp;
+    if (!this->polarAsw)
+    {
+        throw runtime_error("ERROR in G16LOGfile::getBeta(): No NLO found in the log file., Try using polarAsw=1.");
+    }
+    //check if frequency is in the vecFrec vector
+    if (find(this->vecFrec.begin(), this->vecFrec.end(), frequency) == this->vecFrec.end())
+    {   
+        string temp = "";
+        for (int i = 0; i < this->vecFrec.size(); i++)
+        {
+            temp += to_string(this->vecFrec[i]) + ", ";
+        }
+        throw runtime_error("ERROR in G16LOGfile::getBeta(): Frequency not found in the log file. Try: " + temp + "instead.");
+    }
+    //get the element with the frequency key from map this->Alpha
+    beta[frequency];
+    cout << beta[frequency].size() << endl;
+    //create a new map to match with user's unit. The first one is au, the second is esu and last one is SI.311g
+    for (auto it = beta[frequency].begin(); it != beta[frequency].end(); ++it) 
+    {   
+        if (unit == "au")
+        {   
+            replace(it->second[0].begin(), it->second[0].end(), 'D', 'E');
+            temp.insert(make_pair(it->first, stod(it->second[0])));
+        }
+        else if (unit == "esu")
+        {   
+            replace(it->second[1].begin(), it->second[1].end(), 'D', 'E');
+            temp.insert(make_pair(it->first, stod(it->second[1])));
+        }
+        else if (unit == "SI")
+        {   
+            replace(it->second[2].begin(), it->second[2].end(), 'D', 'E');
+            temp.insert(make_pair(it->first, stod(it->second[2])));
+        }
+        else
+        {
+            throw runtime_error("ERROR in G16LOGfile::getBeta(): Invalid unit. Please, use 'au', 'esu' or 'SI'.");
+        }   
+    };
+    return temp;
+};
 
 vector<string> G16LOGfile::customSplit(string str, char separator) 
 {   
