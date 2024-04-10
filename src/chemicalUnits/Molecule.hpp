@@ -69,8 +69,7 @@ public:
     void stdOrientation();
     Eigen::Matrix<double, 3, 3> moleculeTensor();
     void toXYZ(string fileName = "MK_Molecule.xyz");
-    void toGJF(string fileName = "MK_Molecule.gjf", string method = "B3LYP", string basis = "6-311g(d)", string addKeywords = "", string endKeywords = "", int charge = 0, int multiplicity = 1, bool zmatrix=0);
-    void addChargePoints(double xPos, double yPos, double zPos, double charge);
+    void toGJF(string fileName = "MK_Molecule.gjf", string method = "B3LYP", string basis = "6-311g(d)", string addKeywords = "", string midKeywords = "", string endKeywords = "", int charge = 0, int multiplicity = 1, bool zmatrix=0, vector<double> EField = {});    void addChargePoints(double xPos, double yPos, double zPos, double charge);
     void addChargePoints(ChargePoint cp);
     void addAtom(string atomSymbol, double xPos, double yPos, double zPos, double atomicCharge = 0.0, bool freezeCode_ = 0);
     void addAtom(int atomNumber, double xPos, double yPos, double zPos, double atomicCharge = 0.0, bool freezeCode_ = 0);
