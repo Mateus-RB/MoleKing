@@ -1095,7 +1095,7 @@ void G16LOGfile::setBeta()
             }
         }
         map<double,map<string,vector<string>>> FrequencyInfo, FrequencyInfo2;
-        map<string,vector<string>> NLOInfo, NLOInfo2;
+        map<string,vector<string>> NLOInfo;
         vector<vector<string>> Beta_0, Beta_w, Beta_2w;
         for (auto it = start.begin(); it != start.end(); ++it) 
         {   
@@ -1128,7 +1128,7 @@ void G16LOGfile::setBeta()
                     NLOInfo.insert(make_pair(T[0], vector<string>({T[1], T[2], T[3]})));
                 }         
             };
-            FrequencyInfo2.insert(make_pair(it->first, NLOInfo2));
+            FrequencyInfo2.insert(make_pair(it->first, NLOInfo));
             NLOInfo.clear();
         }    
         this->Beta2.insert(make_pair(WhatPolar, FrequencyInfo2));
@@ -1250,8 +1250,13 @@ void G16LOGfile::setGamma()
 
             }
         }
+        // for (auto it = start2.begin(); it != start2.end(); ++it) 
+        // {   
+        //     cout << "start2[" << it->first << "]: " << start2[it->first] << endl;
+        //     cout << "end2[" << it->first << "]: " << end2[it->first] << endl;
+        // }    
         map<double,map<string,vector<string>>> FrequencyInfo, FrequencyInfo2;
-        map<string,vector<string>> NLOInfo, NLOInfo2;
+        map<string,vector<string>> NLOInfo;
         //vector<vector<string>> Gamma_0, Gamma_w, Gamma_2w;
         for (auto it = start.begin(); it != start.end(); ++it) 
         {   
@@ -1271,12 +1276,13 @@ void G16LOGfile::setGamma()
             {   vector<string> T = this->customSplit(UsePolar[i]);         
                 NLOInfo.insert(make_pair(T[0], vector<string>({T[1], T[2], T[3]})));       
             };
-            FrequencyInfo2.insert(make_pair(it->first, NLOInfo2));
+            FrequencyInfo2.insert(make_pair(it->first, NLOInfo));
             NLOInfo.clear();
         }    
         this->Gamma2.insert(make_pair(WhatPolar, FrequencyInfo2));
 
-    };
+   };
+// Print this->Gamma2 on terminal
 };
 
 map<string,double> G16LOGfile::getGamma(string orientation, string unit, double frequency, bool GSHG)

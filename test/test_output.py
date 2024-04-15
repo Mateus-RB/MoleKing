@@ -82,11 +82,22 @@ class TestG16Output():
         if '/test/test' in home_path:
             home_path = home_path.replace('/test/test', '/test')   
         f = G16LOGfile(home_path+'/MK_polar.log', polarAsw=True).getFrequency()
-        b1 = G16LOGfile(home_path+'/MK_polar.log', polarAsw=True).getBeta(unit='esu', frequency=f[0])['||(z)']
-        b2 = G16LOGfile(home_path+'/MK_polar.log', polarAsw=True).getBeta(unit='SI', frequency=f[1])['xxx']
+        b1 = G16LOGfile(home_path+'/MK_polar.log', polarAsw=True).getBeta(unit='esu', frequency=f[0])['||']
+        b2 = G16LOGfile(home_path+'/MK_polar.log', polarAsw=True).getBeta(unit='au', frequency=f[1], BSHG=1)['_|_(z)']
 
-        assert b1 == 0.0125723
-        assert b2 == -0.174984
+        assert b1 == 0.3999
+        assert b2 == -0.0219886
+
+    def test_getGamma(self):
+        home_path = getcwd()+'/test'
+        if '/test/test' in home_path:
+            home_path = home_path.replace('/test/test', '/test')   
+        f = G16LOGfile(home_path+'/MK_polar.log', polarAsw=True).getFrequency()
+        g1 = G16LOGfile(home_path+'/MK_polar.log', polarAsw=True).getGamma(unit='esu', frequency=f[0])['||']
+        g2 = G16LOGfile(home_path+'/MK_polar.log', polarAsw=True).getGamma(unit='au', frequency=f[1], GSHG=1)['xxxx']
+
+        assert g1 == 31.0094
+        assert g2 == 61491.6
 
 class TestPSI4Output():
 
