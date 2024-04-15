@@ -64,6 +64,30 @@ class TestG16Output():
         assert len(Ob1['Occupied']) == 13
         assert len(Ob2['Occupied']) == 5
 
+    def test_getAlpha(self):
+        home_path = getcwd()+'/test'
+        if '/test/test' in home_path:
+            home_path = home_path.replace('/test/test', '/test')   
+        print(home_path+'/MK_polar.log')
+        f = G16LOGfile(home_path+'/MK_polar.log', polarAsw=True).getFrequency()
+        a1 = G16LOGfile(home_path+'/MK_polar.log', polarAsw=True).getAlpha(unit='esu', frequency=f[0])['iso']
+        a2 = G16LOGfile(home_path+'/MK_polar.log', polarAsw=True).getAlpha(unit='SI', frequency=f[1])['xx']
+
+        assert f == [0.0, 656.3, 587.6, 486.1]
+        assert a1 == 95.8572
+        assert a2 == 103.56
+
+    def test_getBeta(self):
+        home_path = getcwd()+'/test'
+        if '/test/test' in home_path:
+            home_path = home_path.replace('/test/test', '/test')   
+        f = G16LOGfile(home_path+'/MK_polar.log', polarAsw=True).getFrequency()
+        b1 = G16LOGfile(home_path+'/MK_polar.log', polarAsw=True).getBeta(unit='esu', frequency=f[0])['||(z)']
+        b2 = G16LOGfile(home_path+'/MK_polar.log', polarAsw=True).getBeta(unit='SI', frequency=f[1])['xxx']
+
+        assert b1 == 0.0125723
+        assert b2 == -0.174984
+
 class TestPSI4Output():
 
     def test_psi4(self):
