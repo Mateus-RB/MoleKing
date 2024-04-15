@@ -128,6 +128,8 @@ private:
     map<string,map<double,map<string,vector<string>>>> Alpha;
     map<string,map<double,map<string,vector<string>>>> Beta;
     map<string,map<double,map<string,vector<string>>>> Beta2;
+    map<string,map<double,map<string,vector<string>>>> Gamma;
+    map<string,map<double,map<string,vector<string>>>> Gamma2;
 
     vector<string> Occupied;
     vector<string> bOccupied;
@@ -158,6 +160,7 @@ private:
     void setFrequency();
     void setAlpha();
     void setBeta();
+    void setGamma();
     vector<string> customSplit(string str, char separator = ' ');
 
 public:
@@ -174,6 +177,7 @@ public:
     string getMethod();
     map<string,double> getAlpha(string orientation = "Dipole", string unit = "esu", double frequency = 0);
     map<string,double> getBeta(string orientation = "Dipole", string unit = "esu", double frequency = 0, bool BSHG = 0);
+    map<string,double> getGamma(string orientation = "Dipole", string unit = "esu", double frequency = 0, bool GSHG = 0);
     string toStr();
     Molecule getMolecule();
     vector<double> getFrequency();  
