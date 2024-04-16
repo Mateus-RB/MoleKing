@@ -161,7 +161,7 @@ PYBIND11_MODULE(MoleKing, m) {
         .def("moveTail", &SupraMolecule::moveTail)
         .def("spinSupraMolecule", (void (SupraMolecule::*)(double, char)) &SupraMolecule::spinSupraMolecule)
         .def("spinSupraMolecule", (void (SupraMolecule::*)(double, Vector3D)) &SupraMolecule::spinSupraMolecule)
-        .def("standardOrientation", &SupraMolecule::standardOrientation)
+        //.def("standardOrientation", &SupraMolecule::standardOrientation)
         .def("getIRCBonds", &SupraMolecule::getIRCBonds)
         .def("getIRCAngles", &SupraMolecule::getIRCAngles)
         .def("getIRCDihedrals", &SupraMolecule::getIRCDihedrals)
@@ -240,7 +240,9 @@ PYBIND11_MODULE(MoleKing, m) {
         .def("getDipole", &G16LOGfile::getDipole, py::arg("axis") = "tot")
         .def("getFrequency", &G16LOGfile::getFrequency)
         .def("getNLO", &G16LOGfile::getNLO, py::arg("Orientation") = "input")
-        .def("getAlpha", &G16LOGfile::getAlpha, py::arg("unit") = "esu", py::arg("frequency") = 0)
+        .def("getAlpha", &G16LOGfile::getAlpha,py::arg("orientation") = "Dipole", py::arg("unit") = "esu", py::arg("frequency") = 0)
+        .def("getBeta", &G16LOGfile::getBeta,py::arg("orientation") = "Dipole", py::arg("unit") = "esu", py::arg("frequency") = 0, py::arg("BSHG") = 0)
+        .def("getGamma", &G16LOGfile::getGamma,py::arg("orientation") = "Dipole", py::arg("unit") = "esu", py::arg("frequency") = 0, py::arg("GSHG") = 0)
         .def("getHOMO", [](G16LOGfile &self, int index) {
             auto values = self.getHOMO(index);
             if (values.size() == 1)
