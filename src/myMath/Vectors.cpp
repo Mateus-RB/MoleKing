@@ -151,7 +151,24 @@ double Vector3D::axisValue(char unitVector){
 
 // Quaternion class //
 
-Quaternion::Quaternion(double u, vector <double> vectorA, vector <double> vectorB = {0.0, 0.0, 0.0}){
+Quaternion::Quaternion(double u, Vector3D vectorA)
+{
+    this->u = u;
+    this->s_i = vectorA.getVector()[0];
+    this->s_j = vectorA.getVector()[1];
+    this->s_k = vectorA.getVector()[2];
+};
+
+Quaternion::Quaternion(double u, double s_i, double s_j, double s_k)
+{
+    this->u = u;
+    this->s_i = s_i;
+    this->s_j = s_j;
+    this->s_k = s_k;
+};
+
+Quaternion::Quaternion(double u, vector <double> vectorA, vector <double> vectorB = {0.0, 0.0, 0.0})
+{
     //Quaternion q = *this;
     this->u = u;
     this->s_i = vectorA[0] - vectorB[0];
@@ -159,16 +176,58 @@ Quaternion::Quaternion(double u, vector <double> vectorA, vector <double> vector
     this->s_k = vectorA[0] - vectorB[0];
 };
 
-Quaternion::~Quaternion(){
-    u = 0.0;
-    s_i = 0.0;
-    s_j = 0.0;
-    s_k = 0.0;
-};
+string Quaternion::toStr()
+{
+    string temp;
+    temp = to_string(this->u);
+    if(this->s_i >= 0){
+        temp = temp + " +" + to_string(this->s_i) + "i";
+    } else {
+        temp = temp + " -" + to_string(this->s_i) + "i";
+    };
+    if(this->s_j >= 0){
+        temp = temp + " +" + to_string(this->s_j) + "j";
+    } else {
+        temp = temp + " -" + to_string(this->s_j) + "j";
+    };
+    if(this->s_k >= 0){
+        temp = temp + " +" + to_string(this->s_k) + "k";
+    } else {
+        temp = temp + " -" + to_string(this->s_k) + "k";
+    };
+    return temp;
 
-double Quaternion::magnitude(){
+}
+
+double Quaternion::magnitude()
+{
     double norm = pow(this->u, 2) + pow(this->s_i, 2) + pow(this->s_j, 2) + pow(this->s_k, 2);
     return sqrt(norm);
+};
+
+double Quaternion::dotProduct(Quaternion qa)
+{
+    return (this->u * qa.u) + (this->s_i * qa.s_i) + (this->s_j * qa.s_j) + (this->s_k * qa.s_k);
+}
+
+Quaternion Quaternion::operator/(double mag)
+{
+    return Quaternion(this->u / mag, this->s_i / mag, this->s_j / mag, this->s_k / mag);
+};
+
+Quaternion Quaternion::operator*(double mag)
+{
+    return Quaternion(this->u * mag, this->s_i * mag, this->s_j * mag, this->s_k * mag);
+};
+
+Quaternion Quaternion::operator+(Quaternion qa)
+{
+    return Quaternion(this->u + qa.u, this->s_i + qa.s_i, this->s_j + qa.s_j, this->s_k + qa.s_k);
+};
+
+Quaternion Quaternion::operator-(Quaternion qa)
+{
+    return Quaternion(this->u - qa.u, this->s_i - qa.s_i, this->s_j - qa.s_j, this->s_k - qa.s_k);
 };
 
 void Quaternion::show(){
@@ -177,4 +236,25 @@ void Quaternion::show(){
 
 vector <double> Quaternion::getQuaternion(){
     return vector <double> {this->u, this->s_i, this->s_j, this->s_k};
+};
+
+Quaternion Quaternion::normalizeQ()
+{
+    Quaternion q = *this;
+
+    double mag_squared = q.dotProduct(q);
+
+    if (mag_squared == 0)
+    {
+        throw invalid_argument("The quaternion cannot be a zero vector");
+    }
+
+    return q / sqrt(mag_squared);
+};
+
+Quaternion::~Quaternion(){
+    u = 0.0;
+    s_i = 0.0;
+    s_j = 0.0;
+    s_k = 0.0;
 };

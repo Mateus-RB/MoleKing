@@ -118,19 +118,26 @@ private:
     bool scfConvergence;
     bool polarAsw;
     bool tdAsw;
+    bool dipFinder = false;
 
     //* map and vectors
 
     map<string, vector<string>> Orbitals;
     map<string, vector<string>> bOrbitals;
     map<int, map<string, double>> transitions;
-    map<double,map<string,vector<string>>> Alpha;
+    map<string,map<double,map<string,vector<string>>>> Alpha;
+    map<string,map<double,map<string,vector<string>>>> Beta;
+    map<string,map<double,map<string,vector<string>>>> Beta2;
+    map<string,map<double,map<string,vector<string>>>> Gamma;
+    map<string,map<double,map<string,vector<string>>>> Gamma2;
 
     vector<string> Occupied;
     vector<string> bOccupied;
     vector<string> Unoccupied;
     vector<string> bUnoccupied;
     vector<double> vecFrec;
+    vector<double> vecFrecDip;
+    vector<double> vecFrecInp;
 
     //* teste
 
@@ -152,6 +159,8 @@ private:
     void setNLO();
     void setFrequency();
     void setAlpha();
+    void setBeta();
+    void setGamma();
     vector<string> customSplit(string str, char separator = ' ');
 
 public:
@@ -166,7 +175,9 @@ public:
     string getDate();    
     string getBasis();
     string getMethod();
-    map<string,double> getAlpha(string unit = "esu", double frequency = 0);
+    map<string,double> getAlpha(string orientation = "Dipole", string unit = "esu", double frequency = 0);
+    map<string,double> getBeta(string orientation = "Dipole", string unit = "esu", double frequency = 0, bool BSHG = 0);
+    map<string,double> getGamma(string orientation = "Dipole", string unit = "esu", double frequency = 0, bool GSHG = 0);
     string toStr();
     Molecule getMolecule();
     vector<double> getFrequency();  
