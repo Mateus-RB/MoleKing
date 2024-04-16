@@ -525,6 +525,10 @@ double PeriodicTable::getCovalentRadii(string symbol){
     return this->radiiMap[symbol];
 };
 
+string PeriodicTable::getColor(string symbol){
+    return this->ColorMap[symbol];
+};
+
 string PeriodicTable::getSymbol(int atomicNumber){
     string target = "";
     for (map<string, int>::iterator it=this->symbolMap.begin(); it!=this->symbolMap.end(); ++it){
@@ -536,6 +540,3 @@ string PeriodicTable::getSymbol(int atomicNumber){
 
 };
 
-string PeriodicTable::getColor(string symbol){
-    return this->ColorMap[symbol];
-};

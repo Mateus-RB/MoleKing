@@ -75,6 +75,8 @@ G16LOGfile::G16LOGfile(string filePath, bool polarAsw, bool tdAsw, int link)
         setNLO();
         setFrequency();
         setAlpha();
+        setBeta();
+        setGamma();
     };
     
 };
@@ -142,7 +144,8 @@ void G16LOGfile::readLOGFile()
         tdFinder = line.find("Excited State ");
         polarFinder = line.find(" Dipole moment:");
         chargeMultiFinder = line.find(" Charge =");
-        normalT = line.find(" Normal termination of Gaussian");       
+        normalT = line.find(" Normal termination of Gaussian");      
+
         // If the line contains "Standard orientation:", set stdFound to true
         if (stdT != string::npos)
         {
@@ -259,7 +262,7 @@ void G16LOGfile::readLOGFile()
         {
             while (getline(this->logfile, line))
             {
-                if (line.find("Distance matrix (angstroms):") != string::npos)
+                if (line.find("Distance matrix (angstroms):") != string::npos || line.find(" Rotational constants (GHZ): ") != string::npos)
                 {
                     break;
                 };
@@ -279,7 +282,7 @@ void G16LOGfile::readLOGFile()
         {
             while (getline(this->logfile, line))
             {
-                if (line.find(" Rotational constants (GHZ): ") != string::npos)
+                if (line.find("Distance matrix (angstroms):") != string::npos || line.find(" Rotational constants (GHZ): ") != string::npos)
                 {
                     break;
                 };
@@ -307,7 +310,7 @@ void G16LOGfile::readLOGFile()
             };
         };
         if (polarAsw)
-        {
+        {   
             if (line.find("Electric dipole moment (input orientation):") != string::npos)
             {
                 polarSTR += line + "\n";
@@ -319,12 +322,14 @@ void G16LOGfile::readLOGFile()
                     };
                     polarSTR += line + "\n";
                 };
+                //cout << polarSTR << endl;
                 polarStorageInp.emplace_back(polarSTR);
                 polarSTR = "";
             };
 
-            if (line.find(" Dipole orientation:") != string::npos)
+            if (line.find(" Electric dipole moment (dipole orientation):") != string::npos)
             {
+                this->dipFinder = true;
                 polarSTR += line + "\n";
                 while (getline(this->logfile, line))
                 {
@@ -334,10 +339,10 @@ void G16LOGfile::readLOGFile()
                     };
                     polarSTR += line + "\n";
                 };
+                //cout << polarSTR << endl;
                 polarStorageDip.emplace_back(polarSTR);
                 polarSTR = "";
             };
-            
         };
     };
 
@@ -803,35 +808,55 @@ double G16LOGfile::getDipole(string axis)
 // Function to user get the frequency of the calculation
 
 void G16LOGfile::setNLO()
-{
-    
-    // get the last element of the polarStorage vector
-    this->polarAuxiliaryDip = this->polarStorageDip[this->polarStorageDip.size() - 1];
-    // create a stringstream object with polarAuxiliary
-    stringstream sdip(polarAuxiliaryDip);
-    // Store each line of the stringstream in the lines vector
-    while (getline(sdip, line))
+{   
+    if ( this->polarStorageDip.size() == 0 )
     {
-        this->vecPolarDip.emplace_back(line);
+        cerr << "WARNING in G16LOGfile: Your molecule is symmetric. So your dipole is zero, and there is no dipole orientation." << endl;
     };
-    //check if the last element of the vector lines is equal to "" or " " or "\n"
-    if (this->vecPolarDip[vecPolarDip.size() - 1] == "" || this->vecPolarDip[vecPolarDip.size() - 1] == " " || this->vecPolarDip[vecPolarDip.size() - 1] == "\n")
+
+    if ( (this->polarStorageDip.size() == 0) && (this->polarStorageInp.size() == 0) )
     {
-        // if true, remove the last element of the vector lines
-        this->vecPolarDip.pop_back();
+        throw runtime_error("ERROR in G16LOGfile::setNLO(): No NLO found in the log file.");
     };
     
-    this->polarAuxiliaryInp = this->polarStorageInp[this->polarStorageInp.size() - 1];
-    stringstream sinp(polarAuxiliaryInp);
-    
-    while (getline(sinp, line))
+    if (this->polarStorageDip.size() > 0) 
     {
-        this->vecPolarInp.emplace_back(line);
+        // get the last element of the polarStorage vector
+        this->polarAuxiliaryDip = this->polarStorageDip[this->polarStorageDip.size() - 1];
+        // create a stringstream object with polarAuxiliary
+        stringstream sdip(polarAuxiliaryDip);
+        // Store each line of the stringstream in the lines vector
+        while (getline(sdip, line))
+        {
+            this->vecPolarDip.emplace_back(line);
+        };
+        //check if the last element of the vector lines is equal to "" or " " or "\n"
+        if (this->vecPolarDip[vecPolarDip.size() - 1] == "" || this->vecPolarDip[vecPolarDip.size() - 1] == " " || this->vecPolarDip[vecPolarDip.size() - 1] == "\n")
+        {
+            // if true, remove the last element of the vector lines
+            this->vecPolarDip.pop_back();
+        };
     };
-    if (this->vecPolarInp[vecPolarInp.size() - 1] == "" || this->vecPolarInp[vecPolarInp.size() - 1] == " " || this->vecPolarInp[vecPolarInp.size() - 1] == "\n")
-    {
-        this->vecPolarInp.pop_back();
-    };
+    //cout << this->dipFinder << endl;
+    if (this->polarStorageInp.size() == 0){
+        throw runtime_error("ERROR in G16LOGfile::setNLO(): No NLO found in the log file.");
+    }
+    if (this->polarStorageInp.size() > 0)
+    {   
+        this->polarAuxiliaryInp = this->polarStorageInp[this->polarStorageInp.size() - 1];
+        stringstream sinp(polarAuxiliaryInp);
+        
+        while (getline(sinp, line))
+        {
+            //cout << line << endl;
+            this->vecPolarInp.emplace_back(line);
+        };
+        if (this->vecPolarInp[vecPolarInp.size() - 1] == "" || this->vecPolarInp[vecPolarInp.size() - 1] == " " || this->vecPolarInp[vecPolarInp.size() - 1] == "\n")
+        {
+            this->vecPolarInp.pop_back();
+
+        };
+    }
 };
 
 vector<string> G16LOGfile::getNLO(string Orientation)
@@ -848,25 +873,45 @@ vector<string> G16LOGfile::getNLO(string Orientation)
     if(Orientation == "dipole")
     {
         return this->polarStorageDip;
-    }else
+    }
+    else
     {
         throw runtime_error("ERROR in G16LOGfile::getNLO(): Invalid Orientation. Please, use 'input' or 'dipole'.");
     };
 };
 
-
 void G16LOGfile::setFrequency()
 {    
-    for (int i = 0; i < this->vecPolarDip.size(); i++)
+
+    if (this->dipFinder)
     {
-        if (this->vecPolarDip[i].find("Alpha(-w;w)") != string::npos)
+        for (int i = 0; i < this->vecPolarDip.size(); i++)
         {
-            this->Freq = this->vecPolarDip[i].substr(this->vecPolarDip[i].find("Alpha(-w;w)") + 14);
-            this->Freq = this->Freq.substr(0, this->Freq.find("nm"));
-            //convert Freq to double
-            this->FreqDouble = stod(this->Freq);
-            // add the frequency to the vecFrec vector
-            this->vecFrec.emplace_back(this->FreqDouble);
+            if (this->vecPolarDip[i].find("Alpha(-w;w)") != string::npos)
+            {
+                this->Freq = this->vecPolarDip[i].substr(this->vecPolarDip[i].find("Alpha(-w;w)") + 14);
+                this->Freq = this->Freq.substr(0, this->Freq.find("nm"));
+                //convert Freq to double
+                this->FreqDouble = stod(this->Freq);
+                // add the frequency to the vecFrec vector
+                this->vecFrec.emplace_back(this->FreqDouble);
+            };
+        };
+    }
+
+    else
+    {
+        for (int i = 0; i < this->vecPolarInp.size(); i++)
+        {
+            if (this->vecPolarInp[i].find("Alpha(-w;w)") != string::npos)
+            {
+                this->Freq = this->vecPolarInp[i].substr(this->vecPolarInp[i].find("Alpha(-w;w)") + 14);
+                this->Freq = this->Freq.substr(0, this->Freq.find("nm"));
+                //convert Freq to double
+                this->FreqDouble = stod(this->Freq);
+                // add the frequency to the vecFrec vector
+                this->vecFrec.emplace_back(this->FreqDouble);
+            };
         };
     };
 };
@@ -875,7 +920,7 @@ vector<double> G16LOGfile::getFrequency()
 {   
     if (!this->polarAsw)
     {
-        throw runtime_error("ERROR in G16LOGfile::getFrequency(): No frequency found in the log file., Try using polarAsw=1.");
+        throw runtime_error("ERROR in G16LOGfile::getFrequency(): No frequency found in the log file. Try using polarAsw=1.");
     }
     return this->vecFrec;
     
@@ -883,52 +928,71 @@ vector<double> G16LOGfile::getFrequency()
 
 void G16LOGfile::setAlpha()
 {   
-    map<double, int> start, end;
-    for (int f = 0; f < this->vecFrec.size(); f++)
-    {
-        double freqPrincipal = this->vecFrec[f];
-        for (int i = 0; i < this->vecPolarInp.size(); i++)
-        {
-            if (vecPolarInp[i].find("Alpha(0;0)") != string::npos)
-            { 
-                start.insert(make_pair(this->vecFrec[0],i+2));
-                end.insert(make_pair(this->vecFrec[0],i+10));
-            }
-            else if (vecPolarInp[i].find("Alpha(-w;w) w= ") != string::npos)
-            { 
-                string Freq = this->vecPolarInp[i].substr(this->vecPolarInp[i].find("Alpha(-w;w)") + 14);
-                Freq = Freq.substr(0, Freq.find("nm"));
-                //convert Freq to double
-                double FreqDouble = stod(Freq);
-                if(freqPrincipal == FreqDouble)
-                {
-                    start.insert(make_pair(FreqDouble,i+2));
-                    end.insert(make_pair(FreqDouble,i+10));
+    string WhatPolar = "";
+    auto UsePolar = this->vecPolarDip;
+    for( int o = 0; o < 2; o++){
+        map<double, int> start, end;
+        map<double,map<string,vector<string>>> FrequencyInfo;
+        map<string,vector<string>> NLOInfo;
+        vector<vector<string>> Alpha_0, Alpha_w;
+
+        if (o==0){
+            WhatPolar = "Input";
+            auto UsePolar = this->vecPolarInp;
+        }
+        else{
+            WhatPolar = "Dipole";
+            auto UsePolar = this->vecPolarDip;
+        }
+        for (int f = 0; f < this->vecFrec.size(); f++){
+            double freqPrincipal = this->vecFrec[f];
+
+            for (int i = 0; i < UsePolar.size(); i++)
+            {
+                if (UsePolar[i].find("Alpha(0;0)") != string::npos)
+                { 
+                    start.insert(make_pair(this->vecFrec[0],i+2));
+                    end.insert(make_pair(this->vecFrec[0],i+10));
+                }
+                else if (UsePolar[i].find("Alpha(-w;w) w= ") != string::npos)
+                {   
+                    string Freq = UsePolar[i].substr(UsePolar[i].find("Alpha(-w;w)") + 14);
+                    Freq = Freq.substr(0, Freq.find("nm"));
+                    //convert Freq to double
+                    double FreqDouble = stod(Freq);
+                    if(freqPrincipal == FreqDouble)
+                    {
+                        start.insert(make_pair(FreqDouble,i+2));
+                        end.insert(make_pair(FreqDouble,i+10));
+                    }
                 }
             }
-        }
+        for (auto it = start.begin(); it != start.end(); ++it) 
+        {   
+            for(int i = start[it->first]; i < end[it->first]; i++)
+            {   
+                vector<string> T = this->customSplit(UsePolar[i]);         
+                NLOInfo.insert(make_pair(T[0], vector<string>({T[1], T[2], T[3]})));
+            };
+            FrequencyInfo.insert(make_pair(it->first, NLOInfo));
+            NLOInfo.clear();
+        }    
     };
-    map<double,map<string,vector<string>>> FrequencyInfo;
-    map<string,vector<string>> NLOInfo;
-    vector<vector<string>> Alpha_0, Alpha_w, Beta_0, Beta_w;
-    for (auto it = start.begin(); it != start.end(); ++it) 
-    {   
-        for(int i = start[it->first]; i < end[it->first]; i++)
-        {   vector<string> T = this->customSplit(vecPolarInp[i]);         
-            NLOInfo.insert(make_pair(T[0], vector<string>({T[1], T[2], T[3]})));
-        };
-        FrequencyInfo.insert(make_pair(it->first, NLOInfo));
-    }    
-    
-    this->Alpha = FrequencyInfo;
-
+    this->Alpha.insert(make_pair(WhatPolar,FrequencyInfo));
+    };
 };
 
 
-map<string,double> G16LOGfile::getAlpha(string unit, double frequency)
+map<string,double> G16LOGfile::getAlpha(string orientation, string unit, double frequency)
 {   
     map<string,double> temp;
-
+    map<double,map<string,vector<string>>> alpha;
+    if (orientation == "Input"){
+        alpha = this->Alpha[orientation];
+    }
+    else{
+        alpha = this->Alpha["Dipole"];
+    }
     if (!this->polarAsw)
     {
         throw runtime_error("ERROR in G16LOGfile::getAlpha(): No NLO found in the log file., Try using polarAsw=1.");
@@ -948,10 +1012,10 @@ map<string,double> G16LOGfile::getAlpha(string unit, double frequency)
     }
     
     //get the element with the frequency key from map this->Alpha
-    this->Alpha[frequency];
+    //this->Alpha[frequency];
 
     //create a new map to match with user's unit. The first one is au, the second is esu and last one is SI.311g
-    for (auto it = this->Alpha[frequency].begin(); it != this->Alpha[frequency].end(); ++it) 
+    for (auto it = alpha[frequency].begin(); it != alpha[frequency].end(); ++it) 
     {   
         if (unit == "au")
         {   
@@ -975,6 +1039,301 @@ map<string,double> G16LOGfile::getAlpha(string unit, double frequency)
         
     };
 
+    return temp;
+};
+
+void G16LOGfile::setBeta()
+{   
+    string WhatPolar = "";
+    auto UsePolar = this->vecPolarDip;
+    for (int o = 0; o < 2; o++){
+        if (o==0){
+            WhatPolar = "Input";
+           auto UsePolar = this->vecPolarInp;
+        }
+        else{
+            WhatPolar = "Dipole";
+            auto UsePolar = this->vecPolarDip;
+        }
+        map<double, int> start, end, start2, end2;
+        for (int f = 0; f < this->vecFrec.size(); f++)
+        {
+            double freqPrincipal = this->vecFrec[f];
+            for (int i = 0; i < UsePolar.size(); i++)
+            {
+                if (UsePolar[i].find("Beta(0;0,0)") != string::npos)
+                {   
+                    start.insert(make_pair(this->vecFrec[0],i+2));
+                    end.insert(make_pair(this->vecFrec[0],i+17));
+                    start2.insert(make_pair(this->vecFrec[0],i+2));
+                    end2.insert(make_pair(this->vecFrec[0],i+17));
+                }
+                else if (UsePolar[i].find("Beta(-w;w,0) w= ") != string::npos)
+                { 
+                    string Freq = UsePolar[i].substr(UsePolar[i].find("Beta(-w;w,0)") + 15);
+                    Freq = Freq.substr(0, Freq.find("nm"));
+                    double FreqDouble = stod(Freq);
+                    if(freqPrincipal == FreqDouble)
+                    {
+                        start.insert(make_pair(FreqDouble,i+2));
+                        end.insert(make_pair(FreqDouble,i+25));
+                    }
+                }
+                else if (UsePolar[i].find("Beta(-2w;w,w) w= ") != string::npos)
+                { 
+                    string Freq = UsePolar[i].substr(UsePolar[i].find("Beta(-2w;w,w)") + 16);
+                    Freq = Freq.substr(0, Freq.find("nm"));
+                    //convert Freq to double
+                    double FreqDouble = stod(Freq);
+                    if(freqPrincipal == FreqDouble)
+                    {
+                        start2.insert(make_pair(FreqDouble,i+2));
+                        end2.insert(make_pair(FreqDouble,i+25));
+                    }
+                }
+
+            }
+        }
+        map<double,map<string,vector<string>>> FrequencyInfo, FrequencyInfo2;
+        map<string,vector<string>> NLOInfo;
+        vector<vector<string>> Beta_0, Beta_w, Beta_2w;
+        for (auto it = start.begin(); it != start.end(); ++it) 
+        {   
+            //cout << typeid(it).name() << endl;
+            for(int i = start[it->first]; i < end[it->first]; i++)
+            {   vector<string> T = this->customSplit(UsePolar[i]);
+                // cout << T[0] << endl;
+                // cout << T[1] << endl;
+                // cout << T[2] << endl;
+                if( T[0] == "||" && T[1] == "(z)"){
+                    NLOInfo.insert(make_pair(T[0]+T[1], vector<string>({T[2], T[3], T[4]})));
+                }   
+                else{
+                    NLOInfo.insert(make_pair(T[0], vector<string>({T[1], T[2], T[3]})));
+                }         
+            };
+            FrequencyInfo.insert(make_pair(it->first, NLOInfo));
+            NLOInfo.clear();
+        }    
+        this->Beta.insert(make_pair(WhatPolar, FrequencyInfo));
+
+        for (auto it = start2.begin(); it != start2.end(); ++it) 
+        {   
+            for(int i = start2[it->first]; i < end2[it->first]; i++)
+            {   vector<string> T = this->customSplit(UsePolar[i]);         
+                if( T[0] == "||" && T[1] == "(z)"){
+                    NLOInfo.insert(make_pair(T[0]+T[1], vector<string>({T[2], T[3], T[4]})));
+                }   
+                else{
+                    NLOInfo.insert(make_pair(T[0], vector<string>({T[1], T[2], T[3]})));
+                }         
+            };
+            FrequencyInfo2.insert(make_pair(it->first, NLOInfo));
+            NLOInfo.clear();
+        }    
+        this->Beta2.insert(make_pair(WhatPolar, FrequencyInfo2));
+
+    };
+};
+
+map<string,double> G16LOGfile::getBeta(string orientation, string unit, double frequency, bool BSHG)
+{   
+    
+    map<double,map<string,vector<string>>> beta;
+    if (BSHG){
+       beta = this->Beta2[orientation];
+    }
+    else
+    {
+        //cout << BSHG << endl;
+        beta = this->Beta[orientation];
+    }
+    map<string,double> temp;
+    if (!this->polarAsw)
+    {
+        throw runtime_error("ERROR in G16LOGfile::getBeta(): No NLO found in the log file., Try using polarAsw=1.");
+    }
+    //check if frequency is in the vecFrec vector
+    if (find(this->vecFrec.begin(), this->vecFrec.end(), frequency) == this->vecFrec.end())
+    {   
+        string temp = "";
+        for (int i = 0; i < this->vecFrec.size(); i++)
+        {
+            temp += to_string(this->vecFrec[i]) + ", ";
+        }
+        throw runtime_error("ERROR in G16LOGfile::getBeta(): Frequency not found in the log file. Try: " + temp + "instead.");
+    }
+    //get the element with the frequency key from map this->Alpha
+    //beta[frequency];
+    //cout << beta[frequency].size() << endl;
+    //create a new map to match with user's unit. The first one is au, the second is esu and last one is SI.311g
+    for (auto it = beta[frequency].begin(); it != beta[frequency].end(); ++it) 
+    {   
+        //cout << it->first<< "  " << it->second[0] << "  " << it->second[1]<< "  " << it->second[2] << endl;
+        if (unit == "au")
+        {   
+            replace(it->second[0].begin(), it->second[0].end(), 'D', 'E');
+            temp.insert(make_pair(it->first, stod(it->second[0])));
+        }
+        else if (unit == "esu")
+        {   
+            replace(it->second[1].begin(), it->second[1].end(), 'D', 'E');
+            temp.insert(make_pair(it->first, stod(it->second[1])));
+        }
+        else if (unit == "SI")
+        {   
+            replace(it->second[2].begin(), it->second[2].end(), 'D', 'E');
+            temp.insert(make_pair(it->first, stod(it->second[2])));
+        }
+        else
+        {
+            throw runtime_error("ERROR in G16LOGfile::getBeta(): Invalid unit. Please, use 'au', 'esu' or 'SI'.");
+        }   
+    };
+    //cout temp
+    // for (const auto& pair : temp) {
+    //     std::cout << pair.first << ": " << pair.second << std::endl;
+    // }
+    return temp;
+};
+
+void G16LOGfile::setGamma()
+{   
+    string WhatPolar = "";
+    auto UsePolar = this->vecPolarDip;
+    for (int o = 0; o < 2; o++){
+        if (o==0){
+            WhatPolar = "Input";
+            auto UsePolar = this->vecPolarInp;
+        }
+        else{
+            WhatPolar = "Dipole";
+            auto UsePolar = this->vecPolarDip;
+        }
+        map<double, int> start, end, start2, end2;
+        for (int f = 0; f < this->vecFrec.size(); f++)
+        {
+            double freqPrincipal = this->vecFrec[f];
+            for (int i = 0; i < UsePolar.size(); i++)
+            {
+                if (UsePolar[i].find("Gamma(0;0,0,0)") != string::npos)
+                {   
+                    
+                    start.insert(make_pair(this->vecFrec[0],i+2));
+                    end.insert(make_pair(this->vecFrec[0],i+18));
+                    start2.insert(make_pair(this->vecFrec[0],i+2));
+                    end2.insert(make_pair(this->vecFrec[0],i+18));
+                }
+                else if (UsePolar[i].find("Gamma(-w;w,0,0) w= ") != string::npos)
+                { 
+                    string Freq = UsePolar[i].substr(UsePolar[i].find("Gamma(-w;w,0,0)") + 18);
+                    Freq = Freq.substr(0, Freq.find("nm"));
+                    double FreqDouble = stod(Freq);
+                    if(freqPrincipal == FreqDouble)
+                    {
+                        start.insert(make_pair(FreqDouble,i+2));
+                        end.insert(make_pair(FreqDouble,i+39));
+                    }
+                }
+                else if (UsePolar[i].find("Gamma(-2w;w,w,0) w= ") != string::npos)
+                { 
+                    string Freq = UsePolar[i].substr(UsePolar[i].find("Gamma(-2w;w,w,0)") + 19);
+                    Freq = Freq.substr(0, Freq.find("nm"));
+                    //convert Freq to double
+                    double FreqDouble = stod(Freq);
+                    if(freqPrincipal == FreqDouble)
+                    {
+                        start2.insert(make_pair(FreqDouble,i+2));
+                        end2.insert(make_pair(FreqDouble,i+57));
+                    }
+                }
+
+            }
+        }
+        // for (auto it = start2.begin(); it != start2.end(); ++it) 
+        // {   
+        //     cout << "start2[" << it->first << "]: " << start2[it->first] << endl;
+        //     cout << "end2[" << it->first << "]: " << end2[it->first] << endl;
+        // }    
+        map<double,map<string,vector<string>>> FrequencyInfo, FrequencyInfo2;
+        map<string,vector<string>> NLOInfo;
+        //vector<vector<string>> Gamma_0, Gamma_w, Gamma_2w;
+        for (auto it = start.begin(); it != start.end(); ++it) 
+        {   
+            //cout << typeid(it).name() << endl;
+            for(int i = start[it->first]; i < end[it->first]; i++)
+            {   vector<string> T = this->customSplit(UsePolar[i]);
+                NLOInfo.insert(make_pair(T[0], vector<string>({T[1], T[2], T[3]})));        
+            };
+            FrequencyInfo.insert(make_pair(it->first, NLOInfo));
+            NLOInfo.clear();
+        }    
+        this->Gamma.insert(make_pair(WhatPolar, FrequencyInfo));
+
+        for (auto it = start2.begin(); it != start2.end(); ++it) 
+        {   
+            for(int i = start2[it->first]; i < end2[it->first]; i++)
+            {   vector<string> T = this->customSplit(UsePolar[i]);         
+                NLOInfo.insert(make_pair(T[0], vector<string>({T[1], T[2], T[3]})));       
+            };
+            FrequencyInfo2.insert(make_pair(it->first, NLOInfo));
+            NLOInfo.clear();
+        }    
+        this->Gamma2.insert(make_pair(WhatPolar, FrequencyInfo2));
+
+   };
+// Print this->Gamma2 on terminal
+};
+
+map<string,double> G16LOGfile::getGamma(string orientation, string unit, double frequency, bool GSHG)
+{   
+    map<double,map<string,vector<string>>> gamma;
+    if (GSHG){
+       gamma = this->Gamma2[orientation];
+    }
+    else
+    {
+        //cout << BSHG << endl;
+        gamma = this->Gamma[orientation];
+    }
+    map<string,double> temp;
+    if (!this->polarAsw)
+    {
+        throw runtime_error("ERROR in G16LOGfile::getGamma(): No NLO found in the log file., Try using polarAsw=1.");
+    }
+    //check if frequency is in the vecFrec vector
+    if (find(this->vecFrec.begin(), this->vecFrec.end(), frequency) == this->vecFrec.end())
+    {   
+        string temp = "";
+        for (int i = 0; i < this->vecFrec.size(); i++)
+        {
+            temp += to_string(this->vecFrec[i]) + ", ";
+        }
+        throw runtime_error("ERROR in G16LOGfile::getGamma(): Frequency not found in the log file. Try: " + temp + "instead.");
+    }
+    for (auto it = gamma[frequency].begin(); it != gamma[frequency].end(); ++it) 
+    {   
+        if (unit == "au")
+        {   
+            replace(it->second[0].begin(), it->second[0].end(), 'D', 'E');
+            temp.insert(make_pair(it->first, stod(it->second[0])));
+        }
+        else if (unit == "esu")
+        {   
+            replace(it->second[1].begin(), it->second[1].end(), 'D', 'E');
+            //cout << it->second[1] << endl;
+            temp.insert(make_pair(it->first, stod(it->second[1])));
+        }
+        else if (unit == "SI")
+        {   
+            replace(it->second[2].begin(), it->second[2].end(), 'D', 'E');
+            temp.insert(make_pair(it->first, stod(it->second[2])));
+        }
+        else
+        {
+            throw runtime_error("ERROR in G16LOGfile::getGamma(): Invalid unit. Please, use 'au', 'esu' or 'SI'.");
+        }   
+    };
     return temp;
 };
 

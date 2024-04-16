@@ -43,7 +43,8 @@ PYBIND11_MODULE(MoleKing, m) {
         .def("getAtomicNumber", &PeriodicTable::getAtomicNumber)
         .def("getAtomicMass", &PeriodicTable::getAtomicMass)
         .def("getSymbol", &PeriodicTable::getSymbol)
-        .def("getCovalentRadii", &PeriodicTable::getCovalentRadii);
+        .def("getCovalentRadii", &PeriodicTable::getCovalentRadii)
+        .def("getColor", &PeriodicTable::getColor);
     
     py::class_<Atom>(m, "Atom", "This class creates a atom variable type allowing for the usage in python like a primitive type.")
         .def(py::init<int, double, double, double, double, bool>(), py::arg("atomicNumber"), py::arg("xPos"), py::arg("yPos"), py::arg("zPos"), py::arg("atomicCharge") = 0.0, py::arg("freezeCode_") = 0)
@@ -137,10 +138,12 @@ PYBIND11_MODULE(MoleKing, m) {
         .def("getIRCAngles", &Molecule::getIRCAngles)
         .def("getIRCDihedrals", &Molecule::getIRCDihedrals)
         .def("removeElement", &Molecule::removeElement)
+        .def("molecularAxis", &Molecule::molecularAxis)
         .def("toXYZ", &Molecule::toXYZ, py::arg("fileName") = "MK_Molecule.xyz")
-        .def("toGJF", &Molecule::toGJF, py::arg("fileName") = "MK_Molecule.gjf", py::arg("method") = "B3LYP", py::arg("basis") = "6-311g(d)", py::arg("addKeywords") = "", py::arg("endKeywords") = "", py::arg("charge") = 0, py::arg("multiplicity") = 1, py::arg("zmatrix") = 0)
+        .def("RMSD", &Molecule::RMSD, py::arg("MOL2"))
+        .def("toGJF", &Molecule::toGJF, py::arg("fileName") = "MK_Molecule.gjf", py::arg("method") = "B3LYP", py::arg("basis") = "6-311g(d)", py::arg("addKeywords") = "", py::arg("midKeywords") = "", py::arg("endKeywords") = "", py::arg("charge") = 0, py::arg("multiplicity") = 1, py::arg("zmatrix") = 0, py::arg("EField") = vector<double> {})
         .def("getMM", &Molecule::getMolecularMass);
-    
+
     py::class_<SupraMolecule>(m, "SupraMolecule", "This class creates a set of molecules variable type allowing for the usage in python like a primitive type.")
         .def(py::init())
         .def("addMolecule", &SupraMolecule::addMolecule)
@@ -158,7 +161,7 @@ PYBIND11_MODULE(MoleKing, m) {
         .def("moveTail", &SupraMolecule::moveTail)
         .def("spinSupraMolecule", (void (SupraMolecule::*)(double, char)) &SupraMolecule::spinSupraMolecule)
         .def("spinSupraMolecule", (void (SupraMolecule::*)(double, Vector3D)) &SupraMolecule::spinSupraMolecule)
-        .def("standardOrientation", &SupraMolecule::standardOrientation)
+        //.def("standardOrientation", &SupraMolecule::standardOrientation)
         .def("getIRCBonds", &SupraMolecule::getIRCBonds)
         .def("getIRCAngles", &SupraMolecule::getIRCAngles)
         .def("getIRCDihedrals", &SupraMolecule::getIRCDihedrals)
@@ -237,7 +240,9 @@ PYBIND11_MODULE(MoleKing, m) {
         .def("getDipole", &G16LOGfile::getDipole, py::arg("axis") = "tot")
         .def("getFrequency", &G16LOGfile::getFrequency)
         .def("getNLO", &G16LOGfile::getNLO, py::arg("Orientation") = "input")
-        .def("getAlpha", &G16LOGfile::getAlpha, py::arg("unit") = "esu", py::arg("frequency") = 0)
+        .def("getAlpha", &G16LOGfile::getAlpha,py::arg("orientation") = "Dipole", py::arg("unit") = "esu", py::arg("frequency") = 0)
+        .def("getBeta", &G16LOGfile::getBeta,py::arg("orientation") = "Dipole", py::arg("unit") = "esu", py::arg("frequency") = 0, py::arg("BSHG") = 0)
+        .def("getGamma", &G16LOGfile::getGamma,py::arg("orientation") = "Dipole", py::arg("unit") = "esu", py::arg("frequency") = 0, py::arg("GSHG") = 0)
         .def("getHOMO", [](G16LOGfile &self, int index) {
             auto values = self.getHOMO(index);
             if (values.size() == 1)

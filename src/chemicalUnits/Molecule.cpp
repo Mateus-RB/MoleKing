@@ -32,15 +32,31 @@ double Molecule::angleToSpinInAref(int ref, char axisName){
         Vector3D sonOfZ = Vector3D( {xTombado , victor.getCoords('c')[1], 0.0} , centroDaLoucura.getCoords('c'));
         double anguloDaLoucura = sonOfVictor.angle(sonOfZ);
         return anguloDaLoucura;
-    } else {
+    } 
+    else 
+    {
         Point victor = Point(cart[0], cart[1], cart[2], 'c');
         Point victorDoidera = Point(cart[0], cart[1], cart[2], 'c');
         Vector3D yAxis = Vector3D({0.0, 1.0, 0.0}, {0.0, 0.0, 0.0});
         victorDoidera.rotationVector(180, yAxis);
+        // cout << "Victor: " << victor.getCoords('c')[0] << " " << victor.getCoords('c')[1] << " " << victor.getCoords('c')[2] << endl;
+        // cout << "VictorDoidera: " << victorDoidera.getCoords('c')[0] << " " << victorDoidera.getCoords('c')[1] << " " << victorDoidera.getCoords('c')[2] << endl;
+
         Vector3D victores = Vector3D(victor.getCoords('c'), victorDoidera.getCoords('c'));
         double linhaDaLoucura = victores.magnitude();
+        // cout << "Linha da Loucura: " << linhaDaLoucura << endl;
+
         double raioVictoral = linhaDaLoucura/2;
-        double yDaLoucura = -1 *(sqrt(pow(raioVictoral, 2) - pow(victorDoidera.getCoords('c')[2],2)) - victorDoidera.getCoords('c')[1]);
+        cout << "RaioVictoral: " << raioVictoral << endl;
+        cout << "VictorDoidera_X: " << victorDoidera.getCoords('c')[0] << endl;
+        cout << "VictorDoidera_Y: " << victorDoidera.getCoords('c')[1] << endl;
+        cout << "VictorDoidera_Z: " << victorDoidera.getCoords('c')[2] << endl;
+        cout << pow(2,2) << endl;
+        double yDaLoucura = -1 *(sqrt(pow(raioVictoral, 2) - pow(victorDoidera.getCoords('c')[2],2)) - victorDoidera.getCoords('c')[0]);
+        cout << "Y da Loucura: " << yDaLoucura << endl;
+
+
+
         Point centroDaLoucura = Point(victor.getCoords('c')[0], yDaLoucura, 0.0, 'c');
         Vector3D sonOfVictor = Vector3D(victor.getCoords('c'), centroDaLoucura.getCoords('c'));
         double yTombado = raioVictoral + yDaLoucura;
@@ -164,6 +180,18 @@ Molecule::~Molecule(){
     multiplicity = 0;
     charge = 0;
 };
+
+double Molecule::RMSD(Molecule MOL2)
+{
+    double rmsd = 0.0;
+    for (int i = 0; i < (int) this->molecule.size(); i++)
+    {
+        rmsd += pow(this->molecule[i].getPos()[0] - MOL2.getAtomObj(i).getPos()[0], 2);
+        rmsd += pow(this->molecule[i].getPos()[1] - MOL2.getAtomObj(i).getPos()[1], 2);
+        rmsd += pow(this->molecule[i].getPos()[2] - MOL2.getAtomObj(i).getPos()[2], 2);
+    }
+    return sqrt(rmsd / this->molecule.size());
+}
 
 void Molecule::addChargePoints(double xPos, double yPos, double zPos, double charge){
     ChargePoint cp(xPos, yPos, zPos, charge);
@@ -325,38 +353,6 @@ void Molecule::moveTail(int atomNumber, double x, double y, double z){
     Vector3D traslationVector = Vector3D({x, y, z}, this->molecule.at(atomNumber).getPos());
     this->translation(traslationVector);
 };
-
-void Molecule::standardOrientation(){
-    vector<int> biggerDistance = this->molecularAxis();
-    this->moveTail(biggerDistance[0]);
-    double angle1 = this->angleToSpinInAref(biggerDistance[1], 'y');
-    this->spinMolecule(angle1, 'y');
-    vector <double> zspin = this->molecule[biggerDistance[1]].getPos();
-    vector <double> zspinSpherical = SphericalCoords(zspin[0], zspin[1], zspin[2], 'c').toSpherical();
-    this->spinMolecule(zspinSpherical[2], 'z');
-    double angle2 = this->angleToSpinInAref(biggerDistance[1], 'x');
-    this->spinMolecule(angle2, 'x');
-    this->spinMolecule(90, 'z');
-    this->spinMolecule(90, 'y');
-    this->moveMassCenter();
-};
-
-vector <double> Molecule::standardOrientationPath(){
-    vector<int> biggerDistance = this->molecularAxis();
-    this->moveTail(biggerDistance[0]);
-    double angle1 = this->angleToSpinInAref(biggerDistance[1], 'y');
-    this->spinMolecule(angle1, 'y');
-    vector <double> zspin = this->molecule[biggerDistance[1]].getPos();
-    vector <double> zspinSpherical = SphericalCoords(zspin[0], zspin[1], zspin[2], 'c').toSpherical();
-    this->spinMolecule(zspinSpherical[2], 'z');
-    double angle2 = this->angleToSpinInAref(biggerDistance[1], 'x');
-    this->spinMolecule(angle2, 'x');
-    this->spinMolecule(90, 'z');
-    this->spinMolecule(90, 'y');
-    this->moveMassCenter();
-    return vector <double> {angle1, zspinSpherical[2], angle2};
-};
-
 Eigen::Matrix<double, 3, 3> Molecule::moleculeTensor(){
     Point centerOfMass = this->getMassCenter();
     double Ixx = 0.0;
@@ -365,8 +361,6 @@ Eigen::Matrix<double, 3, 3> Molecule::moleculeTensor(){
     double Ixy = 0.0;
     double Ixz = 0.0;
     double Iyz = 0.0;
-
-    //double atomMass = this->molecule.at(0).getAtomicMass();
 
     for (int i = 0; i < (int) this->molecule.size(); i++){
         double atomMass = this->molecule.at(i).getAtomicMass();        
@@ -391,8 +385,6 @@ Eigen::Matrix<double, 3, 3> Molecule::moleculeTensor(){
 
     Eigen::Matrix<double, 1, 3> Position;
 
-    //Position << -0.280418, 0.000000,-0.000026;
-
     A << Ixx, Ixy, Ixz,
          Ixy, Iyy, Iyz,
          Ixz, Iyz, Izz;
@@ -400,58 +392,111 @@ Eigen::Matrix<double, 3, 3> Molecule::moleculeTensor(){
     Eigen::EigenSolver<Eigen::Matrix<double, 3, 3> > s(A); 
     Eigen::Matrix<double, 3, 3> evecs = s.eigenvectors().real(); //! Eigenvectors are the columns of evecs.
     
-    //cout << "Position: " << endl << Position << endl;
-    //cout << "\n" << endl;
-    //cout << "Position Transpose: " << endl << Position.transpose() << endl;
-    //cout << "\n" << endl;
-    //cout << "Eigenvalues:" << endl << s.eigenvalues() << endl;
-    //cout << "\n" << endl;
-    //cout << "Eigenvectors: " << endl << evecs << endl;
-    //cout << "\n" << endl;
-    //cout << "Eigenvectors Tranpose" << endl << evecs.transpose() << endl;
-    //cout << "\n" << endl;
-    //cout << "M_Multi w/out Tranpose" << endl << Position*evecs << endl;
-    //cout << "\n" << endl;
-
-    //cout << "\n\n";
-
     return evecs;
 }
 
-void Molecule::stdOrientation(){
-    Eigen::Matrix<double, 3, 3> evecs = this->moleculeTensor();
+Vector3D Molecule::unitVector(Vector3D vector)
+{
+    double magnitude = vector.magnitude();
+    return Vector3D({vector.getVector()[0]/magnitude, vector.getVector()[1]/magnitude, vector.getVector()[2]/magnitude}, {0.0, 0.0, 0.0});
+}
 
-    if (float(evecs.determinant()) == float(-1)){
-        evecs(0,2) = evecs(0,2) * -1;
-        evecs(1,2) = evecs(1,2) * -1;
-        evecs(2,2) = evecs(2,2) * -1;
+Quaternion Molecule::from_axis_angle(Vector3D axis, double angle)
+{
+    double mag_sq = axis.dotProduct(axis);
+    if (mag_sq == 0)
+    {
+        throw invalid_argument("The axis cannot be a zero vector");
+    }
+    
+    if ( abs(1.0 - mag_sq) > 1e-12)
+    {
+        axis = axis / sqrt(mag_sq);
     }
 
-    else{
-        cout << "Error: could not make a rotation matrix while adopting the standard orientation" << endl;
-    };   
-    
-    this->moveMassCenter(0,0,0);
+    double theta = angle / 2.0;
+    double r = cos(theta);
+    Vector3D i = axis * sin(theta);
 
-    for (int i = 0; i < (int) this->molecule.size(); i++ ){
-        Eigen::Matrix<double, 3, 1> temp;
+    return Quaternion(r, i);
+};
+
+Eigen::Matrix<double, 3,3> Molecule::Q_RotMatrix(Quaternion q)
+{
+    double u = q.getQuaternion()[0];
+    double s_i = q.getQuaternion()[1];
+    double s_j = q.getQuaternion()[2];
+    double s_k = q.getQuaternion()[3];
+
+    Eigen::Matrix<double, 3, 3> R;
+
+    R(0,0) = 2 * (pow(u,2) + pow(s_i,2)) - 1;
+    R(0,1) = 2 * (s_i * s_j - u * s_k);
+    R(0,2) = 2 * (s_i * s_k + u * s_j);
+    
+    R(1,0) = 2 * (s_i * s_j + u * s_k);
+    R(1,1) = 2 * (pow(u,2) + pow(s_j,2)) - 1;
+    R(1,2) = 2 * (s_j * s_k - u * s_i);
+
+    R(2,0) = 2 * (s_i * s_k - u * s_j);
+    R(2,1) = 2 * (s_j * s_k + u * s_i);
+    R(2,2) = 2 * (pow(u,2) + pow(s_k,2)) - 1;
+
+    return R;
+}
+
+void Molecule::stdOrientation()
+{
+    this->stdOrientation_Axis('x');
+    this->stdOrientation_Axis('y');
+    this->moveMassCenter();
+}
+
+void Molecule::stdOrientation_Axis(char axis){
+    Eigen::Matrix<double, 3, 3> evecs = this->moleculeTensor();
+
+    Vector3D VictorUnitario;
+    
+    if (axis == 'x')
+    {
+        VictorUnitario = unitVector(Vector3D({1.0, 0.0, 0.0}, {0.0, 0.0, 0.0}));
+    }
+    else if (axis == 'y')
+    {
+        VictorUnitario = unitVector(Vector3D({0.0, 1.0, 0.0}, {0.0, 0.0, 0.0}));
+    }
+    else
+    {
+        VictorUnitario = unitVector(Vector3D({0.0, 0.0, 1.0}, {0.0, 0.0, 0.0}));
+    }
+
+    double angle = VictorUnitario.angle(Vector3D({evecs(0,0), evecs(1,0), evecs(2,0)}, {0.0, 0.0, 0.0}), 'd');
+
+    if (angle < 0.5)
+    {
+        return;
+    }
+
+    Vector3D rotAxis  = VictorUnitario.crossProduct(Vector3D({evecs(0,0), evecs(1,0), evecs(2,0)}, {0.0, 0.0, 0.0}));
+    rotAxis = unitVector(rotAxis);
+
+    Quaternion q = from_axis_angle(rotAxis, angle);
+    Quaternion nq = q.normalizeQ();
+
+    Eigen::Matrix<double, 3, 3> R = Q_RotMatrix(nq);
+
+    for (int i = 0; i < (int) this->molecule.size(); i++)
+    {
+        Eigen::Matrix<double, 1, 3> temp;
         temp << 0.0, 
                 0.0, 
                 0.0;
 
         temp(0,0) = this->molecule.at(i).getX();
-        temp(1,0) = this->molecule.at(i).getY();
-        temp(2,0) = this->molecule.at(i).getZ();
+        temp(0,1) = this->molecule.at(i).getY();
+        temp(0,2) = this->molecule.at(i).getZ();
 
-        //cout << "\nTemp \n\n";
-        //cout << temp;      
-        //cout << "\nTemp Transpose\n\n";
-        //cout << temp.transpose();
-        //cout << "\nEvecs Transpose\n\n";
-        //cout<< evecs.transpose();
-        //cout << "\n";
-
-        Eigen::Matrix<double, 1, 3> newPosition = (temp.transpose() * evecs.transpose()).transpose();
+        Eigen::Matrix<double, 1, 3> newPosition = (temp * R.transpose()).transpose();
 
         float atomX = newPosition(0,0);
         float atomY = newPosition(0,1);
@@ -459,15 +504,9 @@ void Molecule::stdOrientation(){
 
         this->molecule.at(i).setX(atomX);
         this->molecule.at(i).setY(atomY);
-        this->molecule.at(i).setZ(atomZ);        
-//
-        temp(0,0) = 0;
-        temp(1,0) = 0;
-        temp(2,0) = 0;
+        this->molecule.at(i).setZ(atomZ);
     }
-
-    return;
-}
+};
 
 vector <int> Molecule::molecularAxis(){
     int j = 0;
@@ -538,12 +577,41 @@ void Molecule::toXYZ(string fileName){
     file.close();
 }
 
-void Molecule::toGJF(string fileName, string method, string basis, string addKeywords,  string endKeywords, int charge, int multiplicity, bool zmatrix){
-    
-    if (fileName.substr(fileName.find_last_of(".") + 1) != "gjf" && fileName.substr(fileName.find_last_of(".") + 1) != "com"){
+string toLower(const std::string& str) {
+    std::string result = str;
+    std::transform(result.begin(), result.end(), result.begin(), ::tolower);
+    return result;
+}
+
+void Molecule::toGJF(string fileName, string method, string basis, string addKeywords, string midKeywords, string endKeywords, int charge, int multiplicity, bool zmatrix, vector<double> EField)
+{    
+    auto extension = fileName.substr(fileName.find_last_of(".") + 1);
+    if (extension != "gjf" && extension != "com") {
         fileName = fileName.substr(0, fileName.find_last_of(".")) + ".gjf";
-    };
+    }
+
+    if ( (this->chargePoint.size() == 0) && (midKeywords != ""))
+    {
+        throw invalid_argument("Please, just use midKeywords if you have charge points, polarizability and electric field.");
+    }
     
+    if ( (EField.size() > 0) && (toLower(addKeywords).find(toLower("polar")) == string::npos) && (midKeywords != ""))
+    {
+        throw invalid_argument("Please, just use midKeywords if you have charge points, polarizability and electric field.");
+    }
+
+    if (EField.size() > 0) {
+        if (!zmatrix) 
+        {
+            throw invalid_argument("Electric field can only be applied to zmatrix. Set zmatrix=True");
+        }
+
+        if (toLower(addKeywords).find(toLower("Field=Read")) == string::npos) 
+        {
+            addKeywords += " Field=Read";
+        }
+    }
+        
     if (charge != 0){
         this->charge = charge;
     };
@@ -574,8 +642,10 @@ void Molecule::toGJF(string fileName, string method, string basis, string addKey
                 << setw(12) << this->molecule[i].getZ() << endl;
         }
     }
+    
     else 
     {
+        this->reorderMolecule();
         this->doIRC();
         int sizeMolecule = this->molecule.size();
 
@@ -615,60 +685,111 @@ void Molecule::toGJF(string fileName, string method, string basis, string addKey
         }
     };
     
-    if (this->chargePoint.size() != 0){
-        if (endKeywords != ""){
-            file << endl << " " << endKeywords << endl << endl;
+    if (this->chargePoint.size() != 0)
+    {   
+        if ( (EField.size() > 0) && (toLower(addKeywords).find("polar") != string::npos) && (midKeywords != ""))
+        {
+            file << endl << " " << midKeywords << endl << endl;
+
+            for (int i = 0; i < static_cast<int>(this->chargePoint.size()); i++){
+                file << " " <<fixed << setw(12) << this->chargePoint[i].getX()
+                    << " " <<fixed << setw(12) << this->chargePoint[i].getY()
+                    << " " <<fixed << setw(12) << this->chargePoint[i].getZ() 
+                    << " " <<fixed << setw(12) << this->chargePoint[i].getCharge() << endl;
+            }
+
+            endKeywords += " " + to_string(EField[0]) + " " + to_string(EField[1]) + " " + to_string(EField[2]);
+            file << endl << " " << endKeywords << endl;
         }
-        else {
+
+        else 
+        {
+            
             file << endl;
-        }
-        for (int i = 0; i < static_cast<int>(this->chargePoint.size()); i++){
-            file << " " <<fixed << setw(12) << this->chargePoint[i].getX()
-                 << " " <<fixed << setw(12) << this->chargePoint[i].getY()
-                 << " " <<fixed << setw(12) << this->chargePoint[i].getZ() 
-                 << " " <<fixed << setw(12) << this->chargePoint[i].getCharge() << endl;
+
+            for (int i = 0; i < static_cast<int>(this->chargePoint.size()); i++)
+            {
+                file << " " <<fixed << setw(12) << this->chargePoint[i].getX()
+                    << " " <<fixed << setw(12) << this->chargePoint[i].getY()
+                    << " " <<fixed << setw(12) << this->chargePoint[i].getZ() 
+                    << " " <<fixed << setw(12) << this->chargePoint[i].getCharge() << endl;
+            }
+
+            if (endKeywords != "")
+            {
+                if (EField.size() > 0)
+                {   
+                    endKeywords += " " + to_string(EField[0]) + " " + to_string(EField[1]) + " " + to_string(EField[2]);
+                    file << endl << " " << endKeywords << endl;
+                }
+                else
+                {
+                    file << endl << " " << endKeywords << endl;
+                }
+            }
+            else
+            {
+                if (EField.size() > 0)
+                {
+                    endKeywords += " " + to_string(EField[0]) + " " + to_string(EField[1]) + " " + to_string(EField[2]);
+                    file << endl << " " << endKeywords << endl;
+                }
+                else
+                {
+                    file << endl;
+                }
+            }
         }
     }
-
-    else {
-        file << endl << " " << endKeywords << endl;
+    else
+    {   
+        if(EField.size() > 0)
+        {
+            endKeywords += " " + to_string(EField[0]) + " " + to_string(EField[1]) + " " + to_string(EField[2]);
+            file << endl << " " << endKeywords << endl;
+        }
+        else
+        {
+            file << endl << " " << endKeywords << endl;
+        }
     }
 
     file << endl;    
     file.close();
 }
 
-void Molecule::doZMatrix()
-{   
-    this->doIRC();
-    int sizeMolecule = this->molecule.size();
+void Molecule::reorderMolecule()
+{
+    //create a function that reorders the molecule based on the distance with the first atom
 
-    if (sizeMolecule > 0)
-    {
-        zmatrix += this->molecule[0].getAtomicSymbol() + "\n";
-
-        if (sizeMolecule > 1)
-        {
-            zmatrix += this->molecule[1].getAtomicSymbol() + " 1 " + to_string(this->bondLength(0, 1)) + "\n";
-
-            if (sizeMolecule > 2)
-            {
-                zmatrix += this->molecule[2].getAtomicSymbol() + " 1 " + to_string(this->bondLength(0, 2)) + " 2 " + to_string(this->valenceAngle(1, 0, 2)) + "\n";
-
-                if (sizeMolecule > 3)
-                {
-                    for (int i = 3; (int) i < sizeMolecule; i++)
-                    {   
-                        zmatrix += this->molecule[i].getAtomicSymbol() + " " + to_string(i-2) + " " + to_string(this->bondLength(i-3,i)) + " " + to_string(i-1) + " " + to_string(this->valenceAngle(i, i-3, i-2)) + " " + to_string(i) + " " + to_string(this->torsion(i, i-3, i-2,i-1)) + "\n";
-                    }
-                }
+    vector <int> temp;
+    vector <double> distances;
+    vector <double> atom1 = this->molecule[0].getPos();
+    for (int i = 1; i < (int) this->molecule.size(); i++){
+        vector <double> atom2 = this->molecule[i].getPos();
+        distances.push_back(Vector3D(atom1, atom2).magnitude());
+    }
+    vector <double> distancesCopy = distances;
+    sort(distances.begin(), distances.end());
+    for (int i = 0; i < (int) distances.size(); i++){
+        for (int j = 0; j < (int) distancesCopy.size(); j++){
+            if (distances[i] == distancesCopy[j]){
+                temp.push_back(j+1);
+                distancesCopy[j] = -1;
+                break;
             }
         }
     }
-    
-    this->zmatrix = zmatrix;
+    AtomList tempMolecule;
+    tempMolecule.push_back(this->molecule[0]);
+    for (int i = 0; i < (int) temp.size(); i++){
+        tempMolecule.push_back(this->molecule[temp[i]]);
+    }
+    this->molecule = tempMolecule;
+
 };
 
+// Define the method doZMatrix for the Molecule class
 void Molecule::doIRC(){
     this->bonds.clear();
     this->angles.clear();
@@ -743,13 +864,6 @@ void Molecule::removeAtom(Atom atom){
     };
 };
 
-
-void Molecule::detectFunctionExecution()
-{
-    //detect if any Atom class function was executed;
-    
-;
-}
 
 string Molecule::toStr(){
     vector <pair <string, int> > s;
