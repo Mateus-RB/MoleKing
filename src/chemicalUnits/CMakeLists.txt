@@ -11,7 +11,10 @@ add_library(chemicalUnits
         OPLSff.hpp
         OPLSff.cpp
         pov.cpp
-        pov.hpp) 
+        pov.hpp
+        SampleMolecules.cpp
+        SampleMolecules.hpp
+        ) 
 target_include_directories(chemicalUnits PRIVATE 
         "${CMAKE_CURRENT_SOURCE_DIR}"
         "${CMAKE_CURRENT_SOURCE_DIR}/../myMath"

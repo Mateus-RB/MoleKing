@@ -30,6 +30,7 @@
 #include <algorithm>
 #include <vector>
 #include "../../include/Eigen/Eigenvalues"
+#include "SampleMolecules.hpp"
 
 class Molecule{
 
@@ -115,6 +116,7 @@ public:
     double getMolecularMass();
     void clear();    
     double RMSD(Molecule MOL2);
+    void loadMol(string molName);
     //void doOPLS();
 };
 
