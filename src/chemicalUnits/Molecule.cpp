@@ -960,10 +960,7 @@ void Molecule::loadMol(string MolName){
     SampleMolecules sm;
     vector<vector<string>> molData = sm.getSampleMoleculesVector(MolName);
     for (int i = 0; i < (int) molData.size(); i++){
-        // cout << molData[i][0] << endl;
-        // cout << molData[i][1] << endl;
-        // cout << molData[i][2] << endl;
-        // cout << molData[i][3] << endl;
+
         this->addAtom(molData[i][0], stod(molData[i][1]), stod(molData[i][2]), stod(molData[i][3]));
     };
     

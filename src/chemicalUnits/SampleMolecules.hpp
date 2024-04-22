@@ -28,10 +28,10 @@ using namespace std;
 
 class SampleMolecules{
     private:
-    map<string, char*> sampleMoleculesMap;
+    map<string, vector<vector<string>>> sampleMoleculesMap;
     //map<string, int> sampleMoleculesSize;
     vector<string> customSplit(string str, char separator = ' ');
-    vector<string> makeString(char myChar[945], char sep);
+    vector<vector<string>> makeMol(vector<char> myChar, char sep);
 
     public:
     SampleMolecules();

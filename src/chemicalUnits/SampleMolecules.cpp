@@ -17,7 +17,7 @@
 
 SampleMolecules::SampleMolecules(){
 
-    char byteArray[] = {
+    vector<char> byteArray = {
   0x48, 0x2c, 0x34, 0x2e, 0x30, 0x33, 0x33, 0x30, 0x30, 0x30, 0x2c, 0x2d,
   0x32, 0x2e, 0x31, 0x39, 0x35, 0x30, 0x30, 0x30, 0x2c, 0x2d, 0x30, 0x2e,
   0x34, 0x35, 0x32, 0x30, 0x30, 0x30, 0x0a, 0x4f, 0x2c, 0x34, 0x2e, 0x39,
@@ -98,32 +98,9 @@ SampleMolecules::SampleMolecules(){
   0x30, 0x30, 0x2c, 0x2d, 0x30, 0x2e, 0x33, 0x30, 0x32, 0x30, 0x30, 0x30,
   0x2c, 0x30, 0x2e, 0x34, 0x33, 0x38, 0x30, 0x30, 0x30
 };
-    cout << "Size of ByteArray: " << sizeof(byteArray) << endl;
-    char sampleMol[sizeof(byteArray) + 1];
-    cout << "Size of sampleMol: " << sizeof(sampleMol) << endl;
-    memcpy(sampleMol, byteArray, sizeof(byteArray));
-    sampleMol[sizeof(byteArray)] = 0;
-    this->makeString(byteArray, 0x0a);
-    pair<string, char*> p = make_pair("mol1", sampleMol);
+    vector<vector<string>> mol = this->makeMol(byteArray, 0x2c);
+    pair<string, vector<vector<string>>> p = make_pair("mol1", mol);
     this->sampleMoleculesMap.insert(p);
-
-
-};
-
-vector<vector<string>> SampleMolecules::getSampleMoleculesVector(string mol){
-    vector<vector<string>> temp;
-    //cout << this->sampleMoleculesMap[mol] << endl;
-    cout << "-----------------------------" << endl;
-    vector<string> v = customSplit(this->sampleMoleculesMap[mol], 0x0a);
-
-    //print v on terminal 
-    //cout << "Size of splited vector: " << v.size() << endl;
-   for (int i = 0; i < v.size(); i++){
-        vector<string> temp2 = customSplit(v[i], 0x2c);
-        //cout << temp2[0] << ' ' << temp2[1] << ' ' << temp2[2] << ' ' << temp2[3] << endl;
-        temp.push_back(temp2);
-    }
-    return temp;
 };
 
 vector<string> SampleMolecules::customSplit(string str, char separator) 
@@ -131,7 +108,6 @@ vector<string> SampleMolecules::customSplit(string str, char separator)
     vector<string> tokens;
     istringstream iss(str);
     string token;
-
     while (getline(iss, token, separator)) 
     {
         if (!token.empty()) {  // Skip empty tokens
@@ -145,16 +121,20 @@ SampleMolecules::~SampleMolecules(){
     this->sampleMoleculesMap.clear();
 };
 
-vector<string> SampleMolecules::makeString(char myChar[945], char sep){
-    //print every element in myChar 
-    cout << "Size of myChar: " << sizeof(myChar) << endl;
-    for (int i = 0; i < sizeof(myChar); i++){
-        cout << myChar[i] << ' ';
+vector<vector<string>> SampleMolecules::makeMol(vector<char> myChar, char sep){
+    vector<vector<string>> temp2;
+    string str(myChar.begin(), myChar.end());
+    vector<string> tokens = customSplit(str, 0x0a);
+    for (int i = 0; i < tokens.size(); i++){
+        vector<string> temp = customSplit(tokens[i], sep);
+        temp2.push_back(temp);
     }
-    cout << endl;
-    vector<string> temp;
-    return temp;
+    return temp2;
+};
 
-}
+vector<vector<string>> SampleMolecules::getSampleMoleculesVector(string mol){
+    return this->sampleMoleculesMap[mol];
+};
+
 
 
