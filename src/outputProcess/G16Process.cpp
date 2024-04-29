@@ -262,7 +262,7 @@ void G16LOGfile::readLOGFile()
         {
             while (getline(this->logfile, line))
             {
-                if (line.find("Distance matrix (angstroms):") != string::npos || line.find(" Rotational constants (GHZ): ") != string::npos)
+                if (line.find("Distance matrix (angstroms):") != string::npos || line.find(" Rotational constants (GHZ): ") != string::npos || line.find("Stoichiometry") != string::npos)
                 {
                     break;
                 };
