@@ -258,6 +258,7 @@ void G16LOGfile::readLOGFile()
             this->info.pop_back(); // this remove the '.' of the string, wich is the last char in the string.            
         };
         // If the line contains "Input orientation:", extract the molecule's geometry in Input Orientation
+        //Teste!
         if (line.find("Input orientation:") != string::npos)
         {
             while (getline(this->logfile, line))
