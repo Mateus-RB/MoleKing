@@ -274,6 +274,7 @@ void G16LOGfile::readLOGFile()
                 moleculeSTR = moleculeSTR.substr(moleculeSTR.find("\n") + 1);
             };
             moleculeSTR = moleculeSTR.substr(0, moleculeSTR.rfind("---------------------------------------------------------------------\n"));
+            moleculeSTR = moleculeSTR.substr(0, moleculeSTR.rfind(" ---------------------------------------------------------------------"));
             moleculeSTR = moleculeSTR.substr(0, moleculeSTR.rfind("\n"));
             iptStorage.emplace_back(moleculeSTR);
             moleculeSTR = "";
@@ -294,6 +295,7 @@ void G16LOGfile::readLOGFile()
                 moleculeSTR = moleculeSTR.substr(moleculeSTR.find("\n") + 1);
             };
             moleculeSTR = moleculeSTR.substr(0, moleculeSTR.rfind("---------------------------------------------------------------------\n"));
+            moleculeSTR = moleculeSTR.substr(0, moleculeSTR.rfind(" ---------------------------------------------------------------------"));
             moleculeSTR = moleculeSTR.substr(0, moleculeSTR.rfind("\n"));
             stdStorage.emplace_back(moleculeSTR);
             moleculeSTR = "";
