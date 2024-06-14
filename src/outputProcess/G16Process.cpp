@@ -1067,7 +1067,7 @@ void G16LOGfile::setBeta()
                 if (UsePolar[i].find("Beta(0;0,0)") != string::npos)
                 {   
                     start.insert(make_pair(this->vecFrec[0],i+2));
-                    end.insert(make_pair(this->vecFrec[0],i+17));
+                    end.insert(make_pair(this->vecFrec[0],i+18));
                     start2.insert(make_pair(this->vecFrec[0],i+2));
                     end2.insert(make_pair(this->vecFrec[0],i+18));
                 }
