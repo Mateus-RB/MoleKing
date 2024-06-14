@@ -1069,7 +1069,7 @@ void G16LOGfile::setBeta()
                     start.insert(make_pair(this->vecFrec[0],i+2));
                     end.insert(make_pair(this->vecFrec[0],i+17));
                     start2.insert(make_pair(this->vecFrec[0],i+2));
-                    end2.insert(make_pair(this->vecFrec[0],i+17));
+                    end2.insert(make_pair(this->vecFrec[0],i+18));
                 }
                 else if (UsePolar[i].find("Beta(-w;w,0) w= ") != string::npos)
                 { 
@@ -1079,7 +1079,7 @@ void G16LOGfile::setBeta()
                     if(freqPrincipal == FreqDouble)
                     {
                         start.insert(make_pair(FreqDouble,i+2));
-                        end.insert(make_pair(FreqDouble,i+25));
+                        end.insert(make_pair(FreqDouble,i+26));
                     }
                 }
                 else if (UsePolar[i].find("Beta(-2w;w,w) w= ") != string::npos)
@@ -1091,7 +1091,7 @@ void G16LOGfile::setBeta()
                     if(freqPrincipal == FreqDouble)
                     {
                         start2.insert(make_pair(FreqDouble,i+2));
-                        end2.insert(make_pair(FreqDouble,i+25));
+                        end2.insert(make_pair(FreqDouble,i+26));
                     }
                 }
 
@@ -1223,9 +1223,9 @@ void G16LOGfile::setGamma()
                 {   
                     
                     start.insert(make_pair(this->vecFrec[0],i+2));
-                    end.insert(make_pair(this->vecFrec[0],i+18));
+                    end.insert(make_pair(this->vecFrec[0],i+19));
                     start2.insert(make_pair(this->vecFrec[0],i+2));
-                    end2.insert(make_pair(this->vecFrec[0],i+18));
+                    end2.insert(make_pair(this->vecFrec[0],i+19));
                 }
                 else if (UsePolar[i].find("Gamma(-w;w,0,0) w= ") != string::npos)
                 { 
@@ -1235,7 +1235,7 @@ void G16LOGfile::setGamma()
                     if(freqPrincipal == FreqDouble)
                     {
                         start.insert(make_pair(FreqDouble,i+2));
-                        end.insert(make_pair(FreqDouble,i+39));
+                        end.insert(make_pair(FreqDouble,i+40));
                     }
                 }
                 else if (UsePolar[i].find("Gamma(-2w;w,w,0) w= ") != string::npos)
@@ -1247,7 +1247,7 @@ void G16LOGfile::setGamma()
                     if(freqPrincipal == FreqDouble)
                     {
                         start2.insert(make_pair(FreqDouble,i+2));
-                        end2.insert(make_pair(FreqDouble,i+57));
+                        end2.insert(make_pair(FreqDouble,i+58));
                     }
                 }
 
