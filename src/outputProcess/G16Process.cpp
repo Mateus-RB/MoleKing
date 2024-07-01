@@ -465,7 +465,7 @@ void G16LOGfile::setHOMO()
 // Function to set the LUMO orbital of the calculation
 void G16LOGfile::setLUMO()
 {   
-    cout << "Debugging" << endl;
+    //cout << "Debugging" << endl;
     vector<string> temp;
     string aLumoAuxiliary;
     aLumoAuxiliary = this->aLumoStorage[this->aLumoStorage.size() - 1];
