@@ -23,6 +23,8 @@ G16LOGfile::G16LOGfile(string filePath, bool polarAsw, bool tdAsw, int link)
 
     detectLink();
 
+    //cout << this->linkStorage.size() << endl; // Debugging
+
     if (this->linkStorage.size() == 1)
     {
        this->logfile.str(this->linkStorage[0]);
@@ -61,7 +63,7 @@ G16LOGfile::G16LOGfile(string filePath, bool polarAsw, bool tdAsw, int link)
     setMolecule();
     setDipole();
     setHOMO();
-    setLUMO();
+    setLUMO(); // Debugging :: This function Breaks with water log file
     setOrbitals();
 
     if (tdAsw)
@@ -192,6 +194,7 @@ void G16LOGfile::readLOGFile()
             {   
                 if (line.find(" Alpha virt. eigenvalues --") != string::npos)
                 {
+                    //cout << "aHomo to aLumo" << endl; // Debugging
                     aLumoStorageSTR += line + "\n";
                     break;
                 };
@@ -200,7 +203,7 @@ void G16LOGfile::readLOGFile()
             this->aHomoStorage.emplace_back(aHomoStorageSTR);
             aHomoStorageSTR = "";
         };
-        if (aLumoFinder != string::npos)
+        if (line.find(" Alpha virt. eigenvalues --") != string::npos) // Debugging :: aLumoFinder not match
         {
             aLumoStorageSTR += line + "\n";
             while (getline(this->logfile, line))
@@ -212,6 +215,7 @@ void G16LOGfile::readLOGFile()
                 };
                 aLumoStorageSTR += line + "\n";
             };
+            //cout << "Foi feito" << endl; // Debugging
             this->aLumoStorage.emplace_back(aLumoStorageSTR);
             aLumoStorageSTR = "";
         };
@@ -461,58 +465,59 @@ void G16LOGfile::setHOMO()
 // Function to set the LUMO orbital of the calculation
 void G16LOGfile::setLUMO()
 {   
+    cout << "Debugging" << endl;
     vector<string> temp;
     string aLumoAuxiliary;
     aLumoAuxiliary = this->aLumoStorage[this->aLumoStorage.size() - 1];
-    stringstream ss(aLumoAuxiliary);
+    //stringstream ss(aLumoAuxiliary);
 
-    while (getline(ss, line))
-    {   
-        istringstream iss(line);
-        vector<string> results ((istream_iterator<string>(iss)), istream_iterator<string>());
+    // while (getline(ss, line))
+    // {   
+    //     istringstream iss(line);
+    //     vector<string> results ((istream_iterator<string>(iss)), istream_iterator<string>());
 
-        for (int i = 4; i < results.size(); i++)
-        {   
-            try
-            {   
+    //     for (int i = 4; i < results.size(); i++)
+    //     {   
+    //         try
+    //         {   
 
-                temp.emplace_back(results[i]);
-            }
-            catch (const std::exception &e)
-            {
-                // If the string cannot be converted to a double, ignore it
-            };
-        }
-    }
+    //             temp.emplace_back(results[i]);
+    //         }
+    //         catch (const std::exception &e)
+    //         {
+    //             // If the string cannot be converted to a double, ignore it
+    //         };
+    //     }
+    // }
 
-    if (this->bLumoStorage.size() > 0)
-    {
-        vector<string> bTemp;
-        string bLumoAuxiliary;
-        bLumoAuxiliary = this->bLumoStorage[this->bLumoStorage.size()-1];
-        stringstream ss(bLumoAuxiliary);
+    // if (this->bLumoStorage.size() > 0)
+    // {
+    //     vector<string> bTemp;
+    //     string bLumoAuxiliary;
+    //     bLumoAuxiliary = this->bLumoStorage[this->bLumoStorage.size()-1];
+    //     stringstream ss(bLumoAuxiliary);
 
-        while (getline(ss, line))
-        {   
-            istringstream iss(line);
-            vector<string> bResults ((istream_iterator<string>(iss)), istream_iterator<string>());
+    //     while (getline(ss, line))
+    //     {   
+    //         istringstream iss(line);
+    //         vector<string> bResults ((istream_iterator<string>(iss)), istream_iterator<string>());
 
-            for (int i = 4; i < bResults.size(); i++)
-            {   
-                try
-                {   
-                    bTemp.emplace_back(bResults[i]);
-                }
-                catch (const std::exception &e)
-                {
-                    // If the string cannot be converted to a double, ignore it
-                };
-            }
-        };  
-        this->bUnoccupied = bTemp;
-    }
+    //         for (int i = 4; i < bResults.size(); i++)
+    //         {   
+    //             try
+    //             {   
+    //                 bTemp.emplace_back(bResults[i]);
+    //             }
+    //             catch (const std::exception &e)
+    //             {
+    //                 // If the string cannot be converted to a double, ignore it
+    //             };
+    //         }
+    //     };  
+    //     this->bUnoccupied = bTemp;
+    // }
 
-    this->Unoccupied = temp;
+    // this->Unoccupied = temp;
 };
 
 // Function to set the transitions of the calculation
