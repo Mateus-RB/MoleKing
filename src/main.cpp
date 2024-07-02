@@ -159,7 +159,6 @@ PYBIND11_MODULE(MoleKing, m) {
         .def("moveTail", &SupraMolecule::moveTail)
         .def("spinSupraMolecule", (void (SupraMolecule::*)(double, char)) &SupraMolecule::spinSupraMolecule)
         .def("spinSupraMolecule", (void (SupraMolecule::*)(double, Vector3D)) &SupraMolecule::spinSupraMolecule)
-        //.def("standardOrientation", &SupraMolecule::standardOrientation)
         .def("getIRCBonds", &SupraMolecule::getIRCBonds)
         .def("getIRCAngles", &SupraMolecule::getIRCAngles)
         .def("getIRCDihedrals", &SupraMolecule::getIRCDihedrals)
