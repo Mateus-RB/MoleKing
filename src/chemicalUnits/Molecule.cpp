@@ -353,182 +353,12 @@ void Molecule::moveTail(int atomNumber, double x, double y, double z){
     Vector3D traslationVector = Vector3D({x, y, z}, this->molecule.at(atomNumber).getPos());
     this->translation(traslationVector);
 };
-Eigen::Matrix<double, 3, 3> Molecule::moleculeTensor(){
-    Point centerOfMass = this->getMassCenter();
-    double Ixx = 0.0;
-    double Iyy = 0.0;
-    double Izz = 0.0;
-    double Ixy = 0.0;
-    double Ixz = 0.0;
-    double Iyz = 0.0;
-
-    for (int i = 0; i < (int) this->molecule.size(); i++){
-        double atomMass = this->molecule.at(i).getAtomicMass();        
-        double dx = this->molecule.at(i).getX() - centerOfMass.getCoords('c')[0];
-        double dy = this->molecule.at(i).getY() - centerOfMass.getCoords('c')[1];
-        double dz = this->molecule.at(i).getZ() - centerOfMass.getCoords('c')[2];
-
-        Ixx += atomMass * (dy*dy + dz*dz);
-        Iyy += atomMass * (dx*dx + dz*dz);
-        Izz += atomMass * (dx*dx + dy*dy);
-        Ixy += atomMass * dx*dy * -1;
-        Ixz += atomMass * dx*dz * -1;
-        Iyz += atomMass * dy*dz * -1;
-    };
-
-    Matrix inertiaTensor = Matrix({{Ixx,Ixy,Ixz},
-                                   {Ixy,Iyy,Iyz},
-                                   {Ixz,Iyz,Izz} });
-
-    
-    Eigen::Matrix<double, 3, 3> A;
-
-    Eigen::Matrix<double, 1, 3> Position;
-
-    A << Ixx, Ixy, Ixz,
-         Ixy, Iyy, Iyz,
-         Ixz, Iyz, Izz;
-
-    Eigen::EigenSolver<Eigen::Matrix<double, 3, 3> > s(A); 
-    Eigen::Matrix<double, 3, 3> evecs = s.eigenvectors().real(); //! Eigenvectors are the columns of evecs.
-    
-    return evecs;
-}
 
 Vector3D Molecule::unitVector(Vector3D vector)
 {
     double magnitude = vector.magnitude();
     return Vector3D({vector.getVector()[0]/magnitude, vector.getVector()[1]/magnitude, vector.getVector()[2]/magnitude}, {0.0, 0.0, 0.0});
 }
-
-Quaternion Molecule::from_axis_angle(Vector3D axis, double angle)
-{
-    double mag_sq = axis.dotProduct(axis);
-    if (mag_sq == 0)
-    {
-        throw invalid_argument("The axis cannot be a zero vector");
-    }
-    
-    if ( abs(1.0 - mag_sq) > 1e-12)
-    {
-        axis = axis / sqrt(mag_sq);
-    }
-
-    double theta = angle / 2.0;
-    double r = cos(theta);
-    Vector3D i = axis * sin(theta);
-
-    return Quaternion(r, i);
-};
-
-Eigen::Matrix<double, 3,3> Molecule::Q_RotMatrix(Quaternion q)
-{
-    double u = q.getQuaternion()[0];
-    double s_i = q.getQuaternion()[1];
-    double s_j = q.getQuaternion()[2];
-    double s_k = q.getQuaternion()[3];
-
-    Eigen::Matrix<double, 3, 3> R;
-
-    R(0,0) = 2 * (pow(u,2) + pow(s_i,2)) - 1;
-    R(0,1) = 2 * (s_i * s_j - u * s_k);
-    R(0,2) = 2 * (s_i * s_k + u * s_j);
-    
-    R(1,0) = 2 * (s_i * s_j + u * s_k);
-    R(1,1) = 2 * (pow(u,2) + pow(s_j,2)) - 1;
-    R(1,2) = 2 * (s_j * s_k - u * s_i);
-
-    R(2,0) = 2 * (s_i * s_k - u * s_j);
-    R(2,1) = 2 * (s_j * s_k + u * s_i);
-    R(2,2) = 2 * (pow(u,2) + pow(s_k,2)) - 1;
-
-    return R;
-}
-
-void Molecule::stdOrientation()
-{
-    this->stdOrientation_Axis('x');
-    this->stdOrientation_Axis('y');
-    this->moveMassCenter();
-}
-
-void Molecule::stdOrientation_Axis(char axis){
-    Eigen::Matrix<double, 3, 3> evecs = this->moleculeTensor();
-
-    Vector3D VictorUnitario;
-    
-    if (axis == 'x')
-    {
-        VictorUnitario = unitVector(Vector3D({1.0, 0.0, 0.0}, {0.0, 0.0, 0.0}));
-    }
-    else if (axis == 'y')
-    {
-        VictorUnitario = unitVector(Vector3D({0.0, 1.0, 0.0}, {0.0, 0.0, 0.0}));
-    }
-    else
-    {
-        VictorUnitario = unitVector(Vector3D({0.0, 0.0, 1.0}, {0.0, 0.0, 0.0}));
-    }
-
-    double angle = VictorUnitario.angle(Vector3D({evecs(0,0), evecs(1,0), evecs(2,0)}, {0.0, 0.0, 0.0}), 'd');
-
-    if (angle < 0.5)
-    {
-        return;
-    }
-
-    Vector3D rotAxis  = VictorUnitario.crossProduct(Vector3D({evecs(0,0), evecs(1,0), evecs(2,0)}, {0.0, 0.0, 0.0}));
-    rotAxis = unitVector(rotAxis);
-
-    Quaternion q = from_axis_angle(rotAxis, angle);
-    Quaternion nq = q.normalizeQ();
-
-    Eigen::Matrix<double, 3, 3> R = Q_RotMatrix(nq);
-
-    for (int i = 0; i < (int) this->molecule.size(); i++)
-    {
-        Eigen::Matrix<double, 1, 3> temp;
-        temp << 0.0, 
-                0.0, 
-                0.0;
-
-        temp(0,0) = this->molecule.at(i).getX();
-        temp(0,1) = this->molecule.at(i).getY();
-        temp(0,2) = this->molecule.at(i).getZ();
-
-        Eigen::Matrix<double, 1, 3> newPosition = (temp * R.transpose()).transpose();
-
-        float atomX = newPosition(0,0);
-        float atomY = newPosition(0,1);
-        float atomZ = newPosition(0,2);
-
-        this->molecule.at(i).setX(atomX);
-        this->molecule.at(i).setY(atomY);
-        this->molecule.at(i).setZ(atomZ);
-    }
-};
-
-vector <int> Molecule::molecularAxis(){
-    int j = 0;
-    vector <int> temp;
-    temp.push_back(0);
-    temp.push_back(0);
-    double distance = 0;
-    while(j < (int) this->molecule.size()){
-        for(int i = j+1; i < (int) this->molecule.size(); i++){
-            vector<double> atomCoord1 = this->molecule.at(j).getPos();
-            vector<double> atomCoord2 = this->molecule.at(i).getPos();
-            double dist = Vector3D(atomCoord1, atomCoord2).magnitude();
-            if(dist > distance){
-                distance = dist;
-                temp.at(0) = j;
-                temp.at(1) = i;
-            };
-        };
-        j++;
-    };
-    return temp;
-};
 
 double Molecule::bondLength(int atomN1, int atomN2){
     Vector3D bond = Vector3D(this->molecule[atomN1].getPos(), this->molecule[atomN2].getPos());
@@ -758,6 +588,81 @@ void Molecule::toGJF(string fileName, string method, string basis, string addKey
     file.close();
 }
 
+void Molecule::alignMolecule(char axis){
+
+    Eigen::MatrixXd coords(this->molecule.size(), 3);
+
+    for (size_t i = 0; i < this->molecule.size(); ++i)
+    {
+        coords.row(i) = Eigen::Vector3d(this->molecule[i].getX(), this->molecule[i].getY(), this->molecule[i].getZ());
+    }
+
+    //perform PCA
+
+    Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> solver(coords.transpose() * coords);
+    Eigen::MatrixXd principalAxis = solver.eigenvectors().col(2);  // The principal axis is the eigenvector with the largest eigenvalue
+    Eigen::Matrix3d rotationMatrix = Molecule::getRotationMatrix(principalAxis, axis);
+
+    for (size_t i = 0; i < this->molecule.size(); ++i)
+    {
+        Eigen::Vector3d pos = Eigen::Vector3d(this->molecule[i].getX(), this->molecule[i].getY(), this->molecule[i].getZ());
+        pos = rotationMatrix * pos;
+        this->molecule[i].setX(pos(0));
+        this->molecule[i].setY(pos(1));
+        this->molecule[i].setZ(pos(2));
+    }
+
+    this->moveMassCenter(0,0,0);
+};
+
+Eigen::Matrix3d Molecule::getRotationMatrix(Eigen::Vector3d pAxis, char mkAxis)
+{   
+
+    Eigen::Vector3d axis = pAxis.normalized();
+    Eigen::Vector3d xAxis(3);
+
+    // if mkAxis == x
+
+    if (mkAxis == 'x')
+    {
+        xAxis << 1.0, 0.0, 0.0;
+    }
+
+    else if (mkAxis == 'y')
+    {
+        xAxis << 0.0, 1.0, 0.0;
+    }
+
+    else if (mkAxis == 'z')
+    {
+        xAxis << 0.0, 0.0, 1.0;
+    }
+
+    else
+    {
+        throw invalid_argument("Invalid axis. Please, use x, y or z.");
+    }
+
+    if (axis.isApprox(xAxis)){
+        return Eigen::Matrix3d::Identity();
+    }
+
+    Eigen::Vector3d v = axis.cross(xAxis);
+
+    double s = v.norm();
+    double c = axis.dot(xAxis);
+
+    Eigen::Matrix3d vx;
+    vx << 0, -v(2), v(1),
+          v(2), 0, -v(0),
+          -v(1), v(0), 0;
+
+    Eigen::Matrix3d rotationMatrix = Eigen::Matrix3d::Identity() + vx + vx * vx * (1 - c) / (s * s);
+    return rotationMatrix;
+};
+
+
+
 void Molecule::reorderMolecule()
 {
     //create a function that reorders the molecule based on the distance with the first atom
@@ -863,7 +768,6 @@ void Molecule::removeAtom(Atom atom){
         };
     };
 };
-
 
 string Molecule::toStr(){
     vector <pair <string, int> > s;
