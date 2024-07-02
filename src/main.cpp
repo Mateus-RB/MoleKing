@@ -129,8 +129,6 @@ PYBIND11_MODULE(MoleKing, m) {
         .def("translation", &Molecule::translation)
         .def("moveMassCenter", &Molecule::moveMassCenter, py::arg("x")=0, py::arg("y")=0, py::arg("z")=0)
         .def("moveTail", &Molecule::moveTail, py::arg("atomNumber"), py::arg("x")=0, py::arg("y")=0, py::arg("z")=0)
-        //.def("stdOrientation", &Molecule::standardOrientation)
-        .def("stdOrientation", &Molecule::stdOrientation)
         .def("bondLength", &Molecule::bondLength)
         .def("valenceAngle", &Molecule::valenceAngle)
         .def("torsion", &Molecule::torsion)
@@ -138,10 +136,10 @@ PYBIND11_MODULE(MoleKing, m) {
         .def("getIRCAngles", &Molecule::getIRCAngles)
         .def("getIRCDihedrals", &Molecule::getIRCDihedrals)
         .def("removeElement", &Molecule::removeElement)
-        .def("molecularAxis", &Molecule::molecularAxis)
         .def("toXYZ", &Molecule::toXYZ, py::arg("fileName") = "MK_Molecule.xyz")
         .def("RMSD", &Molecule::RMSD, py::arg("MOL2"))
         .def("toGJF", &Molecule::toGJF, py::arg("fileName") = "MK_Molecule.gjf", py::arg("method") = "B3LYP", py::arg("basis") = "6-311g(d)", py::arg("addKeywords") = "", py::arg("midKeywords") = "", py::arg("endKeywords") = "", py::arg("charge") = 0, py::arg("multiplicity") = 1, py::arg("zmatrix") = 0, py::arg("EField") = vector<double> {})
+        .def("alignMolecule", &Molecule::alignMolecule, py::arg("axis") = 'x')
         .def("getMM", &Molecule::getMolecularMass);
 
     py::class_<SupraMolecule>(m, "SupraMolecule", "This class creates a set of molecules variable type allowing for the usage in python like a primitive type.")
@@ -191,7 +189,6 @@ PYBIND11_MODULE(MoleKing, m) {
         .def(py::init<double, double, double, char>(), py::arg("coord1"), py::arg("coord2"), py::arg("coord3"), py::arg("spaceType") = 'c')
         .def("toCartesian", &SphericalCoords::toCartesian)
         .def("toSpherical", &SphericalCoords::toSpherical);
-    
     
     py::class_<Vector3D>(m, "Vector3D", "This class creates a vector (xi + yj + zk) variable type allowing for the usage in python like a primitive type.")
         .def(py::init< vector<double>, vector<double>>(), py::arg("pointA"), py::arg("pointB") = vector <double> {0.0, 0.0, 0.0})
