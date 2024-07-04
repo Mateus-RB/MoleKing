@@ -105,6 +105,8 @@ public:
     string toStr();
     bool operator==(Molecule mol);
     bool operator!=(Molecule mol);
+    bool operator<(Molecule mol);
+    bool operator>(Molecule mol);
     void removeElement(string element);
     Molecule copy();
     double getMolecularMass();

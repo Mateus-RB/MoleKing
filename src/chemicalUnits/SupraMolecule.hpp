@@ -31,10 +31,10 @@ private:
     vector <VectorsInt> angles;
     vector <VectorsInt> dihedrals;
     int multiplicity, charge;
-    void setCharge();
     void getMoleculeBonds();
     void getMoleculeAngles();
     void getMoleculeTorsions();
+    void setCharge();
 
 public:
     typedef MoleculeList::iterator iterator;
@@ -72,6 +72,8 @@ public:
     iterator end();
     bool operator==(SupraMolecule sMol);
     bool operator!=(SupraMolecule sMol);
+    bool operator<(SupraMolecule sMol);
+    bool operator>(SupraMolecule sMol);
 };
 
 

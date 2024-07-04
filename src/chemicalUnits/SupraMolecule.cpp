@@ -42,7 +42,12 @@ void SupraMolecule::addAtomToMolecule(int molNumber, string atomSymbol, double x
 };
 
 string SupraMolecule::toStr(){
-    string result = "Supramolecule:";
+    string result = "Supramolecule: ";
+
+    // result = result << this->supraMolecule.size() << " molecules with a total charge of " << this->charge << endl;
+
+    result = result + to_string(this->supraMolecule.size()) + " molecules with a total charge of " + to_string(this->charge) + ".";
+
     for (int i = 0; i < (int) this->supraMolecule.size(); i++){
         result = result + "\n    " + this->supraMolecule[i].toStr();
     };
@@ -275,4 +280,32 @@ bool SupraMolecule::operator!=(SupraMolecule sMol){
         return 1;
     };
     return 0;
+};
+
+bool SupraMolecule::operator<(SupraMolecule sMol){
+    if ((int) this->supraMolecule.size() < (int) sMol.getSize()){
+        return 1;
+    } else {
+        for (int i = 0; i < (int) this->supraMolecule.size(); i++){
+            if (this->supraMolecule[i] < sMol.getMolecule(i)){
+                continue;
+            } else {
+                return 0;
+            };
+        };
+    };
+};
+
+bool SupraMolecule::operator>(SupraMolecule sMol){
+    if ((int) this->supraMolecule.size() > (int) sMol.getSize()){
+        return 1;
+    } else {
+        for (int i = 0; i < (int) this->supraMolecule.size(); i++){
+            if (this->supraMolecule[i] > sMol.getMolecule(i)){
+                continue;
+            } else {
+                return 0;
+            };
+        };
+    };
 };

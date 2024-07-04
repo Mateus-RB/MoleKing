@@ -831,6 +831,22 @@ bool Molecule::operator!=(Molecule mol){
     return 0;
 };
 
+bool Molecule::operator<(Molecule mol){
+    if ((int) this->molecule.size() < (int) mol.getSize()){
+        return 1;
+    } else {
+        return 0;
+    };
+};
+
+bool Molecule::operator>(Molecule mol){
+    if ((int) this->molecule.size() > (int) mol.getSize()){
+        return 1;
+    } else {
+        return 0;
+    };
+};
+
 void Molecule::removeElement(string element){
 
     Molecule temp = Molecule();
@@ -842,7 +858,7 @@ void Molecule::removeElement(string element){
     }
 
     this->molecule = temp.molecule;
-}
+};
 
 Molecule Molecule::copy(){
     Molecule temp = Molecule();

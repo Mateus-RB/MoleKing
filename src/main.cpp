@@ -112,6 +112,8 @@ PYBIND11_MODULE(MoleKing, m) {
         .def("getCharge", &Molecule::getCharge)
         .def("__eq__", &Molecule::operator==)
         .def("__ne__", &Molecule::operator!=)
+        .def("__lt__", &Molecule::operator<)
+        .def("__gt__", &Molecule::operator>)
         .def("__len__", &Molecule::getSize)
         .def("__iter__", [](Molecule &mol) {return py::make_iterator(mol.begin(), mol.end());}, py::keep_alive<0, 1>())
         .def("setMultiplicity", &Molecule::setMultiplicity)
@@ -171,6 +173,8 @@ PYBIND11_MODULE(MoleKing, m) {
         .def("__iter__", [](SupraMolecule &sMol) {return py::make_iterator(sMol.begin(), sMol.end());}, py::keep_alive<0, 1>())
         .def("__eq__", &SupraMolecule::operator==)
         .def("__ne__", &SupraMolecule::operator!=)
+        .def("__lt__", &SupraMolecule::operator<)
+        .def("__gt__", &SupraMolecule::operator>)
         .def("getSupraMM", &SupraMolecule::getSupraMolecularMass);;
     
     py::class_<Point>(m, "Point", "This class creates a point variable type allowing for the usage in python like a primitive type.")
