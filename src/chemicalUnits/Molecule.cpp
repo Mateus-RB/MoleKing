@@ -832,12 +832,17 @@ bool Molecule::operator!=(Molecule mol){
 };
 
 void Molecule::removeElement(string element){
-    for (int i = 0; i < (int) this->molecule.size(); i++) {
-        if (this->molecule[i].getAtomicSymbol() == element){
-            this->molecule.erase(this->molecule.begin() + i);
+
+    Molecule temp = Molecule();
+
+    for (int i = 0; i < this->molecule.size(); i++){
+        if (this->molecule[i].getAtomicSymbol() != element){
+            temp.addAtom(this->molecule[i]);
         };
-    };
-};
+    }
+
+    this->molecule = temp.molecule;
+}
 
 Molecule Molecule::copy(){
     Molecule temp = Molecule();
