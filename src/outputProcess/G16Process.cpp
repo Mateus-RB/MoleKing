@@ -879,7 +879,7 @@ vector<string> G16LOGfile::getNLO(string Orientation)
     }
     
     if(Orientation == "dipole")
-    {
+    {   
         return this->polarStorageDip;
     }
     else
@@ -890,7 +890,6 @@ vector<string> G16LOGfile::getNLO(string Orientation)
 
 void G16LOGfile::setFrequency()
 {    
-
     if (this->dipFinder)
     {
         for (int i = 0; i < this->vecPolarDip.size(); i++)
@@ -937,7 +936,8 @@ vector<double> G16LOGfile::getFrequency()
 void G16LOGfile::setAlpha()
 {   
     string WhatPolar = "";
-    auto UsePolar = this->vecPolarDip;
+    vector<string> UsePolar;
+
     for( int o = 0; o < 2; o++){
         map<double, int> start, end;
         map<double,map<string,vector<string>>> FrequencyInfo;
@@ -945,25 +945,28 @@ void G16LOGfile::setAlpha()
         vector<vector<string>> Alpha_0, Alpha_w;
 
         if (o==0){
-            WhatPolar = "Input";
-            auto UsePolar = this->vecPolarInp;
+            WhatPolar = "input";
+            UsePolar = this->vecPolarInp;
         }
-        else{
-            WhatPolar = "Dipole";
-            auto UsePolar = this->vecPolarDip;
+        else
+        {
+            WhatPolar = "dipole";
+            UsePolar = this->vecPolarDip;
         }
+
         for (int f = 0; f < this->vecFrec.size(); f++){
             double freqPrincipal = this->vecFrec[f];
 
             for (int i = 0; i < UsePolar.size(); i++)
             {
                 if (UsePolar[i].find("Alpha(0;0)") != string::npos)
-                { 
+                {
                     start.insert(make_pair(this->vecFrec[0],i+2));
                     end.insert(make_pair(this->vecFrec[0],i+10));
                 }
                 else if (UsePolar[i].find("Alpha(-w;w) w= ") != string::npos)
                 {   
+                    // OK
                     string Freq = UsePolar[i].substr(UsePolar[i].find("Alpha(-w;w)") + 14);
                     Freq = Freq.substr(0, Freq.find("nm"));
                     //convert Freq to double
@@ -995,11 +998,14 @@ map<string,double> G16LOGfile::getAlpha(string orientation, string unit, double 
 {   
     map<string,double> temp;
     map<double,map<string,vector<string>>> alpha;
-    if (orientation == "Input"){
+
+    std::transform(orientation.begin(), orientation.end(), orientation.begin(),[](unsigned char c){ return std::tolower(c); });
+        
+    if (orientation == "input"){
         alpha = this->Alpha[orientation];
     }
     else{
-        alpha = this->Alpha["Dipole"];
+        alpha = this->Alpha["dipole"];
     }
     if (!this->polarAsw)
     {
@@ -1056,11 +1062,11 @@ void G16LOGfile::setBeta()
     auto UsePolar = this->vecPolarDip;
     for (int o = 0; o < 2; o++){
         if (o==0){
-            WhatPolar = "Input";
+            WhatPolar = "input";
            auto UsePolar = this->vecPolarInp;
         }
         else{
-            WhatPolar = "Dipole";
+            WhatPolar = "dipole";
             auto UsePolar = this->vecPolarDip;
         }
         map<double, int> start, end, start2, end2;
@@ -1148,6 +1154,8 @@ map<string,double> G16LOGfile::getBeta(string orientation, string unit, double f
 {   
     
     map<double,map<string,vector<string>>> beta;
+    std::transform(orientation.begin(), orientation.end(), orientation.begin(),[](unsigned char c){ return std::tolower(c); });
+
     if (BSHG){
        beta = this->Beta2[orientation];
     }
@@ -1211,11 +1219,11 @@ void G16LOGfile::setGamma()
     auto UsePolar = this->vecPolarDip;
     for (int o = 0; o < 2; o++){
         if (o==0){
-            WhatPolar = "Input";
+            WhatPolar = "input";
             auto UsePolar = this->vecPolarInp;
         }
         else{
-            WhatPolar = "Dipole";
+            WhatPolar = "dipole";
             auto UsePolar = this->vecPolarDip;
         }
         map<double, int> start, end, start2, end2;
@@ -1295,6 +1303,8 @@ void G16LOGfile::setGamma()
 
 map<string,double> G16LOGfile::getGamma(string orientation, string unit, double frequency, bool GSHG)
 {   
+    std::transform(orientation.begin(), orientation.end(), orientation.begin(),[](unsigned char c){ return std::tolower(c); });
+
     map<double,map<string,vector<string>>> gamma;
     if (GSHG){
        gamma = this->Gamma2[orientation];
