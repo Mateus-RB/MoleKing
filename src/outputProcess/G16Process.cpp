@@ -195,7 +195,7 @@ void G16LOGfile::readLOGFile()
                 if (line.find(" Alpha virt. eigenvalues --") != string::npos)
                 {
                     //cout << "aHomo to aLumo" << endl; // Debugging
-                    aLumoStorageSTR += line + "\n";
+                    //aLumoStorageSTR += line + "\n";
                     break;
                 };
                 aHomoStorageSTR += line + "\n";
