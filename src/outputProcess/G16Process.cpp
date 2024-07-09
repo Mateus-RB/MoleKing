@@ -469,55 +469,55 @@ void G16LOGfile::setLUMO()
     vector<string> temp;
     string aLumoAuxiliary;
     aLumoAuxiliary = this->aLumoStorage[this->aLumoStorage.size() - 1];
-    //stringstream ss(aLumoAuxiliary);
+    stringstream ss(aLumoAuxiliary);
 
-    // while (getline(ss, line))
-    // {   
-    //     istringstream iss(line);
-    //     vector<string> results ((istream_iterator<string>(iss)), istream_iterator<string>());
+    while (getline(ss, line))
+    {   
+        istringstream iss(line);
+        vector<string> results ((istream_iterator<string>(iss)), istream_iterator<string>());
 
-    //     for (int i = 4; i < results.size(); i++)
-    //     {   
-    //         try
-    //         {   
+        for (int i = 4; i < results.size(); i++)
+        {   
+            try
+            {   
 
-    //             temp.emplace_back(results[i]);
-    //         }
-    //         catch (const std::exception &e)
-    //         {
-    //             // If the string cannot be converted to a double, ignore it
-    //         };
-    //     }
-    // }
+                temp.emplace_back(results[i]);
+            }
+            catch (const std::exception &e)
+            {
+                // If the string cannot be converted to a double, ignore it
+            };
+        }
+    }
 
-    // if (this->bLumoStorage.size() > 0)
-    // {
-    //     vector<string> bTemp;
-    //     string bLumoAuxiliary;
-    //     bLumoAuxiliary = this->bLumoStorage[this->bLumoStorage.size()-1];
-    //     stringstream ss(bLumoAuxiliary);
+    if (this->bLumoStorage.size() > 0)
+    {
+        vector<string> bTemp;
+        string bLumoAuxiliary;
+        bLumoAuxiliary = this->bLumoStorage[this->bLumoStorage.size()-1];
+        stringstream ss(bLumoAuxiliary);
 
-    //     while (getline(ss, line))
-    //     {   
-    //         istringstream iss(line);
-    //         vector<string> bResults ((istream_iterator<string>(iss)), istream_iterator<string>());
+        while (getline(ss, line))
+        {   
+            istringstream iss(line);
+            vector<string> bResults ((istream_iterator<string>(iss)), istream_iterator<string>());
 
-    //         for (int i = 4; i < bResults.size(); i++)
-    //         {   
-    //             try
-    //             {   
-    //                 bTemp.emplace_back(bResults[i]);
-    //             }
-    //             catch (const std::exception &e)
-    //             {
-    //                 // If the string cannot be converted to a double, ignore it
-    //             };
-    //         }
-    //     };  
-    //     this->bUnoccupied = bTemp;
-    // }
+            for (int i = 4; i < bResults.size(); i++)
+            {   
+                try
+                {   
+                    bTemp.emplace_back(bResults[i]);
+                }
+                catch (const std::exception &e)
+                {
+                    // If the string cannot be converted to a double, ignore it
+                };
+            }
+        };  
+        this->bUnoccupied = bTemp;
+    }
 
-    // this->Unoccupied = temp;
+    this->Unoccupied = temp;
 };
 
 // Function to set the transitions of the calculation
