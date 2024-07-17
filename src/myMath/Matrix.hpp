@@ -15,7 +15,7 @@
 
 #ifndef Matrix_hpp
 #define Matrix_hpp
-#include <math.h>
+#include <cmath>
 #include <vector>
 //#include <../../include/Eigen/Core>
 

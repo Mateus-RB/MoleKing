@@ -25,7 +25,7 @@
 #include "OPLSff.hpp"
 #include "../myMath/Geometry.hpp"
 #include "../myMath/Matrix.hpp"
-#include <math.h>
+#include <cmath>
 #include <iterator>
 #include <algorithm>
 #include <vector>

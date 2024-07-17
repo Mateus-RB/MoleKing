@@ -15,7 +15,7 @@
 #ifndef Geometry_hpp
 #define Geometry_hpp
 #include <vector>
-#include <math.h>
+#include <cmath>
 #include <iostream>
 #include "Matrix.hpp"
 #include "Vectors.hpp"

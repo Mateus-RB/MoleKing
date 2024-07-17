@@ -19,7 +19,7 @@
 #include <stdio.h>
 #include "../myMath/Matrix.hpp"
 #include "../myMath/Geometry.hpp"
-#include <math.h>
+#include <cmath>
 #include <vector>
 #include "../chemicalUnits/Molecule.hpp"
 #include "../chemicalUnits/AtomicScale.hpp"
