@@ -15,10 +15,13 @@
 #ifndef Geometry_hpp
 #define Geometry_hpp
 #include <vector>
-#include <cmath>
 #include <iostream>
 #include "Matrix.hpp"
 #include "Vectors.hpp"
+
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
 
 using namespace std;
 
