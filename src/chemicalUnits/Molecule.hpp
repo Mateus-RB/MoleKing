@@ -25,12 +25,15 @@
 #include "OPLSff.hpp"
 #include "../myMath/Geometry.hpp"
 #include "../myMath/Matrix.hpp"
-#include <cmath>
 #include <iterator>
 #include <algorithm>
 #include <vector>
 #include "../../include/Eigen/Eigen"
+#include <cmath>
 
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
 
 class Molecule{
 
