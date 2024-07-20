@@ -61,3 +61,5 @@ _generate/
 *.py[cod]
 *.egg-info
 *env*
+
+wheelhouse/

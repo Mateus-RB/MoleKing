@@ -4,3 +4,10 @@ graft pybind11/tools
 graft src
 graft include
 global-include CMakeLists.txt *.cmake
+include tests/MK_test1.log
+include tests/MK_orbitals.log
+include tests/MK_link.log
+include tests/MK_link2.log
+include tests/MK_polar.log
+include tests/MK_Test.out
+

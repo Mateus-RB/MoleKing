@@ -3,7 +3,7 @@ requires = [
     "setuptools>=66",
     "wheel",
     "ninja",
-    "cmake>=3.12",
+    "cmake>=3.12"
 ]
 build-backend = "setuptools.build_meta"
 
@@ -27,12 +27,17 @@ xfail_strict = true
 filterwarnings = ["error"]
 testpaths = ["tests"]
 
-[tool.cibuildwheel]
+[tool.cibuildwheel.linux]
 test-command = "pytest {project}/tests"
 test-extras = ["test"]
 test-skip = ["*universal2:arm64"]
-# Setuptools bug causes collision between pypy and cpython artifacts
 before-build = "rm -rf {project}/build"
+
+[tool.cibuildwheel.windows]
+test-command = "pytest {project}/tests"
+test-extras = ["test"]
+before-build = "rmdir /s /q {project}\\build"
+
 
 [tool.ruff]
 extend-select = [
