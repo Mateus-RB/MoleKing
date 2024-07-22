@@ -1,5 +1,6 @@
 from MoleKing import G16LOGfile, Psi4OUTfile
 import os
+import platform
 
 class TestG16Output:
     @classmethod
@@ -17,7 +18,10 @@ class TestG16Output:
     def test_reader(self):
         log_path = os.path.join(self.home_path, 'MK_test1.log')
         file = G16LOGfile(log_path).__str__()
-        assert file == "G16LOGFile: Calculation of MK_test1.log done in 2024, with the level of theory B3LYP/6-31+G(d) (6D, 7F) and SCF energy of -155.045622 Hartrees."
+        if platform.system() == 'Windows':
+            assert file == "G16LOGFile: Calculation of {} done in 2024, with the level of theory B3LYP/6-31+G(d) (6D, 7F) and SCF energy of -155.045622 Hartrees.".format(log_path)
+        else:
+            assert file == "G16LOGFile: Calculation of MK_test1.log done in 2024, with the level of theory B3LYP/6-31+G(d) (6D, 7F) and SCF energy of -155.045622 Hartrees."
 
     def test_getMol(self):
         Mol = G16LOGfile(os.path.join(self.home_path, 'MK_test1.log')).getMolecule()
@@ -79,15 +83,13 @@ class TestG16Output:
 
         assert g1 == 31.0094
         assert g2 == 61491.6
-
 class TestPSI4Output():
 
     @classmethod
     def setup_class(cls):
         cls.home_path = os.path.abspath(os.path.dirname(__file__))
-        print(f"Home path: {cls.home_path}")
 
-    def test_psi4(self):
+    def test_psi4(self): 
         file = Psi4OUTfile(os.path.join(self.home_path,'MK_Test.out'))
         assert file.getMul() == 1
         assert file.getCharge() == 0
@@ -96,4 +98,3 @@ class TestPSI4Output():
         file = Psi4OUTfile(os.path.join(self.home_path,'MK_Test.out'))
         assert file.getMolecule().__str__() == 'Molecule BR_{4}O_{2}N_{2}C_{44}H_{30}, with charge 0 and multiplicity 1'
         assert file.getCharge() == 0
-
