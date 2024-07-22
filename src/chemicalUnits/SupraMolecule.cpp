@@ -284,16 +284,17 @@ bool SupraMolecule::operator!=(SupraMolecule sMol){
 
 bool SupraMolecule::operator<(SupraMolecule sMol){
     if ((int) this->supraMolecule.size() < (int) sMol.getSize()){
-        return 1;
+        return true;
     } else {
         for (int i = 0; i < (int) this->supraMolecule.size(); i++){
             if (this->supraMolecule[i] < sMol.getMolecule(i)){
                 continue;
             } else {
-                return 0;
+                return false;
             };
         };
     };
+    return false;
 };
 
 bool SupraMolecule::operator>(SupraMolecule sMol){
@@ -308,4 +309,5 @@ bool SupraMolecule::operator>(SupraMolecule sMol){
             };
         };
     };
+    return false;
 };
