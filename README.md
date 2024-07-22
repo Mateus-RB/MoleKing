@@ -45,6 +45,7 @@ cmake --build .
 
 **Please feel free to report any issues or suggestions to mateus_barbosa@ufg.br or phfmatias@discente.ufg.br**
 
-![MoleKing_Grad](https://user-images.githubusercontent.com/71854729/213286170-38170b42-8e1b-4bfb-9b9b-80aa8308444e.png)
+![MoleKing_Gold](https://github.com/user-attachments/assets/c25a3305-e3bd-4526-9fd3-d7b31700a1c1)
+
 
 
