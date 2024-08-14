@@ -92,14 +92,13 @@ jobs:
 
       - name: Build wheels
         run: |
-          mkdir wheelhouse\windows
-          if (Test-Path build) { Remove-Item -Recurse -Force build }
+          mkdir wheelhouse/windows
           cibuildwheel --output-dir wheelhouse --platform windows
 
       - name: List contents of wheelhouse
         run: |
           echo "Contents of wheelhouse directory:"
-          dir wheelhouse\windows
+          dir wheelhouse/windows
 
       - name: Upload wheels
         uses: actions/upload-artifact@v2
