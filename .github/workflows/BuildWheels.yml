@@ -92,19 +92,19 @@ jobs:
 
       - name: Build wheels
         run: |
-          mkdir wheelhouse/windows
+          mkdir wheelhouse
           cibuildwheel --output-dir wheelhouse --platform windows
 
       - name: List contents of wheelhouse
         run: |
           echo "Contents of wheelhouse directory:"
-          dir wheelhouse/windows
+          dir wheelhouse
 
       - name: Upload wheels
         uses: actions/upload-artifact@v2
         with:
           name: windows-wheels
-          path: wheelhouse/windows
+          path: wheelhouse
 
   upload-to-pypi:
     needs: [build-linux, build-macos, build-windows]
