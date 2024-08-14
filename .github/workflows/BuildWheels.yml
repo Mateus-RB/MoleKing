@@ -93,7 +93,7 @@ jobs:
       - name: Build wheels
         run: |
           mkdir wheelhouse
-          IF EXIST build (rmdir /s /q build)
+          if (Test-Path build) { Remove-Item -Recurse -Force build }
           cibuildwheel --output-dir wheelhouse --platform windows
 
       - name: List contents of wheelhouse
