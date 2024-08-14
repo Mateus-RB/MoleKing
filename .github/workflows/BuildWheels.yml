@@ -43,6 +43,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: dist
+          path: wheelhouse/dist
 
   build-linux:
     runs-on: ubuntu-latest
@@ -135,7 +136,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: windows-wheels
-          path: wheelhouse
+          path: wheelhouse/windows
   
   
   upload-to-pypi:
@@ -182,5 +183,5 @@ jobs:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
         run: |
-          python -m twine upload --repository pypi wheelhouse/linux/* wheelhouse/macos/* wheelhouse/windows/* wheelhouse/dist/*
+          python -m twine upload --repository pypi wheelhouse/linux/* wheelhouse/macos/* wheelhouse/windows/*
         
