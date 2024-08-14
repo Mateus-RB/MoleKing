@@ -1,0 +1,142 @@
+name: Build Wheels
+
+on:
+  workflow_dispatch:
+    inputs:
+      upload-to-pypi:
+        description: 'Whether to upload wheels to PyPI'
+        required: true
+        default: 'no'
+        type: choice
+        options:
+          - 'yes'
+          - 'no'
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+
+      - name: Install cibuildwheel
+        run: |
+          python -m pip install --upgrade pip
+          pip install cibuildwheel
+
+      - name: Build wheels
+        run: |
+          mkdir -p wheelhouse/linux
+          cibuildwheel --output-dir wheelhouse/linux --platform linux
+
+      - name: List contents of wheelhouse
+        run: |
+          echo "Contents of wheelhouse directory:"
+          ls -R wheelhouse
+
+      - name: Upload wheels
+        uses: actions/upload-artifact@v2
+        with:
+          name: linux-wheels
+          path: wheelhouse/linux
+
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+
+      - name: Install cibuildwheel
+        run: |
+          python -m pip install --upgrade pip
+          pip install cibuildwheel
+
+      - name: Build wheels
+        run: |
+          mkdir -p wheelhouse/macos
+          cibuildwheel --output-dir wheelhouse/macos --platform macos
+
+      - name: List contents of wheelhouse
+        run: |
+          echo "Contents of wheelhouse directory:"
+          ls -R wheelhouse
+
+      - name: Upload wheels
+        uses: actions/upload-artifact@v2
+        with:
+          name: macos-wheels
+          path: wheelhouse/macos
+
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+
+      - name: Install cibuildwheel
+        run: |
+          python -m pip install --upgrade pip
+          pip install cibuildwheel
+
+      - name: Build wheels
+        run: |
+          mkdir wheelhouse
+          cibuildwheel --output-dir wheelhouse --platform windows
+
+      - name: List contents of wheelhouse
+        run: |
+          echo "Contents of wheelhouse directory:"
+          dir wheelhouse
+
+      - name: Upload wheels
+        uses: actions/upload-artifact@v2
+        with:
+          name: windows-wheels
+          path: wheelhouse
+
+  upload-to-pypi:
+    needs: [build-linux, build-macos, build-windows]
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.upload-to-pypi == 'yes' }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install twine
+
+      - name: Download wheels from Linux
+        uses: actions/download-artifact@v2
+        with:
+          name: linux-wheels
+          path: wheelhouse/linux
+
+      - name: Download wheels from macOS
+        uses: actions/download-artifact@v2
+        with:
+          name: macos-wheels
+          path: wheelhouse/macos
+
+      - name: Download wheels from Windows
+        uses: actions/download-artifact@v2
+        with:
+          name: windows-wheels
+          path: wheelhouse/windows
+
+      - name: Upload wheels to PyPI
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+        run: |
+          python -m twine upload --repository pypi wheelhouse/linux/* wheelhouse/macos/* wheelhouse/windows/*
+        
