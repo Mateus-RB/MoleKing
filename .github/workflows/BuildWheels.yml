@@ -182,5 +182,5 @@ jobs:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
         run: |
-          python -m twine upload --repository pypi wheelhouse/linux/* wheelhouse/macos/* wheelhouse/windows/*
+          python -m twine upload --repository pypi wheelhouse/linux/* wheelhouse/macos/* wheelhouse/windows/* wheelhouse/dist/*
         
