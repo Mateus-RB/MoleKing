@@ -160,6 +160,5 @@ setup(
         "Intended Audience :: Science/Research",
         "Topic :: Scientific/Engineering :: Chemistry",
     ],
-    readme="README.md",
     license="LICENSE",
 )
