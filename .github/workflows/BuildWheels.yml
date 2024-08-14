@@ -92,20 +92,20 @@ jobs:
 
       - name: Build wheels
         run: |
-          mkdir wheelhouse
+          mkdir wheelhouse\windows
           if (Test-Path build) { Remove-Item -Recurse -Force build }
           cibuildwheel --output-dir wheelhouse --platform windows
 
       - name: List contents of wheelhouse
         run: |
           echo "Contents of wheelhouse directory:"
-          dir wheelhouse
+          dir wheelhouse\windows
 
       - name: Upload wheels
         uses: actions/upload-artifact@v2
         with:
           name: windows-wheels
-          path: wheelhouse
+          path: wheelhouse/windows
 
   upload-to-pypi:
     needs: [build-linux, build-macos, build-windows]
