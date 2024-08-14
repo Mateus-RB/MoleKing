@@ -14,7 +14,7 @@ on:
 
 jobs:
 
-  build_sdist:
+  build-sdist:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -139,7 +139,7 @@ jobs:
   
   
   upload-to-pypi:
-    needs: [build-linux, build-macos, build-windows]
+    needs: [build-linux, build-macos, build-windows, build-sdist]
     runs-on: ubuntu-latest
     if: ${{ github.event.inputs.upload-to-pypi == 'yes' }}
     steps:
