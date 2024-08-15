@@ -124,13 +124,7 @@ jobs:
         run: |
           mkdir -p wheelhouse/dist
           python setup.py sdist --dist-dir=wheelhouse/dist
-
-
-      - name: List contents of dist
-        run: |
-          echo "Contents of dist directory:"
-          ls -R dist
-
+          
       - name: Upload source distribution
         uses: actions/upload-artifact@v2
         with:
