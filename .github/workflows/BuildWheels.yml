@@ -123,9 +123,8 @@ jobs:
       - name: Build source distribution
         run: |
           mkdir -p wheelhouse/dist
-          cd wheelhouse/dist
-          python ../../setup.py sdist bdist_wheel
-          cd ../../
+          python setup.py sdist bdist_wheel --dist-dir=wheelhouse/dist
+
 
       - name: List contents of dist
         run: |
