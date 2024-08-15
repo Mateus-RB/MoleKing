@@ -91,13 +91,13 @@ jobs:
 
       - name: Build wheels
         run: |
-          mkdir wheelhouse
-          cibuildwheel --output-dir wheelhouse --platform windows
+          mkdir wheelhouse/windows
+          cibuildwheel --output-dir wheelhouse/windows --platform windows
 
       - name: List contents of wheelhouse
         run: |
           echo "Contents of wheelhouse directory:"
-          dir wheelhouse
+ 
 
       - name: Upload wheels
         uses: actions/upload-artifact@v2
