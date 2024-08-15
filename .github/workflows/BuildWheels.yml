@@ -123,7 +123,7 @@ jobs:
       - name: Build source distribution
         run: |
           mkdir -p wheelhouse/dist
-          python setup.py sdist bdist_wheel --dist-dir=wheelhouse/dist
+          python setup.py sdist --dist-dir=wheelhouse/dist
 
 
       - name: List contents of dist
@@ -181,5 +181,5 @@ jobs:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
         run: |
-          python -m twine upload --repository pypi wheelhouse/linux/* wheelhouse/macos/* wheelhouse/windows/* wheelhouse/dist/*
+          python -m twine upload --repository pypi --skip-existing wheelhouse/linux/* wheelhouse/macos/* wheelhouse/windows/* wheelhouse/dist/*
         
