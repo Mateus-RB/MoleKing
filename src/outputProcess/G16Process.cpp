@@ -16,8 +16,8 @@
 
 //!----------------------- G16LOGfile -----------------------//
 
-G16LOGfile::G16LOGfile(string filePath, bool polarAsw, bool tdAsw, int link)
-    : ntFound(false), stdFound(false), scfConvergence(true),str_filePath(filePath), polarAsw(polarAsw), tdAsw(tdAsw)
+G16LOGfile::G16LOGfile(string filePath, bool polarAsw, bool tdAsw, bool cpAsw, int link)
+    : ntFound(false), stdFound(false), scfConvergence(true),str_filePath(filePath), polarAsw(polarAsw), tdAsw(tdAsw), cpAsw(cpAsw), link(link)
 {
     // SET FUNCTIONS
 
