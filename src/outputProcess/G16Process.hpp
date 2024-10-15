@@ -55,7 +55,8 @@ private:
     size_t scf;
     size_t scfC;
     size_t normalT;   
-    size_t stdT; 
+    size_t stdT;
+    size_t cpFinder;
     size_t starterSCF;
     size_t endSCF;
     size_t starterMethod;  
@@ -71,6 +72,7 @@ private:
     string info;
     string method;
     string moleculeSTR = "";
+    string cpSTR = "";
     string polarSTR = "";
     string mullikenSTR = "";
     string str_filePath;
@@ -151,6 +153,7 @@ private:
     void detectLink();
     void readLOGFile();
     void setMolecule();
+    void setChargePoints();
     void setOrbitals();
     void setHOMO();
     void setLUMO();

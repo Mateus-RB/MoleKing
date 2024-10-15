@@ -143,6 +143,7 @@ void G16LOGfile::readLOGFile()
         bHomoFinder = line.find(" Beta  occ. eigenvalues --");
         bLumoFinder = line.find(" Beta virt. eigenvalues --");
         dipoleFinder = line.find("Tot=");
+        cpFinder = line.find("Point Charges:");
         tdFinder = line.find("Excited State ");
         polarFinder = line.find(" Dipole moment:");
         chargeMultiFinder = line.find(" Charge =");
@@ -304,6 +305,24 @@ void G16LOGfile::readLOGFile()
             stdStorage.emplace_back(moleculeSTR);
             moleculeSTR = "";
         };
+        if (cpAsw)
+        {
+            if (cpFinder != string::npos)
+            {
+                cpSTR += line + "\n";
+                while (getline(this->logfile, line))
+                {
+                    if (line.find(" Pt Chg Charge= ") != string::npos)
+                    {
+                        break;
+                    };
+                    cpSTR += line + "\n";
+                };
+            };
+        };
+
+
+
         // If the line contains "Excited State", extract the TD-DFT information
         if (tdAsw)
         {
@@ -390,6 +409,26 @@ void G16LOGfile::setMolecule()
     {
         throw runtime_error("Molecule not found in the log. Please check your output file.");
     };
+    // if cpAsw is true get the chargePoints from LOG
+    if (this->cpAsw)
+    {
+        setChargePoints();
+    };
+};
+
+void G16LOGfile::setChargePoints()
+{   
+    stringstream ss(this->cpSTR);
+    string line;
+    int i = 0;
+    while (getline(ss, line))
+    {   
+        istringstream iss(line);
+        vector<string> results((istream_iterator<string>(iss)), istream_iterator<string>());
+        this->mol.addChargePoints(stod(results[1]), stod(results[2]), stod(results[3]), stod(results[5]));
+        i++;
+    };
+
 };
 
 void G16LOGfile::setOrbitals()
