@@ -309,7 +309,7 @@ void G16LOGfile::readLOGFile()
         {
             if (cpFinder != string::npos)
             {
-                cpSTR += line + "\n";
+                //cpSTR += line + "\n";
                 while (getline(this->logfile, line))
                 {
                     if (line.find(" Pt Chg Charge= ") != string::npos)
@@ -428,7 +428,6 @@ void G16LOGfile::setChargePoints()
         this->mol.addChargePoints(stod(results[1]), stod(results[2]), stod(results[3]), stod(results[5]));
         i++;
     };
-
 };
 
 void G16LOGfile::setOrbitals()
