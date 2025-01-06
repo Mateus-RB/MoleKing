@@ -532,6 +532,21 @@ void Molecule::toGJF(string fileName, string method, string basis, string addKey
             file << endl << " " << endKeywords << endl;
         }
 
+        else if ( (EField.size() == 0) && (toLower(addKeywords).find("polar") != string::npos) && (midKeywords != ""))
+        {
+            file << endl << " " << midKeywords << endl << endl;
+
+            for (int i = 0; i < static_cast<int>(this->chargePoint.size()); i++){
+                file << " " <<fixed << setw(12) << this->chargePoint[i].getX()
+                    << " " <<fixed << setw(12) << this->chargePoint[i].getY()
+                    << " " <<fixed << setw(12) << this->chargePoint[i].getZ() 
+                    << " " <<fixed << setw(12) << this->chargePoint[i].getCharge() << endl;
+            }
+
+            endKeywords += " ";
+            file << endl << " " << endKeywords << endl;
+        }
+
         else 
         {
             
