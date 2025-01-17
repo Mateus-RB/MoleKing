@@ -142,7 +142,7 @@ void G16LOGfile::readLOGFile()
         aLumoFinder = line.find(" Alpha virt. eigenvalues --");
         bHomoFinder = line.find(" Beta  occ. eigenvalues --");
         bLumoFinder = line.find(" Beta virt. eigenvalues --");
-        dipoleFinder = line.find("Tot=");
+        dipoleFinder = line.find(" Tot=");
         cpFinder = line.find("Point Charges:");
         tdFinder = line.find("Excited State ");
         polarFinder = line.find(" Dipole moment:");

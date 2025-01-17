@@ -408,6 +408,7 @@ PeriodicTable::PeriodicTable(){
     this->ColorMap.insert(pair<string, string>("P",         "FF8000"));
     this->ColorMap.insert(pair<string, string>("S",         "FFFF30"));
     this->ColorMap.insert(pair<string, string>("Cl",        "1FF01F"));
+    this->ColorMap.insert(pair<string, string>("Br",        "32ff00"));
     this->ColorMap.insert(pair<string, string>("Ar",        "80D1E3"));
     this->ColorMap.insert(pair<string, string>("K",         "8F40D4"));
     this->ColorMap.insert(pair<string, string>("Ca",        "3DFF00"));
