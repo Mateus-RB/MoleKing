@@ -147,25 +147,25 @@ jobs:
           pip install twine
 
       - name: Download wheels from Linux
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: linux-wheels
           path: wheelhouse/linux
 
       - name: Download wheels from macOS
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: macos-wheels
           path: wheelhouse/macos
 
       - name: Download wheels from Windows
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: windows-wheels
           path: wheelhouse/windows
 
       - name: Download source distribution
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: dist
           path: wheelhouse/dist
