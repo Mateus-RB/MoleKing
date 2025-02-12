@@ -413,8 +413,19 @@ string toLower(const std::string& str) {
     return result;
 }
 
-void Molecule::toGJF(string fileName, string method, string basis, string addKeywords, string midKeywords, string endKeywords, int charge, int multiplicity, bool zmatrix, vector<double> EField)
+void Molecule::toGJF(string fileName, string method, string basis, string addKeywords, string midKeywords, string endKeywords, int charge, int multiplicity, bool zmatrix, vector<double> EField, vector<int> bondFixer)
 {    
+
+    if (bondFixer.size() > 0)
+    {
+        cout << "WARNING in Molecule::toGJF: Attention, if you used Molecule::alignMolecule before, now it will be oriented in z-axis." << endl;
+    }
+    else if (bondFixer.size() == 1 || bondFixer.size() > 2)
+    {
+        throw invalid_argument("BondFixer must have 2 elements.");
+        
+    }
+
     auto extension = fileName.substr(fileName.find_last_of(".") + 1);
     if (extension != "gjf" && extension != "com") {
         fileName = fileName.substr(0, fileName.find_last_of(".")) + ".gjf";
@@ -474,8 +485,8 @@ void Molecule::toGJF(string fileName, string method, string basis, string addKey
     }
     
     else 
-    {
-        this->reorderMolecule();
+    {   
+        this->reorderMolecule(bondFixer);
         this->doIRC();
         int sizeMolecule = this->molecule.size();
 
@@ -630,6 +641,54 @@ void Molecule::alignMolecule(char axis){
     this->moveMassCenter(0,0,0);
 };
 
+void Molecule::alignBond(int atom1, int atom2, char axis){
+    // Move atom1 para a origem usando moveTail
+    this->moveTail(atom1, 0, 0, 0);
+    
+    // Vetor da ligação
+    Eigen::Vector3d bond(
+        this->molecule[atom2].getX() - this->molecule[atom1].getX(),
+        this->molecule[atom2].getY() - this->molecule[atom1].getY(),
+        this->molecule[atom2].getZ() - this->molecule[atom1].getZ()
+    );
+    
+    Eigen::Vector3d targetAxis;
+    
+    // Define o eixo de alinhamento
+    if (axis == 'x') {
+        targetAxis = Eigen::Vector3d(1.0, 0.0, 0.0);
+    } else if (axis == 'y') {
+        targetAxis = Eigen::Vector3d(0.0, 1.0, 0.0);
+    } else if (axis == 'z') {
+        targetAxis = Eigen::Vector3d(0.0, 0.0, 1.0);
+    } else {
+        throw std::invalid_argument("Invalid axis. Use 'x', 'y' or 'z'.");
+    }
+    
+    // Normaliza os vetores
+    Eigen::Vector3d bondNorm = bond.normalized();
+    Eigen::Vector3d rotationAxis = bondNorm.cross(targetAxis);
+    double angle = acos(bondNorm.dot(targetAxis));
+    
+    if (rotationAxis.norm() > 1e-6) { // Evita erro numérico
+        rotationAxis.normalize();
+        Eigen::AngleAxisd rotation(angle, rotationAxis);
+        Eigen::Matrix3d rotationMatrix = rotation.toRotationMatrix();
+        
+        // Aplica a rotação a todos os átomos da molécula
+        for (size_t i = 0; i < this->molecule.size(); ++i) {
+            Eigen::Vector3d pos(this->molecule[i].getX(), this->molecule[i].getY(), this->molecule[i].getZ());
+            pos = rotationMatrix * pos;
+            this->molecule[i].setX(pos(0));
+            this->molecule[i].setY(pos(1));
+            this->molecule[i].setZ(pos(2));
+        }
+    }
+    
+    this->moveTail(atom1, 0, 0, 0);
+}
+
+
 Eigen::Matrix3d Molecule::getRotationMatrix(Eigen::Vector3d pAxis, char mkAxis)
 {   
 
@@ -678,34 +737,67 @@ Eigen::Matrix3d Molecule::getRotationMatrix(Eigen::Vector3d pAxis, char mkAxis)
 
 
 
-void Molecule::reorderMolecule()
+void Molecule::reorderMolecule(vector <int> fixedAtoms)
 {
     //create a function that reorders the molecule based on the distance with the first atom
 
-    vector <int> temp;
-    vector <double> distances;
-    vector <double> atom1 = this->molecule[0].getPos();
-    for (int i = 1; i < (int) this->molecule.size(); i++){
-        vector <double> atom2 = this->molecule[i].getPos();
-        distances.push_back(Vector3D(atom1, atom2).magnitude());
-    }
-    vector <double> distancesCopy = distances;
-    sort(distances.begin(), distances.end());
-    for (int i = 0; i < (int) distances.size(); i++){
-        for (int j = 0; j < (int) distancesCopy.size(); j++){
-            if (distances[i] == distancesCopy[j]){
-                temp.push_back(j+1);
-                distancesCopy[j] = -1;
-                break;
+    if (fixedAtoms.size() == 0)
+    {
+        vector <int> temp;
+        vector <double> distances;
+        vector <double> atom1 = this->molecule[0].getPos();
+        
+        for (int i = 1; i < (int) this->molecule.size(); i++){
+            vector <double> atom2 = this->molecule[i].getPos();
+            distances.push_back(Vector3D(atom1, atom2).magnitude());
+        }
+        vector <double> distancesCopy = distances;
+        sort(distances.begin(), distances.end());
+        for (int i = 0; i < (int) distances.size(); i++){
+            for (int j = 0; j < (int) distancesCopy.size(); j++){
+                if (distances[i] == distancesCopy[j]){
+                    temp.push_back(j+1);
+                    distancesCopy[j] = -1;
+                    break;
+                }
             }
         }
+        AtomList tempMolecule;
+        tempMolecule.push_back(this->molecule[0]);
+        for (int i = 0; i < (int) temp.size(); i++){
+            tempMolecule.push_back(this->molecule[temp[i]]);
+        }
+        this->molecule = tempMolecule;
     }
-    AtomList tempMolecule;
-    tempMolecule.push_back(this->molecule[0]);
-    for (int i = 0; i < (int) temp.size(); i++){
-        tempMolecule.push_back(this->molecule[temp[i]]);
+    else if (fixedAtoms.size() == 2)
+    {
+        vector<pair<double, int>> distances;
+    
+        vector<double> atom1 = this->molecule[fixedAtoms[0]].getPos();
+    
+        for (int i = 0; i < (int)this->molecule.size(); i++)
+        {
+            if (i != fixedAtoms[0] && i != fixedAtoms[1])
+            {
+                vector<double> atom2 = this->molecule[i].getPos();
+                distances.push_back({Vector3D(atom1, atom2).magnitude(), i});
+            }
+        }
+    
+        // Ordena os átomos por distância em relação ao primeiro átomo fixo
+        sort(distances.begin(), distances.end());
+    
+        AtomList tempMolecule;
+        tempMolecule.push_back(this->molecule[fixedAtoms[0]]);
+        tempMolecule.push_back(this->molecule[fixedAtoms[1]]);
+    
+        for (const auto &pair : distances)
+        {
+            tempMolecule.push_back(this->molecule[pair.second]);
+        }
+    
+        this->molecule = tempMolecule;
     }
-    this->molecule = tempMolecule;
 
 };
 

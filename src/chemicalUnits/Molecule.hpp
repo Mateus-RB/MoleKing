@@ -57,7 +57,7 @@ private:
     vector<int> getBonded(int atomIndex);
     void doIRC();
     string zmatrix = "";
-    void reorderMolecule();
+    void reorderMolecule(vector<int> fixedAtoms);
 
 
 public:
@@ -67,7 +67,7 @@ public:
     Molecule();
     ~Molecule();
     void toXYZ(string fileName = "MK_Molecule.xyz");
-    void toGJF(string fileName = "MK_Molecule.gjf", string method = "B3LYP", string basis = "6-311g(d)", string addKeywords = "", string midKeywords = "", string endKeywords = "", int charge = 0, int multiplicity = 1, bool zmatrix=0, vector<double> EField = {});    
+    void toGJF(string fileName = "MK_Molecule.gjf", string method = "B3LYP", string basis = "6-311g(d)", string addKeywords = "", string midKeywords = "", string endKeywords = "", int charge = 0, int multiplicity = 1, bool zmatrix=0, vector<double> EField = {}, vector<int> bondFixer = {});  
     void addChargePoints(double xPos, double yPos, double zPos, double charge);
     void addChargePoints(ChargePoint cp);
     void addAtom(string atomSymbol, double xPos, double yPos, double zPos, double atomicCharge = 0.0, bool freezeCode_ = 0);
@@ -116,6 +116,7 @@ public:
     void clear();    
     double RMSD(Molecule MOL2);
     void alignMolecule(char axis = 'x');
+    void alignBond(int atom1, int atom2, char axis = 'x');
     Eigen::Matrix3d getRotationMatrix(Eigen::Vector3d principalAxis, char mkAxis);
 
 };
