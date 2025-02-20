@@ -318,6 +318,11 @@ void Molecule::spinMolecule(double angle, Vector3D spinVector){
     for (int i = 0; i < (int) this->molecule.size(); i++){
         this->molecule[i].rotationAxis(angle, spinVector);
     };
+    if (this->chargePoint.size() != 0){
+        for (int i = 0; i < (int) this->chargePoint.size(); i++){
+            this->chargePoint[i].rotationAxis(angle, spinVector);
+        };
+    };
 };
 
 void Molecule::spinMolecule(double angle, char axis){
