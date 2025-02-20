@@ -688,6 +688,16 @@ void Molecule::alignBond(int atom1, int atom2, char axis){
             this->molecule[i].setY(pos(1));
             this->molecule[i].setZ(pos(2));
         }
+
+        if (this->chargePoint.size() != 0) {
+            for (size_t i = 0; i < this->chargePoint.size(); ++i) {
+                Eigen::Vector3d pos(this->chargePoint[i].getX(), this->chargePoint[i].getY(), this->chargePoint[i].getZ());
+                pos = rotationMatrix * pos;
+                this->chargePoint[i].setX(pos(0));
+                this->chargePoint[i].setY(pos(1));
+                this->chargePoint[i].setZ(pos(2));
+            }
+        }
     }
     
     this->moveTail(atom1, 0, 0, 0);
