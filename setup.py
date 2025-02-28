@@ -160,5 +160,5 @@ setup(
         "Intended Audience :: Science/Research",
         "Topic :: Scientific/Engineering :: Chemistry",
     ],
-   license_files=["LICENSE"],
+   license_files=["LICENSE.txt"],
 )
