@@ -15,7 +15,7 @@ jobs:
   build-linux:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: true
 
@@ -46,7 +46,7 @@ jobs:
   build-macos:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: true
 
@@ -77,7 +77,7 @@ jobs:
   build-windows:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: true
 
@@ -108,7 +108,7 @@ jobs:
   build-sdist:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: true
 
@@ -136,7 +136,7 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.event.inputs.upload-to-pypi == 'yes' }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -170,6 +170,10 @@ jobs:
           name: dist
           path: wheelhouse/dist
 
+      - name: Check package metadata
+        run: |
+          python -m twine check wheelhouse/linux/* wheelhouse/macos/* wheelhouse/windows/* wheelhouse/dist/*
+          
       - name: Upload wheels to PyPI
         env:
           TWINE_USERNAME: __token__
