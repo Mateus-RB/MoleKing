@@ -160,5 +160,4 @@ setup(
         "Intended Audience :: Science/Research",
         "Topic :: Scientific/Engineering :: Chemistry",
     ],
-   license="MIT",
-)
+   )
