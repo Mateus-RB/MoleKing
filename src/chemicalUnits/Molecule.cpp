@@ -449,7 +449,7 @@ void Molecule::toGJF(string fileName, string method, string basis, string addKey
     if (EField.size() > 0) {
         if (!zmatrix) 
         {
-            throw invalid_argument("Electric field can only be applied to zmatrix. Set zmatrix=True");
+            cout <<  "Warning Geometry Optimization with Electric field can only be applied to zmatrix. Set zmatrix=True" << endl;
         }
 
         if (toLower(addKeywords).find(toLower("Field=Read")) == string::npos) 
