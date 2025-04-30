@@ -39,8 +39,8 @@ G16LOGfile::G16LOGfile(string filePath, bool polarAsw, bool tdAsw, bool cpAsw, i
 
         else if (link == 0)
         {
-            cerr << "WARNING in G16LOGfile::G16LOGfile(): We detected " << this->linkStorage.size() << " link calculation(s) in your log file. As default, we will use the last one. To change it use: G16LOGfile(filename, link=n)" << endl;
-            this->logfile.str(this->linkStorage[0]);
+            //Throw an error if the user try to use link = 0. Tell him to use link = -1 to get the last link, or 1,2,3..
+            throw runtime_error("ERROR in G16LOGfile::G16LOGfile(): Invalid log number. If you want to use the last link calculation, please use link = -1. To use the first link calculation, please use link = 1.");
         }
 
         else if (link == -1)

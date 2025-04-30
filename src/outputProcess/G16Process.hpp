@@ -168,7 +168,7 @@ private:
     vector<string> customSplit(string str, char separator = ' ');
 
 public:
-    G16LOGfile(string filePath, bool polarAsw = 0, bool tdAsw = 0, bool cpAsw = 0, int  link = 0);   
+    G16LOGfile(string filePath, bool polarAsw = 0, bool tdAsw = 0, bool cpAsw = 0, int  link = -1);   
     ~G16LOGfile();      
     map<string, vector<string>> getOrbitals(); 
     map<int, map<string, double>> getTransitions(const int index = 0);
