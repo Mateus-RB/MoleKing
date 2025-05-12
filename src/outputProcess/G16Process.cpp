@@ -641,7 +641,7 @@ double G16LOGfile::getEnergy()
     // If scfConvergence is false, print a message to the console, to warn the user
     else
     {
-        cerr << "WARNING in G16LOGfile::getEnergy(): SCF convergence not achieved. Please check your log file for 'Convergence criterion not met.'" << endl;
+        cerr << "WARNING in G16LOGfile::getEnergy(" << this->str_filePath << "): SCF convergence not achieved. Please check your log file for 'Convergence criterion not met.'" << endl;
         return this->scfValue;
     };
 };

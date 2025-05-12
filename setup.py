@@ -75,6 +75,7 @@ class CMakeBuild(build_ext):
                         "-GNinja",
                         f"-DCMAKE_MAKE_PROGRAM:FILEPATH={ninja_executable_path}",
                         f"-DBuild_Python=ON",
+                        f"-DCMAKE_POLICY_VERSION_MINIMUM=3.5",
                     ]
                 except ImportError:
                     pass
