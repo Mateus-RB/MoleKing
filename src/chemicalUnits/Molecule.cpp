@@ -418,7 +418,7 @@ string toLower(const std::string& str) {
     return result;
 }
 
-void Molecule::toGJF(string fileName, string method, string basis, string addKeywords, string midKeywords, string endKeywords, int charge, int multiplicity, bool zmatrix, vector<double> EField, vector<int> bondFixer)
+void Molecule::toGJF(string fileName, string method, string basis, string addKeywords, string midKeywords, string endKeywords, int charge, int multiplicity, bool zmatrix, vector<double> EField, vector<int> bondFixer, int modHF)
 {    
 
     if (bondFixer.size() > 0)
@@ -435,6 +435,38 @@ void Molecule::toGJF(string fileName, string method, string basis, string addKey
     if (extension != "gjf" && extension != "com") {
         fileName = fileName.substr(0, fileName.find_last_of(".")) + ".gjf";
     }
+
+    if ( modHF != -1 )
+    {
+        int p1 = 100 - modHF;
+
+        if (modHF == 0)
+        {
+            addKeywords += " IOP(3/76=0" + to_string(p1) + "000" + to_string(modHF) + "00) IOP(3/77=0900010000)";
+        }
+        else if (modHF > 0 and modHF < 10)
+        {
+            addKeywords += " IOP(3/76=00" + to_string(modHF) + "000" + to_string(p1) + "00) IOP(3/77=0900010000)";
+        }
+        else if (modHF >= 10 and modHF <= 100)
+        {
+            addKeywords += " IOP(3/76=0" + to_string(p1) + "000" + to_string(modHF) + "00) IOP(3/77=0900010000)";
+        }
+        else
+        {
+            addKeywords += " IOP(3/76=" + to_string(modHF) + "000" + to_string(p1) + "00) IOP(3/77=0900010000)";
+        }
+    }
+    else if (modHF == -1)
+    {
+        // Do nothing, modHF is not set
+        // This is the default behavior, no modification to the keywords
+    }
+    else if (modHF > 100 || modHF < -1)
+    {
+        throw invalid_argument("modHF must be between 0 and 100.");
+    }
+
 
     if ( (this->chargePoint.size() == 0) && (midKeywords != ""))
     {
