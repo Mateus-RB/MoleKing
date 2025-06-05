@@ -182,7 +182,13 @@ Molecule::~Molecule(){
 };
 
 double Molecule::RMSD(Molecule MOL2)
-{
+{   
+
+    //move both mass centers to the origin
+
+    this->moveMassCenter(0.0, 0.0, 0.0);
+    MOL2.moveMassCenter(0.0, 0.0, 0.0);
+
     double rmsd = 0.0;
     for (int i = 0; i < (int) this->molecule.size(); i++)
     {
