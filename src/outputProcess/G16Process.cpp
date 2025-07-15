@@ -1097,15 +1097,16 @@ map<string,double> G16LOGfile::getAlpha(string orientation, string unit, double 
 void G16LOGfile::setBeta()
 {   
     string WhatPolar = "";
-    auto UsePolar = this->vecPolarDip;
+    vector<string> UsePolar;
+    //auto UsePolar = this->vecPolarDip;
     for (int o = 0; o < 2; o++){
         if (o==0){
             WhatPolar = "input";
-           auto UsePolar = this->vecPolarInp;
+            UsePolar = this->vecPolarInp;
         }
         else{
             WhatPolar = "dipole";
-            auto UsePolar = this->vecPolarDip;
+            UsePolar = this->vecPolarDip;
         }
         map<double, int> start, end, start2, end2;
         for (int f = 0; f < this->vecFrec.size(); f++)
@@ -1254,15 +1255,16 @@ map<string,double> G16LOGfile::getBeta(string orientation, string unit, double f
 void G16LOGfile::setGamma()
 {   
     string WhatPolar = "";
-    auto UsePolar = this->vecPolarDip;
+    vector<string> UsePolar;
+    //auto UsePolar = this->vecPolarDip;
     for (int o = 0; o < 2; o++){
         if (o==0){
             WhatPolar = "input";
-            auto UsePolar = this->vecPolarInp;
+            UsePolar = this->vecPolarInp;
         }
         else{
             WhatPolar = "dipole";
-            auto UsePolar = this->vecPolarDip;
+            UsePolar = this->vecPolarDip;
         }
         map<double, int> start, end, start2, end2;
         for (int f = 0; f < this->vecFrec.size(); f++)
