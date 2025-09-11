@@ -169,7 +169,7 @@ void G16LOGfile::readLOGFile()
 
             starterMethod = value.find("E(R");
 
-            this->scfValue = stod(value.substr(starterSCF + 3, endSCF - starterSCF - 3));
+            this->scfValue = stod(value.substr(starterSCF + 2, endSCF - starterSCF - 3));
             this->method = value.substr(starterMethod + 3, starterSCF - starterMethod - 5);
         };
         // Getting the charge and multiplicity
