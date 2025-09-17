@@ -140,7 +140,7 @@ PYBIND11_MODULE(MoleKing, m) {
         .def("removeElement", &Molecule::removeElement)
         .def("toXYZ", &Molecule::toXYZ, py::arg("fileName") = "MK_Molecule.xyz")
         .def("RMSD", &Molecule::RMSD, py::arg("MOL2"))
-        .def("toGJF", &Molecule::toGJF, py::arg("fileName") = "MK_Molecule.gjf", py::arg("method") = "B3LYP", py::arg("basis") = "6-311g(d)", py::arg("addKeywords") = "", py::arg("midKeywords") = "", py::arg("endKeywords") = "", py::arg("charge") = 0, py::arg("multiplicity") = 1, py::arg("zmatrix") = 0, py::arg("EField") = vector<double> {}, py::arg("bondFixer") = vector<int> {}, py::arg("modHF") = -1)
+        .def("toGJF", &Molecule::toGJF, py::arg("fileName") = "MK_Molecule.gjf", py::arg("method") = "B3LYP", py::arg("basis") = "6-311g(d)", py::arg("addKeywords") = "", py::arg("midKeywords") = "", py::arg("endKeywords") = "", py::arg("charge") = 0, py::arg("multiplicity") = 1, py::arg("zmatrix") = 0, py::arg("EField") = vector<double> {}, py::arg("bondFixer") = vector<int> {}, py::arg("modHF") = -1, py::arg("mem") = 4, py::arg("procs") = 1)
         .def("alignMolecule", &Molecule::alignMolecule, py::arg("axis") = 'x')
         .def("alignBond", &Molecule::alignBond, py::arg("atom1"), py::arg("atom2"), py::arg("axis") = 'x')
         .def("getMM", &Molecule::getMolecularMass);
