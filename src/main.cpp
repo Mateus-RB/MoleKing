@@ -230,7 +230,7 @@ PYBIND11_MODULE(MoleKing, m) {
         .def(py::init<const Molecule&>(), py::arg("mol"));
         
     py::class_<G16LOGfile>(m, "G16LOGfile", "This class is experimental and under development.")
-        .def(py::init< string, bool, bool, bool, int>(), py::arg("filePath"), py::arg("polarAsw") = 0, py::arg("tdAsw") = 0, py::arg("cpAsw") = 0, py::arg("link") = -1)
+        .def(py::init< string, bool, bool, bool, bool, int>(), py::arg("filePath"), py::arg("polarAsw") = 0, py::arg("tdAsw") = 0, py::arg("thermoAsw") = 0,  py::arg("cpAsw") = 0, py::arg("link") = -1)
         .def("getDate", &G16LOGfile::getDate)
         .def("getEnergy", &G16LOGfile::getEnergy)
         .def("getBasis", &G16LOGfile::getBasis)
@@ -239,11 +239,22 @@ PYBIND11_MODULE(MoleKing, m) {
         .def("getOrbitals", &G16LOGfile::getOrbitals)
         .def("getTransitions", &G16LOGfile::getTransitions, py::arg("index") = 0)
         .def("getDipole", &G16LOGfile::getDipole, py::arg("axis") = "tot")
-        .def("getFrequency", &G16LOGfile::getFrequency)
+        .def("getNLOFrequency", &G16LOGfile::getNLOFrequency)
         .def("getNLO", &G16LOGfile::getNLO, py::arg("Orientation") = "input")
         .def("getAlpha", &G16LOGfile::getAlpha,py::arg("orientation") = "Dipole", py::arg("unit") = "esu", py::arg("frequency") = 0)
         .def("getBeta", &G16LOGfile::getBeta,py::arg("orientation") = "Dipole", py::arg("unit") = "esu", py::arg("frequency") = 0, py::arg("BSHG") = 0)
         .def("getGamma", &G16LOGfile::getGamma,py::arg("orientation") = "Dipole", py::arg("unit") = "esu", py::arg("frequency") = 0, py::arg("GSHG") = 0)
+        .def("getVibFrequencies", &G16LOGfile::getVibFrequencies)
+        .def("getZPE", &G16LOGfile::getZPE)
+        .def("getZPVE", &G16LOGfile::getZPVE)
+        .def("getH", &G16LOGfile::getH)
+        .def("getS", &G16LOGfile::getS)
+        .def("getG", &G16LOGfile::getG)
+        .def("get_qEle", &G16LOGfile::get_qEle)
+        .def("get_qVib", &G16LOGfile::get_qVib)
+        .def("get_qRot", &G16LOGfile::get_qRot)
+        .def("get_qTrans", &G16LOGfile::get_qTrans)
+        .def("get_qTot", &G16LOGfile::get_qTot)
         .def("getHOMO", [](G16LOGfile &self, int index) {
             auto values = self.getHOMO(index);
             if (values.size() == 1)

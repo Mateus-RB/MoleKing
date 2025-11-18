@@ -21,16 +21,30 @@
 #include "../myMath/Vectors.hpp"
 #include "../myMath/Matrix.hpp"
 #include <iostream>
+#include <numeric>
 #include <regex>
 #include "../chemicalUnits/Molecule.hpp"
 #include <stdexcept>
 #include <map>
+#include <cmath>
 
 using namespace std;
 #endif /* Testing_hpp */
 
 class G16LOGfile{
 private:
+
+    //* Constants
+
+    const double k_B = 1.3806503E-23;                  // Constante de Boltzman (J/K)
+    const double h = 6.62607004E-34;                   // Constante de Planck (J*s)
+    const double c = 2.99792458e10;                    // Velocidade da luz (cm/s)
+    const double R = 1.98720425864083;                 // Constante dos gases (cal/(mol*K))
+    const double PI = 3.14159265358979323846;          // Pi
+    const double P_0  = 101325;                          // Pressão (Pa)
+    const double AMU_2_KG = 1.660538921E-27;           // Conversão de AMU para Kg
+    const double AMU_2_KG_M2 = 4.65082513926e-48;      // Conversão de AMU para Kg/m^2  
+
 
     //* istringstream
 
@@ -74,12 +88,15 @@ private:
     string moleculeSTR = "";
     string cpSTR = "";
     string polarSTR = "";
+    string vibFreqSTR = "";
     string mullikenSTR = "";
     string str_filePath;
     string linkStorageSTD = "";
     string polarAuxiliaryDip;
     string polarAuxiliaryInp;
     string Freq;
+    string dof;
+    string principalAxisSTR;
     vector <string> iptStorage;
     vector <string> stdStorage;
     vector <string> aHomoStorage;
@@ -91,8 +108,10 @@ private:
     vector <string> polarStorageDip;
     vector <string> polarStorageInp;
     vector <string> vecPolarDip;
+    vector <double> vibFrequencies;
     vector <string> vecPolarInp;
     vector <string> linkStorage;
+    vector <string> vibFrequenciesStorage;
     vector<string> elstDipoleStorage;
     vector<string> alphaStorage;
     vector<string> betaStorage;
@@ -100,6 +119,8 @@ private:
 
     //* double
     double scfValue;
+    double ZPE;
+    double ZPVE;
     double aHomoValue;
     double aLumoValue;
     double bHomoValue;
@@ -109,6 +130,16 @@ private:
     double dipoleY;
     double dipoleZ;
     double FreqDouble;   
+    double sigma_r;
+    double H;
+    double S;
+    double G;
+    double qEle;
+    double qVib;
+    double qRot;
+    double thetha_r;
+    double qTrans;
+    double qTot;
 
     //* molecule
     Molecule mol;
@@ -120,8 +151,10 @@ private:
     bool scfConvergence;
     bool polarAsw;
     bool tdAsw;
+    bool thermoAsw;
     bool cpAsw;
     bool dipFinder = false;
+    bool isLinear = false;
 
     //* map and vectors
 
@@ -138,10 +171,12 @@ private:
     vector<string> bOccupied;
     vector<string> Unoccupied;
     vector<string> bUnoccupied;
-    vector<double> vecFrec;
+    vector<double> vecNLOFrec;
     vector<double> vecFrecDip;
     vector<double> vecFrecInp;
-
+    vector<double> vecPrincipalAxesInertia;
+    vector<double> vecThetha_r;
+    
     //* teste
 
     string aLumoStorageSTR = "";
@@ -161,18 +196,38 @@ private:
     void setDipole();
     void splitter();
     void setNLO();
-    void setFrequency();
+    void setNLOFrequency();
+    void setVibFrequencies();
     void setAlpha();
     void setBeta();
+    void setIsLinear();
+    void setSigma_r();
+    void setPrincipalAxesInertia();
     void setGamma();
+    void set_qVib();
+    void set_thetha_r();
+    void set_qRot();
+    void set_qTrans();
+    void set_qEle();
+    void set_qTot();
     vector<string> customSplit(string str, char separator = ' ');
 
 public:
-    G16LOGfile(string filePath, bool polarAsw = 0, bool tdAsw = 0, bool cpAsw = 0, int  link = -1);   
+    G16LOGfile(string filePath, bool polarAsw = 0, bool tdAsw = 0, bool thermoAsw = 0, bool cpAsw = 0, int  link = -1);   
     ~G16LOGfile();      
     map<string, vector<string>> getOrbitals(); 
     map<int, map<string, double>> getTransitions(const int index = 0);
     double getEnergy();
+    double getZPE();
+    double getZPVE();
+    double getH();
+    double getS();
+    double getG();
+    double get_qEle();
+    double get_qVib();
+    double get_qRot();
+    double get_qTrans();
+    double get_qTot();
     vector<double> getHOMO(int index = -1);
     vector<double> getLUMO(int index = 0);    
     double getDipole(string axis = "tot");
@@ -182,9 +237,10 @@ public:
     map<string,double> getAlpha(string orientation = "Dipole", string unit = "esu", double frequency = 0);
     map<string,double> getBeta(string orientation = "Dipole", string unit = "esu", double frequency = 0, bool BSHG = 0);
     map<string,double> getGamma(string orientation = "Dipole", string unit = "esu", double frequency = 0, bool GSHG = 0);
+    vector<double> getVibFrequencies();
     string toStr();
     Molecule getMolecule();
-    vector<double> getFrequency();  
+    vector<double> getNLOFrequency();  
     vector<string> getNLO(string orientation = "input");
     
 };

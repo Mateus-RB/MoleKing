@@ -16,8 +16,8 @@
 
 //!----------------------- G16LOGfile -----------------------//
 
-G16LOGfile::G16LOGfile(string filePath, bool polarAsw, bool tdAsw, bool cpAsw, int link)
-    : ntFound(false), stdFound(false), scfConvergence(true),str_filePath(filePath), polarAsw(polarAsw), tdAsw(tdAsw), cpAsw(cpAsw), link(link)
+G16LOGfile::G16LOGfile(string filePath, bool polarAsw, bool tdAsw, bool thermoAsw, bool cpAsw, int link)
+    : ntFound(false), stdFound(false), scfConvergence(true), str_filePath(filePath), polarAsw(polarAsw), tdAsw(tdAsw), thermoAsw(thermoAsw), cpAsw(cpAsw), link(link)
 {
     // SET FUNCTIONS
 
@@ -73,14 +73,27 @@ G16LOGfile::G16LOGfile(string filePath, bool polarAsw, bool tdAsw, bool cpAsw, i
 
     if (polarAsw)
     {
-        this->vecFrec = {0.000};
+        this->vecNLOFrec = {0.000};
         setNLO();
-        setFrequency();
+        setNLOFrequency();
         setAlpha();
         setBeta();
         setGamma();
     };
-    
+
+    if (thermoAsw)
+    {
+        setVibFrequencies();
+        setIsLinear();
+        setPrincipalAxesInertia();
+        setSigma_r();
+        set_qVib();
+        set_thetha_r();
+        set_qRot();
+        set_qTrans();
+        set_qTot();
+    };
+
 };
 
 //!----------------------- Set Functions -----------------------//
@@ -321,8 +334,6 @@ void G16LOGfile::readLOGFile()
             };
         };
 
-
-
         // If the line contains "Excited State", extract the TD-DFT information
         if (tdAsw)
         {
@@ -335,6 +346,92 @@ void G16LOGfile::readLOGFile()
                 };
             };
         };
+
+        if (thermoAsw)
+        {
+            if (line.find(" Frequencies --") != string::npos)
+            {
+                vibFreqSTR += line + "\n";
+                vibFrequenciesStorage.emplace_back(vibFreqSTR);
+                vibFreqSTR = "";
+            };
+            
+            if (line.find(" Principal axes and moments of inertia in atomic units:") != string::npos)
+            {
+                getline(this->logfile, line);
+                getline(this->logfile, line);
+
+                principalAxisSTR += line + "\n";
+            };
+
+            if (line.find("Sum of electronic and zero-point Energies=") != string::npos)
+            {
+                auto pos = line.find("=") + 1;
+                string zpeString = line.substr(pos);
+                zpeString.erase(0, zpeString.find_first_not_of(" \t"));
+                zpeString.erase(zpeString.find_last_not_of(" \t\r\n") + 1);
+                this->ZPE = stod(zpeString);
+            };
+            
+            if (line.find(" Zero-point vibrational energy") != string::npos)
+            {
+                getline(this->logfile, line);
+                // line ==                                    65.02685 (Kcal/Mol)
+                auto pos = line.find(")") + 1;
+                string zpveString = line.substr(0, pos);
+                zpveString.erase(0, zpveString.find_first_not_of(" \t"));
+                zpveString.erase(zpveString.find_last_not_of(" \t\r\n") + 1);
+                this->ZPVE = stod(zpveString);
+            };
+
+            if (line.find("Rotational symmetry number") != string::npos)
+            {
+                // line ==  Rotational symmetry number  1.
+                // get the last character before the dot
+                auto pos = line.find(".") - 1;
+                this->sigma_r = stod(line.substr(pos, 1));
+            };
+
+            if (line.find("Sum of electronic and thermal Enthalpies=") != string::npos)
+            {
+                auto pos = line.find("=") + 1;
+                string enthalpyString = line.substr(pos);
+                enthalpyString.erase(0, enthalpyString.find_first_not_of(" \t"));
+                enthalpyString.erase(enthalpyString.find_last_not_of(" \t\r\n") + 1);
+                this->H = stod(enthalpyString);
+            };
+
+            if (line.find("                     E (Thermal)             CV                S") != string::npos)
+            {
+                getline(this->logfile, line);
+                getline(this->logfile, line);
+                istringstream iss(line);
+                vector<string> results((istream_iterator<string>(iss)), istream_iterator<string>());
+                this->S = stod(results[results.size() - 1]);
+            };
+
+            if (line.find("Sum of electronic and thermal Free Energies=") != string::npos)
+            {
+                auto pos = line.find("=") + 1;
+                string gibbsString = line.substr(pos);
+                gibbsString.erase(0, gibbsString.find_first_not_of(" \t"));
+                gibbsString.erase(gibbsString.find_last_not_of(" \t\r\n") + 1);
+                this->G = stod(gibbsString);
+            };
+
+            if (line.find(" Electronic      0") != string::npos)
+            {
+                size_t dPos = line.find("D");
+                if (dPos != string::npos)
+                {
+                    line.replace(dPos, 1, "e");
+                };
+                istringstream iss(line);
+                vector<string> results((istream_iterator<string>(iss)), istream_iterator<string>());
+                this->qEle = stod(results[1]);
+            };
+        };
+
         if (polarAsw)
         {   
             if (line.find("Electric dipole moment (input orientation):") != string::npos)
@@ -348,7 +445,6 @@ void G16LOGfile::readLOGFile()
                     };
                     polarSTR += line + "\n";
                 };
-                //cout << polarSTR << endl;
                 polarStorageInp.emplace_back(polarSTR);
                 polarSTR = "";
             };
@@ -924,7 +1020,7 @@ vector<string> G16LOGfile::getNLO(string Orientation)
     };
 };
 
-void G16LOGfile::setFrequency()
+void G16LOGfile::setNLOFrequency()
 {    
     if (this->dipFinder)
     {
@@ -936,8 +1032,8 @@ void G16LOGfile::setFrequency()
                 this->Freq = this->Freq.substr(0, this->Freq.find("nm"));
                 //convert Freq to double
                 this->FreqDouble = stod(this->Freq);
-                // add the frequency to the vecFrec vector
-                this->vecFrec.emplace_back(this->FreqDouble);
+                // add the frequency to the vecNLOFrec vector
+                this->vecNLOFrec.emplace_back(this->FreqDouble);
             };
         };
     }
@@ -952,20 +1048,20 @@ void G16LOGfile::setFrequency()
                 this->Freq = this->Freq.substr(0, this->Freq.find("nm"));
                 //convert Freq to double
                 this->FreqDouble = stod(this->Freq);
-                // add the frequency to the vecFrec vector
-                this->vecFrec.emplace_back(this->FreqDouble);
+                // add the frequency to the vecNLOFrec vector
+                this->vecNLOFrec.emplace_back(this->FreqDouble);
             };
         };
     };
 };
 
-vector<double> G16LOGfile::getFrequency()
+vector<double> G16LOGfile::getNLOFrequency()
 {   
     if (!this->polarAsw)
     {
-        throw runtime_error("ERROR in G16LOGfile::getFrequency(): No frequency found in the log file. Try using polarAsw=1.");
+        throw runtime_error("ERROR in G16LOGfile::getNLOFrequency(): No frequency found in the log file. Try using polarAsw=1.");
     }
-    return this->vecFrec;
+    return this->vecNLOFrec;
     
 };
 
@@ -990,15 +1086,15 @@ void G16LOGfile::setAlpha()
             UsePolar = this->vecPolarDip;
         }
 
-        for (int f = 0; f < this->vecFrec.size(); f++){
-            double freqPrincipal = this->vecFrec[f];
+        for (int f = 0; f < this->vecNLOFrec.size(); f++){
+            double freqPrincipal = this->vecNLOFrec[f];
 
             for (int i = 0; i < UsePolar.size(); i++)
             {
                 if (UsePolar[i].find("Alpha(0;0)") != string::npos)
                 {
-                    start.insert(make_pair(this->vecFrec[0],i+2));
-                    end.insert(make_pair(this->vecFrec[0],i+10));
+                    start.insert(make_pair(this->vecNLOFrec[0],i+2));
+                    end.insert(make_pair(this->vecNLOFrec[0],i+10));
                 }
                 else if (UsePolar[i].find("Alpha(-w;w) w= ") != string::npos)
                 {   
@@ -1048,14 +1144,14 @@ map<string,double> G16LOGfile::getAlpha(string orientation, string unit, double 
         throw runtime_error("ERROR in G16LOGfile::getAlpha(): No NLO found in the log file., Try using polarAsw=1.");
     }
 
-    //check if frequency is in the vecFrec vector
-    if (find(this->vecFrec.begin(), this->vecFrec.end(), frequency) == this->vecFrec.end())
+    //check if frequency is in the vecNLOFrec vector
+    if (find(this->vecNLOFrec.begin(), this->vecNLOFrec.end(), frequency) == this->vecNLOFrec.end())
     {   
         string temp = "";
 
-        for (int i = 0; i < this->vecFrec.size(); i++)
+        for (int i = 0; i < this->vecNLOFrec.size(); i++)
         {
-            temp += to_string(this->vecFrec[i]) + ", ";
+            temp += to_string(this->vecNLOFrec[i]) + ", ";
         }
         
         throw runtime_error("ERROR in G16LOGfile::getAlpha(): Frequency not found in the log file. Try: " + temp + "instead.");
@@ -1107,17 +1203,17 @@ void G16LOGfile::setBeta()
             UsePolar = this->vecPolarDip;
         }
         map<double, int> start, end, start2, end2;
-        for (int f = 0; f < this->vecFrec.size(); f++)
+        for (int f = 0; f < this->vecNLOFrec.size(); f++)
         {
-            double freqPrincipal = this->vecFrec[f];
+            double freqPrincipal = this->vecNLOFrec[f];
             for (int i = 0; i < UsePolar.size(); i++)
             {
                 if (UsePolar[i].find("Beta(0;0,0)") != string::npos)
                 {   
-                    start.insert(make_pair(this->vecFrec[0],i+2));
-                    end.insert(make_pair(this->vecFrec[0],i+18));
-                    start2.insert(make_pair(this->vecFrec[0],i+2));
-                    end2.insert(make_pair(this->vecFrec[0],i+18));
+                    start.insert(make_pair(this->vecNLOFrec[0],i+2));
+                    end.insert(make_pair(this->vecNLOFrec[0],i+18));
+                    start2.insert(make_pair(this->vecNLOFrec[0],i+2));
+                    end2.insert(make_pair(this->vecNLOFrec[0],i+18));
                 }
                 else if (UsePolar[i].find("Beta(-w;w,0) w= ") != string::npos)
                 { 
@@ -1187,6 +1283,253 @@ void G16LOGfile::setBeta()
     };
 };
 
+
+void G16LOGfile::setVibFrequencies()
+{
+    if ( this->vibFrequenciesStorage.size() == 0 )
+    {
+        throw runtime_error("ERROR in G16LOGfile::setVibFrequencies(): No vibrational frequencies found in the log file.");
+    };
+
+    if ( this->vibFrequenciesStorage.size() > 0 )
+    {
+        for (int i = 0; i < this->vibFrequenciesStorage.size(); i++)
+        {
+            stringstream ss(this->vibFrequenciesStorage[i]);
+            string line;
+            while (getline(ss, line))
+            {
+                if (line.find("Frequencies --") != string::npos)
+                {
+                    istringstream iss(line);
+                    vector<string> results((istream_iterator<string>(iss)), istream_iterator<string>());
+                    for (int j = 2; j < results.size(); j++)
+                    {
+                        this->vibFrequencies.emplace_back(stod(results[j])); 
+                    };
+                };
+            };
+        };
+    };
+};
+
+vector<double> G16LOGfile::getVibFrequencies()
+{
+    // cm^-1
+    return this->vibFrequencies; // cm^-1
+};
+
+
+void G16LOGfile::setSigma_r()
+{
+
+};
+
+void G16LOGfile::setPrincipalAxesInertia()
+{   
+
+    // atomic units
+
+    stringstream ss(this->principalAxisSTR);
+    string line;
+
+    while (getline(ss, line))
+    {
+        if (line.find("Eigenvalues --") != string::npos)
+        {
+            istringstream iss(line);
+            vector<string> results((istream_iterator<string>(iss)), istream_iterator<string>());
+            for (int j = 2; j < results.size(); j++)
+            { 
+                if (results.size() == 5)
+                {
+                    this->vecPrincipalAxesInertia.emplace_back(stod(results[j]));
+                }
+                else
+                {
+                    size_t dot = results[j].find('.');
+                    size_t start = 0;
+                    while (dot != string::npos)
+                    {
+                        if (dot + 6 > results[j].size()) break;
+
+                        string intPart = results[j].substr(start, dot - start);
+                        string decPart = results[j].substr(dot + 1, 5);
+                        start = dot + 6;
+                        if (start >= results[j].size()) break;
+                        dot = results[j].find('.', start);
+
+                        this->vecPrincipalAxesInertia.emplace_back(stod(intPart + "." + decPart));
+                    }
+                };
+            };
+        }
+    };
+};
+
+double G16LOGfile::getZPE()
+{   
+    // hartree
+    return this->ZPE;
+};
+
+double G16LOGfile::getZPVE()
+{   
+    // kcal/mol
+    return this->ZPVE;
+};
+
+double G16LOGfile::getH()
+{
+    // hartree
+    return this->H;
+};
+
+double G16LOGfile::getG()
+{
+    // hartree
+    return this->G;
+};
+
+double G16LOGfile::getS()
+{
+    // cal/(mol*K)
+    return this->S;
+};
+
+double G16LOGfile::get_qEle()
+{   
+    return this->qEle;
+};
+
+void G16LOGfile::set_qVib()
+{
+    vector<double> l1;
+    vector<double> l2;
+    double thetha_v;
+
+    for (int i = 0; i < this->vibFrequencies.size(); i++)
+    {
+        thetha_v = (this->h * this->vibFrequencies[i] * this->c)/(this->k_B);
+        l1.emplace_back(thetha_v);
+    };
+
+    for (int j = 0; j < l1.size(); j++)
+    {
+        double f1 = 1.0;
+        double f2 = 1.0 - exp(-l1[j]/(373.15));
+        l2.emplace_back(f1/f2);
+    };
+
+    this->qVib = accumulate(l2.begin(), l2.end(), 1.0, std::multiplies<double>());
+
+};
+
+void G16LOGfile::set_thetha_r()
+{
+
+    double inertia_x = this->vecPrincipalAxesInertia[0]*this->AMU_2_KG_M2; // kg*m^2
+    double inertia_y = this->vecPrincipalAxesInertia[1]*this->AMU_2_KG_M2; // kg*m^2
+    double inertia_z = this->vecPrincipalAxesInertia[2]*this->AMU_2_KG_M2; // kg*m^2
+
+    if (not this->isLinear)
+    {
+        double f2_x = 8.0 * pow(this->PI, 2) * inertia_x * this->k_B;
+        double f2_y = 8.0 * pow(this->PI, 2) * inertia_y * this->k_B;
+        double f2_z = 8.0 * pow(this->PI, 2) * inertia_z * this->k_B;
+
+        double thetha_x = (this->h * this->h) / f2_x;
+        double thetha_y = (this->h * this->h) / f2_y;
+        double thetha_z = (this->h * this->h) / f2_z;
+
+        this->vecThetha_r = {thetha_x, thetha_y, thetha_z};
+    }
+
+    else
+    {
+        double f2 = 8 * pow(this->PI, 2) * inertia_y * this->k_B;
+
+        this->thetha_r = (this->h * this->h) / f2;
+    }
+
+};
+
+void G16LOGfile::set_qRot()
+{
+    if (this->isLinear)
+    {
+        {
+            double inertia = this->vecPrincipalAxesInertia[1] * this->AMU_2_KG_M2;
+            double factor = (8.0 * pow(this->PI, 2) * this->k_B * 373.15) / pow(this->h, 2);
+            this->qRot = (factor * inertia) / this->sigma_r;
+        }
+    }
+    else
+    {
+        double f1 = pow(this->PI, 0.5)/this->sigma_r;
+        double f2 = pow(373.15, 1.5);
+        double f3 = pow((this->vecThetha_r[0]*this->vecThetha_r[1]*this->vecThetha_r[2]), 0.5);
+
+        this->qRot = f1 * (f2/f3);
+    }
+};
+
+void G16LOGfile::set_qTrans()
+{
+    double mass = this->mol.getMolecularMass()*this->AMU_2_KG; // kg
+
+    double f1 = (2 * this->PI * mass * this->k_B * 373.15) / (pow(this->h, 2));
+    double f2 = (this->k_B * 373.15) / this->P_0;
+
+    this->qTrans = pow(f1, 1.5) * f2;
+};
+
+void G16LOGfile::set_qTot()
+{
+    this->qTot = this->qEle * this->qTrans * this->qRot * this->qVib;
+};
+
+double G16LOGfile::get_qTrans()
+{
+    return this->qTrans;
+};
+
+double G16LOGfile::get_qTot()
+{
+    return this->qTot;
+};
+
+double G16LOGfile::get_qRot()
+{
+    return this->qRot;
+};
+
+double G16LOGfile::get_qVib()
+{
+    return this->qVib;
+};
+
+void G16LOGfile::setIsLinear()
+{
+    int count = 0;
+    for (int i = 0; i < this->vibFrequencies.size(); i++)
+        {
+            if (this->vibFrequencies[i] > 0)
+            {
+                count++;
+            }
+        }
+    
+    if (count > 1)
+    {
+        this->isLinear = false;
+    }
+    else
+    {
+        this->isLinear = true;
+    }
+};
+
 map<string,double> G16LOGfile::getBeta(string orientation, string unit, double frequency, bool BSHG)
 {   
     
@@ -1206,13 +1549,13 @@ map<string,double> G16LOGfile::getBeta(string orientation, string unit, double f
     {
         throw runtime_error("ERROR in G16LOGfile::getBeta(): No NLO found in the log file., Try using polarAsw=1.");
     }
-    //check if frequency is in the vecFrec vector
-    if (find(this->vecFrec.begin(), this->vecFrec.end(), frequency) == this->vecFrec.end())
+    //check if frequency is in the vecNLOFrec vector
+    if (find(this->vecNLOFrec.begin(), this->vecNLOFrec.end(), frequency) == this->vecNLOFrec.end())
     {   
         string temp = "";
-        for (int i = 0; i < this->vecFrec.size(); i++)
+        for (int i = 0; i < this->vecNLOFrec.size(); i++)
         {
-            temp += to_string(this->vecFrec[i]) + ", ";
+            temp += to_string(this->vecNLOFrec[i]) + ", ";
         }
         throw runtime_error("ERROR in G16LOGfile::getBeta(): Frequency not found in the log file. Try: " + temp + "instead.");
     }
@@ -1265,18 +1608,18 @@ void G16LOGfile::setGamma()
             UsePolar = this->vecPolarDip;
         }
         map<double, int> start, end, start2, end2;
-        for (int f = 0; f < this->vecFrec.size(); f++)
+        for (int f = 0; f < this->vecNLOFrec.size(); f++)
         {
-            double freqPrincipal = this->vecFrec[f];
+            double freqPrincipal = this->vecNLOFrec[f];
             for (int i = 0; i < UsePolar.size(); i++)
             {
                 if (UsePolar[i].find("Gamma(0;0,0,0)") != string::npos)
                 {   
                     
-                    start.insert(make_pair(this->vecFrec[0],i+2));
-                    end.insert(make_pair(this->vecFrec[0],i+19));
-                    start2.insert(make_pair(this->vecFrec[0],i+2));
-                    end2.insert(make_pair(this->vecFrec[0],i+19));
+                    start.insert(make_pair(this->vecNLOFrec[0],i+2));
+                    end.insert(make_pair(this->vecNLOFrec[0],i+19));
+                    start2.insert(make_pair(this->vecNLOFrec[0],i+2));
+                    end2.insert(make_pair(this->vecNLOFrec[0],i+19));
                 }
                 else if (UsePolar[i].find("Gamma(-w;w,0,0) w= ") != string::npos)
                 { 
@@ -1357,13 +1700,13 @@ map<string,double> G16LOGfile::getGamma(string orientation, string unit, double 
     {
         throw runtime_error("ERROR in G16LOGfile::getGamma(): No NLO found in the log file., Try using polarAsw=1.");
     }
-    //check if frequency is in the vecFrec vector
-    if (find(this->vecFrec.begin(), this->vecFrec.end(), frequency) == this->vecFrec.end())
+    //check if frequency is in the vecNLOFrec vector
+    if (find(this->vecNLOFrec.begin(), this->vecNLOFrec.end(), frequency) == this->vecNLOFrec.end())
     {   
         string temp = "";
-        for (int i = 0; i < this->vecFrec.size(); i++)
+        for (int i = 0; i < this->vecNLOFrec.size(); i++)
         {
-            temp += to_string(this->vecFrec[i]) + ", ";
+            temp += to_string(this->vecNLOFrec[i]) + ", ";
         }
         throw runtime_error("ERROR in G16LOGfile::getGamma(): Frequency not found in the log file. Try: " + temp + "instead.");
     }
@@ -1413,6 +1756,9 @@ string G16LOGfile::toStr()
 {
     return "G16LOGFile: Calculation of " + this->str_filePath.substr(this->str_filePath.find_last_of("/") + 1) + " done in " + this->info + ", with the level of theory " + this->method + "/" + this->basisValue + " and " + "SCF energy of " + to_string(this->scfValue) + " Hartrees.";
 };
+
+
+
 
 //!----------------------- Destructor -----------------------//
 

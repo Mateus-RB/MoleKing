@@ -791,7 +791,6 @@ Eigen::Matrix3d Molecule::getRotationMatrix(Eigen::Vector3d pAxis, char mkAxis)
 };
 
 
-
 void Molecule::reorderMolecule(vector <int> fixedAtoms)
 {
     //create a function that reorders the molecule based on the distance with the first atom
