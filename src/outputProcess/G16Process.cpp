@@ -670,7 +670,6 @@ Molecule G16LOGfile::getMolecule()
         {
             temp = temp.substr(temp.find_last_of("/") + 1);
         };
-        //cerr << "WARNING in G16LOGfile::getMolecule(): The geometry of " << temp << " was not taken from the standard orientation." << endl;
     };
     return this->mol;
 };
@@ -681,7 +680,6 @@ map<string, vector<string>> G16LOGfile::getOrbitals()
     if (this->bOccupied.size() > 0 && this->bUnoccupied.size() > 0)
     {   
         //throw an warning
-        cerr << "WARNING in G16LOGfile::getOrbitals(): Your job is an open shell. Please, use getOrbitals()['Alpha_Occupied'] or ['Beta_Occupied']" << endl;
         return this->bOrbitals;
     }
     else
