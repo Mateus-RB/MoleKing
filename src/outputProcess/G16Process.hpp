@@ -27,6 +27,7 @@
 #include <stdexcept>
 #include <map>
 #include <cmath>
+#include "../chemicalUnits/PeriodicTable.hpp"
 
 using namespace std;
 #endif /* Testing_hpp */
@@ -35,6 +36,9 @@ class G16LOGfile{
 private:
 
     //* Constants
+
+    //periodic table from PeriodicTable class
+    PeriodicTable pt;
 
     const double k_B = 1.3806503E-23;                    // Boltzmann (J/K)
     const double h = 6.62607004E-34;                     // Planck (J*s)

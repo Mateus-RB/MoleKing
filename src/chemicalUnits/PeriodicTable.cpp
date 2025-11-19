@@ -505,6 +505,31 @@ PeriodicTable::PeriodicTable(){
     this->ColorMap.insert(pair<string, string>("Ubn",       "EB0026"));
     this->ColorMap.insert(pair<string, string>("00",        "98f58e"));
 
+    this->ConstantMap.insert(pair<string, double>("a0_bohr", 0.52917721092)); // in Angstrom
+    this->ConstantMap.insert(pair<string, double>("qe_c", 1.602176565e-19)); // in Coulombs
+    this->ConstantMap.insert(pair<string, double>("qe_esu", 4.803204e-10)); // in ESU
+    this->ConstantMap.insert(pair<string, double>("h", 6.62606957e-34)); // in Joule-secs
+    this->ConstantMap.insert(pair<string, double>("PI", 3.14159265358979323846)); // dimensionless
+    this->ConstantMap.insert(pair<string, double>("hbar", 1.054571726e-34)); // in Joule-secs
+    this->ConstantMap.insert(pair<string, double>("NA", 6.02214129e23)); // dimensionless
+    this->ConstantMap.insert(pair<string, double>("hartree", 4.35974434e-18)); // in Joules
+    this->ConstantMap.insert(pair<string, double>("C", 2.99792458e10)); // in cm/sec
+    this->ConstantMap.insert(pair<string, double>("k_B", 1.3806488e-23)); // in Joule/Kelvin
+    this->ConstantMap.insert(pair<string, double>("me", 9.10938291e-31)); // in kg
+    this->ConstantMap.insert(pair<string, double>("R_cal", 1.9872036)); // in cal/(mol*K)
+    this->ConstantMap.insert(pair<string, double>("R_J", 8.3144621)); // in J/(mol*K)
+    this->ConstantMap.insert(pair<string, double>("P_0", 101325)); // in Pa
+
+    this->ConversionMap.insert(pair<string, double>("Hartree_to_ev", 27.21138602)); // Hartree to eV conversion
+    this->ConversionMap.insert(pair<string, double>("Hartree_to_KJ", 2625.499638)); // Hartree to KJ/mol conversion
+    this->ConversionMap.insert(pair<string, double>("Hartree_to_Kcal", 627.509474)); // Hartree to Kcal/mol conversion
+    this->ConversionMap.insert(pair<string, double>("ev_to_Joule", 1.602176565e-19)); // eV to Joule conversion
+    this->ConversionMap.insert(pair<string, double>("Kcal_to_KJ", 4.184)); // Kcal to KJ conversion
+    this->ConversionMap.insert(pair<string, double>("atm_to_Pa", 101325)); // atm to Pa conversion
+    this->ConversionMap.insert(pair<string, double>("bar_to_Pa", 100000)); // bar to Pa conversion
+    this->ConversionMap.insert(pair<string, double>("amu_to_kg", 1.660538921E-27)); // AMU to Kg conversion
+    this->ConversionMap.insert(pair<string, double>("amu_to_kg_m2", 4.65082513926e-48)); // AMU to Kg/m^2 conversion
+
 };
 
 PeriodicTable::~PeriodicTable(){
@@ -512,10 +537,41 @@ PeriodicTable::~PeriodicTable(){
     this->massMap.clear();
     this->radiiMap.clear();
     this->ColorMap.clear();
+    this->ConstantMap.clear();
+    this->ConversionMap.clear();
 };   
 
 int PeriodicTable::getAtomicNumber(string symbol){
     return this->symbolMap[symbol];
+};
+
+double PeriodicTable::getConstant(string constantName){
+    if (this->ConstantMap.find(constantName) == this->ConstantMap.end()){
+        std::string msg = "Constant '" + constantName + "' not found. Available constants: ";
+        bool first = true;
+        for (const auto &p : this->ConstantMap){
+            if (!first) msg += ", ";
+            msg += p.first;
+            first = false;
+        }
+        throw std::runtime_error(msg);
+    };
+
+    return this->ConstantMap[constantName];
+};
+
+double PeriodicTable::getConversion(string conversionName){
+    if (this->ConversionMap.find(conversionName) == this->ConversionMap.end()){
+        std::string msg = "Conversion '" + conversionName + "' not found. Available conversions: ";
+        bool first = true;
+        for (const auto &p : this->ConversionMap){
+            if (!first) msg += ", ";
+            msg += p.first;
+            first = false;
+        }
+        throw std::runtime_error(msg);
+    };
+    return this->ConversionMap[conversionName];
 };
 
 double PeriodicTable::getAtomicMass(string symbol){

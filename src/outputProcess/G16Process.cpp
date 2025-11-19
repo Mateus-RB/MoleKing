@@ -1420,10 +1420,9 @@ void G16LOGfile::set_qVib()
             {
                 continue;
             };
-            
-            thetha_v = (this->h * this->vibFrequencies[i] * this->c)/(this->k_B);
+        
+            thetha_v = (this->h * this->vibFrequencies[i] * this->c)/(this->pt.getConstant("k_B"));
 
-            // double upper = exp(-thetha_v/(2*this->temperature));
             double upper = 1.0;
             double lower = 1.0 - exp(-thetha_v/(this->temperature));
 
@@ -1442,27 +1441,22 @@ void G16LOGfile::set_thetha_r()
 
     else
     {
-        double inertia_x = this->vecPrincipalAxesInertia[0]*this->AMU_2_KG_M2; // kg*m^2
-        double inertia_y = this->vecPrincipalAxesInertia[1]*this->AMU_2_KG_M2; // kg*m^2
-        double inertia_z = this->vecPrincipalAxesInertia[2]*this->AMU_2_KG_M2; // kg*m^2
+        double inertia_x = this->vecPrincipalAxesInertia[0]*this->pt.getConversion("amu_to_kg_m2"); // kg*m^2
+        double inertia_y = this->vecPrincipalAxesInertia[1]*this->pt.getConversion("amu_to_kg_m2"); // kg*m^2
+        double inertia_z = this->vecPrincipalAxesInertia[2]*this->pt.getConversion("amu_to_kg_m2"); // kg*m^2
 
         if (not this->isLinear)
         {
-            // double thetha_x = pow(this->hbar, 2) / (2 * this->k_B * inertia_x);
-            // double thetha_y = pow(this->hbar, 2) / (2 * this->k_B * inertia_y);
-            // double thetha_z = pow(this->hbar, 2) / (2 * this->k_B * inertia_z);
-
-            double thetha_x = pow(this->h, 2) / (8 * pow(this->PI, 2) * this->k_B * inertia_x);
-            double thetha_y = pow(this->h, 2) / (8 * pow(this->PI, 2) * this->k_B * inertia_y);
-            double thetha_z = pow(this->h, 2) / (8 * pow(this->PI, 2) * this->k_B * inertia_z);
+            double thetha_x = pow(this->h, 2) / (8 * pow(this->PI, 2) * this->pt.getConstant("k_B") * inertia_x);
+            double thetha_y = pow(this->h, 2) / (8 * pow(this->PI, 2) * this->pt.getConstant("k_B") * inertia_y);
+            double thetha_z = pow(this->h, 2) / (8 * pow(this->PI, 2) * this->pt.getConstant("k_B") * inertia_z);
 
             this->vecThetha_r = {thetha_x, thetha_y, thetha_z};
         }
 
         else
         {
-            this->thetha_r = pow(this->h, 2) / (8 * pow(this->PI, 2) * this->k_B * inertia_y);
-            //this->thetha_r = pow(this->hbar, 2) / (2 * this->k_B * inertia_y);
+            this->thetha_r = pow(this->h, 2) / (8 * pow(this->PI, 2) * this->pt.getConstant("k_B") * inertia_y);
         };
     };
 };
@@ -1490,18 +1484,16 @@ void G16LOGfile::set_qRot()
             double f3 = pow((this->vecThetha_r[0]*this->vecThetha_r[1]*this->vecThetha_r[2]), 0.5);
 
             this->qRot = f1 * (f2/f3);
-
-            //((np.pi ** 0.5) / specie['NSym']) * ((self.T ** 1.5) / (np.product(specie['Trot'][:])) ** 0.5)
         }
     };
 };
 
 void G16LOGfile::set_qTrans()
 {
-    double mass = this->mol.getMolecularMass()*this->AMU_2_KG; // kg
+    double mass = this->mol.getMolecularMass()*this->pt.getConversion("amu_to_kg"); // kg
 
-    double f1 = pow((2 * this->PI * mass * this->k_B * this->temperature) / (pow(this->h, 2)), 1.5);
-    double f2 = (this->k_B * this->temperature) / this->P_0;
+    double f1 = pow((2 * this->pt.getConstant("PI") * mass * this->pt.getConstant("k_B") * this->temperature) / (pow(this->pt.getConstant("h"), 2)), 1.5);
+    double f2 = (this->pt.getConstant("k_B") * this->temperature) / this->pt.getConstant("P_0");
 
     this->qTrans = f1 * f2;
 };

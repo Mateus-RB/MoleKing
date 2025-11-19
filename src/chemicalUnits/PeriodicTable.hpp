@@ -30,6 +30,9 @@ class PeriodicTable{
     map<string, double> massMap;
     map<string, double> radiiMap;
     map<string, string> ColorMap;
+    map<string, double> ConstantMap;
+    map<string, double> ConversionMap;
+
     public:
     PeriodicTable();
     ~PeriodicTable();
@@ -37,6 +40,8 @@ class PeriodicTable{
     double getAtomicMass(string symbol);
     string getSymbol(int atomicNumber);
     double getCovalentRadii(string symbol);
+    double getConstant(string constantName);
+    double getConversion(string conversionName);
     string getColor(string symbol);
 };
 
