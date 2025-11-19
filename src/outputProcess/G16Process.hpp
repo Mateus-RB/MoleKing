@@ -36,14 +36,15 @@ private:
 
     //* Constants
 
-    const double k_B = 1.3806503E-23;                  // Constante de Boltzman (J/K)
-    const double h = 6.62607004E-34;                   // Constante de Planck (J*s)
-    const double c = 2.99792458e10;                    // Velocidade da luz (cm/s)
-    const double R = 1.98720425864083;                 // Constante dos gases (cal/(mol*K))
-    const double PI = 3.14159265358979323846;          // Pi
-    const double P_0  = 101325;                          // Pressão (Pa)
-    const double AMU_2_KG = 1.660538921E-27;           // Conversão de AMU para Kg
-    const double AMU_2_KG_M2 = 4.65082513926e-48;      // Conversão de AMU para Kg/m^2  
+    const double k_B = 1.3806503E-23;                    // Boltzmann (J/K)
+    const double h = 6.62607004E-34;                     // Planck (J*s)
+    const double hbar = 1.0545718e-34;                   // Planck reduced (J*s)
+    const double c = 2.99792458e10;                      // Speed of light (cm/s)
+    const double R = 1.98720425864083;                   // Gas constant (cal/(mol*K))
+    const double PI = 3.14159265358979323846;            // Pi
+    const double P_0  = 101325;                          // Pressure (Pa)
+    const double AMU_2_KG = 1.660538921E-27;             // Conversion from AMU to Kg
+    const double AMU_2_KG_M2 = 4.65082513926e-48;        // Conversion from AMU to Kg/m^2  
 
 
     //* istringstream
@@ -118,6 +119,7 @@ private:
     vector<string> gammaStorage;
 
     //* double
+    double temperature;
     double scfValue;
     double ZPE;
     double ZPVE;
@@ -213,7 +215,7 @@ private:
     vector<string> customSplit(string str, char separator = ' ');
 
 public:
-    G16LOGfile(string filePath, bool polarAsw = 0, bool tdAsw = 0, bool thermoAsw = 0, bool cpAsw = 0, int  link = -1);   
+    G16LOGfile(string filePath, bool polarAsw = 0, bool tdAsw = 0, bool thermoAsw = 0, bool cpAsw = 0, double temperature = 298.15, int link = -1);   
     ~G16LOGfile();      
     map<string, vector<string>> getOrbitals(); 
     map<int, map<string, double>> getTransitions(const int index = 0);

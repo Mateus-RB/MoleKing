@@ -16,14 +16,12 @@
 
 //!----------------------- G16LOGfile -----------------------//
 
-G16LOGfile::G16LOGfile(string filePath, bool polarAsw, bool tdAsw, bool thermoAsw, bool cpAsw, int link)
-    : ntFound(false), stdFound(false), scfConvergence(true), str_filePath(filePath), polarAsw(polarAsw), tdAsw(tdAsw), thermoAsw(thermoAsw), cpAsw(cpAsw), link(link)
+G16LOGfile::G16LOGfile(string filePath, bool polarAsw, bool tdAsw, bool thermoAsw, bool cpAsw, double temperature, int link)
+    : ntFound(false), stdFound(false), scfConvergence(true), str_filePath(filePath), polarAsw(polarAsw), tdAsw(tdAsw), thermoAsw(thermoAsw), cpAsw(cpAsw), temperature(temperature), link(link)
 {
     // SET FUNCTIONS
 
     detectLink();
-
-    //cout << this->linkStorage.size() << endl; // Debugging
 
     if (this->linkStorage.size() == 1)
     {
@@ -63,7 +61,7 @@ G16LOGfile::G16LOGfile(string filePath, bool polarAsw, bool tdAsw, bool thermoAs
     setMolecule();
     setDipole();
     setHOMO();
-    setLUMO(); // Debugging :: This function Breaks with water log file
+    setLUMO();
     setOrbitals();
 
     if (tdAsw)
@@ -86,14 +84,12 @@ G16LOGfile::G16LOGfile(string filePath, bool polarAsw, bool tdAsw, bool thermoAs
         setVibFrequencies();
         setIsLinear();
         setPrincipalAxesInertia();
-        setSigma_r();
         set_qVib();
         set_thetha_r();
         set_qRot();
         set_qTrans();
         set_qTot();
     };
-
 };
 
 //!----------------------- Set Functions -----------------------//
@@ -208,8 +204,6 @@ void G16LOGfile::readLOGFile()
             {   
                 if (line.find(" Alpha virt. eigenvalues --") != string::npos)
                 {
-                    //cout << "aHomo to aLumo" << endl; // Debugging
-                    //aLumoStorageSTR += line + "\n";
                     break;
                 };
                 aHomoStorageSTR += line + "\n";
@@ -229,7 +223,6 @@ void G16LOGfile::readLOGFile()
                 };
                 aLumoStorageSTR += line + "\n";
             };
-            //cout << "Foi feito" << endl; // Debugging
             this->aLumoStorage.emplace_back(aLumoStorageSTR);
             aLumoStorageSTR = "";
         };
@@ -386,10 +379,12 @@ void G16LOGfile::readLOGFile()
 
             if (line.find("Rotational symmetry number") != string::npos)
             {
-                // line ==  Rotational symmetry number  1.
-                // get the last character before the dot
-                auto pos = line.find(".") - 1;
-                this->sigma_r = stod(line.substr(pos, 1));
+                // line ==  Rotational symmetry number  12.
+                // get the last number before the '.'
+                auto pos = line.find_last_of(" ");
+                string sigmaString = line.substr(pos + 1);
+                sigmaString.erase(sigmaString.find_last_not_of(".\t\r\n") + 1);
+                this->sigma_r = stod(sigmaString);
             };
 
             if (line.find("Sum of electronic and thermal Enthalpies=") != string::npos)
@@ -461,7 +456,6 @@ void G16LOGfile::readLOGFile()
                     };
                     polarSTR += line + "\n";
                 };
-                //cout << polarSTR << endl;
                 polarStorageDip.emplace_back(polarSTR);
                 polarSTR = "";
             };
@@ -599,7 +593,6 @@ void G16LOGfile::setHOMO()
 // Function to set the LUMO orbital of the calculation
 void G16LOGfile::setLUMO()
 {   
-    //cout << "Debugging" << endl;
     vector<string> temp;
     string aLumoAuxiliary;
     aLumoAuxiliary = this->aLumoStorage[this->aLumoStorage.size() - 1];
@@ -977,7 +970,6 @@ void G16LOGfile::setNLO()
             this->vecPolarDip.pop_back();
         };
     };
-    //cout << this->dipFinder << endl;
     if (this->polarStorageInp.size() == 0){
         throw runtime_error("ERROR in G16LOGfile::setNLO(): No NLO found in the log file.");
     }
@@ -988,7 +980,6 @@ void G16LOGfile::setNLO()
         
         while (getline(sinp, line))
         {
-            //cout << line << endl;
             this->vecPolarInp.emplace_back(line);
         };
         if (this->vecPolarInp[vecPolarInp.size() - 1] == "" || this->vecPolarInp[vecPolarInp.size() - 1] == " " || this->vecPolarInp[vecPolarInp.size() - 1] == "\n")
@@ -1246,12 +1237,8 @@ void G16LOGfile::setBeta()
         vector<vector<string>> Beta_0, Beta_w, Beta_2w;
         for (auto it = start.begin(); it != start.end(); ++it) 
         {   
-            //cout << typeid(it).name() << endl;
             for(int i = start[it->first]; i < end[it->first]; i++)
             {   vector<string> T = this->customSplit(UsePolar[i]);
-                // cout << T[0] << endl;
-                // cout << T[1] << endl;
-                // cout << T[2] << endl;
                 if( T[0] == "||" && T[1] == "(z)"){
                     NLOInfo.insert(make_pair(T[0]+T[1], vector<string>({T[2], T[3], T[4]})));
                 }   
@@ -1288,7 +1275,7 @@ void G16LOGfile::setVibFrequencies()
 {
     if ( this->vibFrequenciesStorage.size() == 0 )
     {
-        throw runtime_error("ERROR in G16LOGfile::setVibFrequencies(): No vibrational frequencies found in the log file.");
+        this->vibFrequencies.emplace_back(0.0);
     };
 
     if ( this->vibFrequenciesStorage.size() > 0 )
@@ -1319,17 +1306,8 @@ vector<double> G16LOGfile::getVibFrequencies()
     return this->vibFrequencies; // cm^-1
 };
 
-
-void G16LOGfile::setSigma_r()
-{
-
-};
-
 void G16LOGfile::setPrincipalAxesInertia()
-{   
-
-    // atomic units
-
+{
     stringstream ss(this->principalAxisSTR);
     string line;
 
@@ -1337,33 +1315,53 @@ void G16LOGfile::setPrincipalAxesInertia()
     {
         if (line.find("Eigenvalues --") != string::npos)
         {
-            istringstream iss(line);
-            vector<string> results((istream_iterator<string>(iss)), istream_iterator<string>());
-            for (int j = 2; j < results.size(); j++)
-            { 
-                if (results.size() == 5)
+            vector<string> results;
+            {
+                istringstream iss(line);
+                for (string w; iss >> w; )
+                    results.push_back(w);
+            }
+
+            if (results.size() == 5)
+            {
+                double ix = stod(results[2]);
+                double iy = stod(results[3]);
+                double iz = stod(results[4]);
+
+                this->vecPrincipalAxesInertia.push_back(ix);
+                this->vecPrincipalAxesInertia.push_back(iy);
+                this->vecPrincipalAxesInertia.push_back(iz);
+            }
+
+            else
+            {
+                string raw = results[2];
+
+                vector<string> base;
                 {
-                    this->vecPrincipalAxesInertia.emplace_back(stod(results[j]));
-                }
-                else
-                {
-                    size_t dot = results[j].find('.');
                     size_t start = 0;
-                    while (dot != string::npos)
+                    size_t pos;
+                    while ((pos = raw.find('.', start)) != string::npos)
                     {
-                        if (dot + 6 > results[j].size()) break;
-
-                        string intPart = results[j].substr(start, dot - start);
-                        string decPart = results[j].substr(dot + 1, 5);
-                        start = dot + 6;
-                        if (start >= results[j].size()) break;
-                        dot = results[j].find('.', start);
-
-                        this->vecPrincipalAxesInertia.emplace_back(stod(intPart + "." + decPart));
+                        base.push_back(raw.substr(start, pos - start));
+                        start = pos + 1;
                     }
-                };
+                    base.push_back(raw.substr(start));
+                }
+
+                string inertia_x = base[0] + "." + base[1].substr(0, 5);
+                string inertia_y = base[1].substr(5, 4) + "." + base[2].substr(0, 5);
+                string inertia_z = base[2].substr(5, 4) + "." + base[3].substr(0, 5);
+
+                double ix = stod(inertia_x); 
+                double iy = stod(inertia_y); 
+                double iz = stod(inertia_z); 
+
+                this->vecPrincipalAxesInertia.push_back(ix);
+                this->vecPrincipalAxesInertia.push_back(iy);
+                this->vecPrincipalAxesInertia.push_back(iz);
             };
-        }
+        };
     };
 };
 
@@ -1403,85 +1401,109 @@ double G16LOGfile::get_qEle()
 };
 
 void G16LOGfile::set_qVib()
-{
-    vector<double> l1;
-    vector<double> l2;
-    double thetha_v;
+{   
+    double thetha_v = 0.0;
+    double upper, lower;
 
-    for (int i = 0; i < this->vibFrequencies.size(); i++)
+    this->qVib = 1.0;
+
+    if (this->vibFrequencies.size() == 0)
     {
-        thetha_v = (this->h * this->vibFrequencies[i] * this->c)/(this->k_B);
-        l1.emplace_back(thetha_v);
-    };
+        this->qVib = 1.0;
+    }
 
-    for (int j = 0; j < l1.size(); j++)
+    else
     {
-        double f1 = 1.0;
-        double f2 = 1.0 - exp(-l1[j]/(373.15));
-        l2.emplace_back(f1/f2);
+        for (int i = 0; i < this->vibFrequencies.size(); i++)
+        {
+            if (this->vibFrequencies[i] <= 0)
+            {
+                continue;
+            };
+            
+            thetha_v = (this->h * this->vibFrequencies[i] * this->c)/(this->k_B);
+
+            // double upper = exp(-thetha_v/(2*this->temperature));
+            double upper = 1.0;
+            double lower = 1.0 - exp(-thetha_v/(this->temperature));
+
+            thetha_v = 0.0;
+            this->qVib *= upper/lower;
+        };
     };
-
-    this->qVib = accumulate(l2.begin(), l2.end(), 1.0, std::multiplies<double>());
-
 };
 
 void G16LOGfile::set_thetha_r()
 {
-
-    double inertia_x = this->vecPrincipalAxesInertia[0]*this->AMU_2_KG_M2; // kg*m^2
-    double inertia_y = this->vecPrincipalAxesInertia[1]*this->AMU_2_KG_M2; // kg*m^2
-    double inertia_z = this->vecPrincipalAxesInertia[2]*this->AMU_2_KG_M2; // kg*m^2
-
-    if (not this->isLinear)
+    if (this->vecPrincipalAxesInertia.size() == 0)
     {
-        double f2_x = 8.0 * pow(this->PI, 2) * inertia_x * this->k_B;
-        double f2_y = 8.0 * pow(this->PI, 2) * inertia_y * this->k_B;
-        double f2_z = 8.0 * pow(this->PI, 2) * inertia_z * this->k_B;
-
-        double thetha_x = (this->h * this->h) / f2_x;
-        double thetha_y = (this->h * this->h) / f2_y;
-        double thetha_z = (this->h * this->h) / f2_z;
-
-        this->vecThetha_r = {thetha_x, thetha_y, thetha_z};
+        this->thetha_r = 1.0;
     }
 
     else
     {
-        double f2 = 8 * pow(this->PI, 2) * inertia_y * this->k_B;
+        double inertia_x = this->vecPrincipalAxesInertia[0]*this->AMU_2_KG_M2; // kg*m^2
+        double inertia_y = this->vecPrincipalAxesInertia[1]*this->AMU_2_KG_M2; // kg*m^2
+        double inertia_z = this->vecPrincipalAxesInertia[2]*this->AMU_2_KG_M2; // kg*m^2
 
-        this->thetha_r = (this->h * this->h) / f2;
-    }
+        if (not this->isLinear)
+        {
+            // double thetha_x = pow(this->hbar, 2) / (2 * this->k_B * inertia_x);
+            // double thetha_y = pow(this->hbar, 2) / (2 * this->k_B * inertia_y);
+            // double thetha_z = pow(this->hbar, 2) / (2 * this->k_B * inertia_z);
 
+            double thetha_x = pow(this->h, 2) / (8 * pow(this->PI, 2) * this->k_B * inertia_x);
+            double thetha_y = pow(this->h, 2) / (8 * pow(this->PI, 2) * this->k_B * inertia_y);
+            double thetha_z = pow(this->h, 2) / (8 * pow(this->PI, 2) * this->k_B * inertia_z);
+
+            this->vecThetha_r = {thetha_x, thetha_y, thetha_z};
+        }
+
+        else
+        {
+            this->thetha_r = pow(this->h, 2) / (8 * pow(this->PI, 2) * this->k_B * inertia_y);
+            //this->thetha_r = pow(this->hbar, 2) / (2 * this->k_B * inertia_y);
+        };
+    };
 };
 
 void G16LOGfile::set_qRot()
 {
-    if (this->isLinear)
+
+    if (this->vecPrincipalAxesInertia.size() == 0)
     {
-        {
-            double inertia = this->vecPrincipalAxesInertia[1] * this->AMU_2_KG_M2;
-            double factor = (8.0 * pow(this->PI, 2) * this->k_B * 373.15) / pow(this->h, 2);
-            this->qRot = (factor * inertia) / this->sigma_r;
-        }
+        this->qRot = 1.0;
     }
+
     else
     {
-        double f1 = pow(this->PI, 0.5)/this->sigma_r;
-        double f2 = pow(373.15, 1.5);
-        double f3 = pow((this->vecThetha_r[0]*this->vecThetha_r[1]*this->vecThetha_r[2]), 0.5);
+        if (this->isLinear)
+        {
+            {
+                this->qRot = (this->temperature)/(this->sigma_r * this->thetha_r);
+            }
+        }
+        else
+        {
+            double f1 = pow(this->PI, 0.5)/this->sigma_r;
+            double f2 = pow(this->temperature, 1.5);
+            double f3 = pow((this->vecThetha_r[0]*this->vecThetha_r[1]*this->vecThetha_r[2]), 0.5);
 
-        this->qRot = f1 * (f2/f3);
-    }
+            this->qRot = f1 * (f2/f3);
+
+            //((np.pi ** 0.5) / specie['NSym']) * ((self.T ** 1.5) / (np.product(specie['Trot'][:])) ** 0.5)
+        }
+    };
 };
 
 void G16LOGfile::set_qTrans()
 {
     double mass = this->mol.getMolecularMass()*this->AMU_2_KG; // kg
 
-    double f1 = (2 * this->PI * mass * this->k_B * 373.15) / (pow(this->h, 2));
-    double f2 = (this->k_B * 373.15) / this->P_0;
+    double f1 = pow((2 * this->PI * mass * this->k_B * this->temperature) / (pow(this->h, 2)), 1.5);
+    double f2 = (this->k_B * this->temperature) / this->P_0;
 
-    this->qTrans = pow(f1, 1.5) * f2;
+    this->qTrans = f1 * f2;
 };
 
 void G16LOGfile::set_qTot()
@@ -1541,7 +1563,6 @@ map<string,double> G16LOGfile::getBeta(string orientation, string unit, double f
     }
     else
     {
-        //cout << BSHG << endl;
         beta = this->Beta[orientation];
     }
     map<string,double> temp;
@@ -1559,13 +1580,8 @@ map<string,double> G16LOGfile::getBeta(string orientation, string unit, double f
         }
         throw runtime_error("ERROR in G16LOGfile::getBeta(): Frequency not found in the log file. Try: " + temp + "instead.");
     }
-    //get the element with the frequency key from map this->Alpha
-    //beta[frequency];
-    //cout << beta[frequency].size() << endl;
-    //create a new map to match with user's unit. The first one is au, the second is esu and last one is SI.311g
     for (auto it = beta[frequency].begin(); it != beta[frequency].end(); ++it) 
     {   
-        //cout << it->first<< "  " << it->second[0] << "  " << it->second[1]<< "  " << it->second[2] << endl;
         if (unit == "au")
         {   
             replace(it->second[0].begin(), it->second[0].end(), 'D', 'E');
@@ -1586,10 +1602,6 @@ map<string,double> G16LOGfile::getBeta(string orientation, string unit, double f
             throw runtime_error("ERROR in G16LOGfile::getBeta(): Invalid unit. Please, use 'au', 'esu' or 'SI'.");
         }   
     };
-    //cout temp
-    // for (const auto& pair : temp) {
-    //     std::cout << pair.first << ": " << pair.second << std::endl;
-    // }
     return temp;
 };
 
@@ -1647,17 +1659,11 @@ void G16LOGfile::setGamma()
 
             }
         }
-        // for (auto it = start2.begin(); it != start2.end(); ++it) 
-        // {   
-        //     cout << "start2[" << it->first << "]: " << start2[it->first] << endl;
-        //     cout << "end2[" << it->first << "]: " << end2[it->first] << endl;
-        // }    
         map<double,map<string,vector<string>>> FrequencyInfo, FrequencyInfo2;
         map<string,vector<string>> NLOInfo;
         //vector<vector<string>> Gamma_0, Gamma_w, Gamma_2w;
         for (auto it = start.begin(); it != start.end(); ++it) 
         {   
-            //cout << typeid(it).name() << endl;
             for(int i = start[it->first]; i < end[it->first]; i++)
             {   vector<string> T = this->customSplit(UsePolar[i]);
                 NLOInfo.insert(make_pair(T[0], vector<string>({T[1], T[2], T[3]})));        
@@ -1692,7 +1698,6 @@ map<string,double> G16LOGfile::getGamma(string orientation, string unit, double 
     }
     else
     {
-        //cout << BSHG << endl;
         gamma = this->Gamma[orientation];
     }
     map<string,double> temp;
@@ -1720,7 +1725,6 @@ map<string,double> G16LOGfile::getGamma(string orientation, string unit, double 
         else if (unit == "esu")
         {   
             replace(it->second[1].begin(), it->second[1].end(), 'D', 'E');
-            //cout << it->second[1] << endl;
             temp.insert(make_pair(it->first, stod(it->second[1])));
         }
         else if (unit == "SI")
