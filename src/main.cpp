@@ -232,7 +232,7 @@ PYBIND11_MODULE(MoleKing, m) {
         .def(py::init<const Molecule&>(), py::arg("mol"));
         
     py::class_<G16LOGfile>(m, "G16LOGfile", "This class is experimental and under development.")
-        .def(py::init< string, bool, bool, bool, bool, double, int>(), py::arg("filePath"), py::arg("polarAsw") = 0, py::arg("tdAsw") = 0, py::arg("thermoAsw") = 0,  py::arg("cpAsw") = 0, py::arg("temperature") = 298.15, py::arg("link") = -1)
+        .def(py::init< string, bool, bool, bool, bool, int>(), py::arg("filePath"), py::arg("polarAsw") = 0, py::arg("tdAsw") = 0, py::arg("thermoAsw") = 0,  py::arg("cpAsw") = 0, py::arg("link") = -1)
         .def("getDate", &G16LOGfile::getDate)
         .def("getEnergy", &G16LOGfile::getEnergy)
         .def("getBasis", &G16LOGfile::getBasis)
@@ -253,10 +253,10 @@ PYBIND11_MODULE(MoleKing, m) {
         .def("getS", &G16LOGfile::getS)
         .def("getG", &G16LOGfile::getG)
         .def("get_qEle", &G16LOGfile::get_qEle)
-        .def("get_qVib", &G16LOGfile::get_qVib)
-        .def("get_qRot", &G16LOGfile::get_qRot)
-        .def("get_qTrans", &G16LOGfile::get_qTrans)
-        .def("get_qTot", &G16LOGfile::get_qTot)
+        .def("get_qVib", &G16LOGfile::get_qVib, py::arg("Temperature") = 298.15)
+        .def("get_qRot", &G16LOGfile::get_qRot, py::arg("Temperature") = 298.15)
+        .def("get_qTrans", &G16LOGfile::get_qTrans, py::arg("Temperature") = 298.15)
+        .def("get_qTot", &G16LOGfile::get_qTot, py::arg("Temperature") = 298.15)
         .def("getHOMO", [](G16LOGfile &self, int index) {
             auto values = self.getHOMO(index);
             if (values.size() == 1)

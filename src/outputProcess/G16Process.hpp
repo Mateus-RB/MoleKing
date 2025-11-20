@@ -123,7 +123,7 @@ private:
     vector<string> gammaStorage;
 
     //* double
-    double temperature;
+    double Temperature;
     double scfValue;
     double ZPE;
     double ZPVE;
@@ -210,16 +210,16 @@ private:
     void setSigma_r();
     void setPrincipalAxesInertia();
     void setGamma();
-    void set_qVib();
+    void set_qVib(double Temperature);
     void set_thetha_r();
-    void set_qRot();
-    void set_qTrans();
+    void set_qRot(double Temperature);
+    void set_qTrans(double Temperature);
     void set_qEle();
     void set_qTot();
     vector<string> customSplit(string str, char separator = ' ');
 
 public:
-    G16LOGfile(string filePath, bool polarAsw = 0, bool tdAsw = 0, bool thermoAsw = 0, bool cpAsw = 0, double temperature = 298.15, int link = -1);   
+    G16LOGfile(string filePath, bool polarAsw = 0, bool tdAsw = 0, bool thermoAsw = 0, bool cpAsw = 0, int link = -1);   
     ~G16LOGfile();      
     map<string, vector<string>> getOrbitals(); 
     map<int, map<string, double>> getTransitions(const int index = 0);
@@ -230,10 +230,10 @@ public:
     double getS();
     double getG();
     double get_qEle();
-    double get_qVib();
-    double get_qRot();
-    double get_qTrans();
-    double get_qTot();
+    double get_qVib(double Temperature = 298.15);
+    double get_qRot(double Temperature = 298.15);
+    double get_qTrans(double Temperature = 298.15);
+    double get_qTot(double Temperature = 298.15);
     vector<double> getHOMO(int index = -1);
     vector<double> getLUMO(int index = 0);    
     double getDipole(string axis = "tot");

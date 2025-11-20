@@ -16,8 +16,8 @@
 
 //!----------------------- G16LOGfile -----------------------//
 
-G16LOGfile::G16LOGfile(string filePath, bool polarAsw, bool tdAsw, bool thermoAsw, bool cpAsw, double temperature, int link)
-    : ntFound(false), stdFound(false), scfConvergence(true), str_filePath(filePath), polarAsw(polarAsw), tdAsw(tdAsw), thermoAsw(thermoAsw), cpAsw(cpAsw), temperature(temperature), link(link)
+G16LOGfile::G16LOGfile(string filePath, bool polarAsw, bool tdAsw, bool thermoAsw, bool cpAsw, int link)
+    : ntFound(false), stdFound(false), scfConvergence(true), str_filePath(filePath), polarAsw(polarAsw), tdAsw(tdAsw), thermoAsw(thermoAsw), cpAsw(cpAsw), link(link)
 {
     // SET FUNCTIONS
 
@@ -84,11 +84,11 @@ G16LOGfile::G16LOGfile(string filePath, bool polarAsw, bool tdAsw, bool thermoAs
         setVibFrequencies();
         setIsLinear();
         setPrincipalAxesInertia();
-        set_qVib();
         set_thetha_r();
-        set_qRot();
-        set_qTrans();
-        set_qTot();
+        // set_qVib();
+        // set_qRot();
+        // set_qTrans();
+        // set_qTot();
     };
 };
 
@@ -1400,7 +1400,7 @@ double G16LOGfile::get_qEle()
     return this->qEle;
 };
 
-void G16LOGfile::set_qVib()
+void G16LOGfile::set_qVib(double Temperature)
 {   
     double thetha_v = 0.0;
     double upper, lower;
@@ -1424,7 +1424,7 @@ void G16LOGfile::set_qVib()
             thetha_v = (this->h * this->vibFrequencies[i] * this->c)/(this->pt.getConstant("k_B"));
 
             double upper = 1.0;
-            double lower = 1.0 - exp(-thetha_v/(this->temperature));
+            double lower = 1.0 - exp(-thetha_v/(Temperature));
 
             thetha_v = 0.0;
             this->qVib *= upper/lower;
@@ -1461,7 +1461,7 @@ void G16LOGfile::set_thetha_r()
     };
 };
 
-void G16LOGfile::set_qRot()
+void G16LOGfile::set_qRot(double Temperature)
 {
 
     if (this->vecPrincipalAxesInertia.size() == 0)
@@ -1474,13 +1474,13 @@ void G16LOGfile::set_qRot()
         if (this->isLinear)
         {
             {
-                this->qRot = (this->temperature)/(this->sigma_r * this->thetha_r);
+                this->qRot = (Temperature)/(this->sigma_r * this->thetha_r);
             }
         }
         else
         {
             double f1 = pow(this->PI, 0.5)/this->sigma_r;
-            double f2 = pow(this->temperature, 1.5);
+            double f2 = pow(Temperature, 1.5);
             double f3 = pow((this->vecThetha_r[0]*this->vecThetha_r[1]*this->vecThetha_r[2]), 0.5);
 
             this->qRot = f1 * (f2/f3);
@@ -1488,12 +1488,12 @@ void G16LOGfile::set_qRot()
     };
 };
 
-void G16LOGfile::set_qTrans()
+void G16LOGfile::set_qTrans(double Temperature)
 {
     double mass = this->mol.getMolecularMass()*this->pt.getConversion("amu_to_kg"); // kg
 
-    double f1 = pow((2 * this->pt.getConstant("PI") * mass * this->pt.getConstant("k_B") * this->temperature) / (pow(this->pt.getConstant("h"), 2)), 1.5);
-    double f2 = (this->pt.getConstant("k_B") * this->temperature) / this->pt.getConstant("P_0");
+    double f1 = pow((2 * this->pt.getConstant("PI") * mass * this->pt.getConstant("k_B") * Temperature) / (pow(this->pt.getConstant("h"), 2)), 1.5);
+    double f2 = (this->pt.getConstant("k_B") * Temperature) / this->pt.getConstant("P_0");
 
     this->qTrans = f1 * f2;
 };
@@ -1503,23 +1503,31 @@ void G16LOGfile::set_qTot()
     this->qTot = this->qEle * this->qTrans * this->qRot * this->qVib;
 };
 
-double G16LOGfile::get_qTrans()
+double G16LOGfile::get_qTrans(double Temperature)
 {
+    this->set_qTrans(Temperature);
     return this->qTrans;
 };
 
-double G16LOGfile::get_qTot()
+double G16LOGfile::get_qTot(double Temperature)
 {
+    this->get_qEle();
+    this->set_qVib(Temperature);
+    this->set_qRot(Temperature);
+    this->set_qTrans(Temperature);
+    this->set_qTot();
     return this->qTot;
 };
 
-double G16LOGfile::get_qRot()
+double G16LOGfile::get_qRot(double Temperature)
 {
+    this->set_qRot(Temperature);
     return this->qRot;
 };
 
-double G16LOGfile::get_qVib()
+double G16LOGfile::get_qVib(double Temperature)
 {
+    this->set_qVib(Temperature);
     return this->qVib;
 };
 
@@ -1758,61 +1766,98 @@ string G16LOGfile::toStr()
 
 //!----------------------- Destructor -----------------------//
 
-G16LOGfile::~G16LOGfile()
+G16LOGfile::~G16LOGfile() noexcept
 {
-    //clear int
-    this->charge = 0;
-    this->multiplicity = 0;
+    // Reset flags and simple members
+    ntFound = false;
+    stdFound = false;
+    scfConvergence = true;
+    dipFinder = false;
 
-    // clear the size_t
-    this->dipoleFinder = 0;
-    this->scf = 0;
-    this->scfC = 0;
-    this->aHomoFinder = 0;
-    this->aLumoFinder = 0;
-    this->tdFinder = 0;
-    this->polarFinder = 0;
-    this->normalT = 0;
-    this->stdT = 0;
-    this->starterSCF = 0;
-    this->endSCF = 0;
-    this->starterMethod = 0;
-    this->basis = 0;
+    // Integers / indices
+    charge = 0;
+    multiplicity = 0;
+    scf = scfC = aHomoFinder = aLumoFinder = bHomoFinder = bLumoFinder = dipoleFinder = cpFinder = tdFinder = polarFinder = chargeMultiFinder = normalT = stdT = starterSCF = endSCF = starterMethod = basis = 0;
 
-    // clear the strings
-    this->moleculeSTR.clear();
-    //this->polarAuxiliary.clear();
+    // Doubles
+    scfValue = 0.0;
+    aHomoValue = 0.0;
+    aLumoValue = 0.0;
+    dipoleTot = dipoleX = dipoleY = dipoleZ = 0.0;
+    ZPE = ZPVE = H = G = S = qEle = 0.0;
+    qVib = qRot = qTrans = qTot = thetha_r = FreqDouble = 0.0;
+    sigma_r = 1.0;
+    thetha_r = 0.0;
 
-    // clear the doubless
-    this->scfValue = 0;
-    this->aHomoValue = 0;
-    this->aLumoValue = 0;
-    this->dipoleTot = 0;
-    this->dipoleX = 0;
-    this->dipoleY = 0;
-    this->dipoleZ = 0;
+    // Clear strings / string buffers
+    moleculeSTR.clear();
+    str_filePath.clear();
+    method.clear();
+    basisValue.clear();
+    info.clear();
+    linkStorageSTD.clear();
+    cpSTR.clear();
+    polarAuxiliaryDip.clear();
+    polarAuxiliaryInp.clear();
 
-    // clear the molecules
-    this->mol.clear();
+    // Clear stringstreams
+    logfile.str("");
+    logfile.clear();
 
-    // clear maps and vectors
+    // Clear containers (vectors, maps, etc.)
+    linkStorage.clear();
+    dipoleStorage.clear();
+    aHomoStorage.clear();
+    aLumoStorage.clear();
+    bHomoStorage.clear();
+    bLumoStorage.clear();
+    iptStorage.clear();
+    stdStorage.clear();
+    tdStorage.clear();
+    polarStorageInp.clear();
+    polarStorageDip.clear();
+    vecPolarDip.clear();
+    vecPolarInp.clear();
+    vecNLOFrec.clear();
+    vecPrincipalAxesInertia.clear();
+    vibFrequenciesStorage.clear();
+    vibFrequencies.clear();
+    vecThetha_r.clear();
 
-    this->Orbitals.clear();
-    this->Occupied.clear();
-    this->Unoccupied.clear();
-    this->transitions.clear();
-};
+    Orbitals.clear();
+    bOrbitals.clear();
+    Occupied.clear();
+    Unoccupied.clear();
+    bOccupied.clear();
+    bUnoccupied.clear();
+
+    transitions.clear();
+
+    // Clear NLO maps
+    Alpha.clear();
+    Beta.clear();
+    Beta2.clear();
+    Gamma.clear();
+    Gamma2.clear();
+
+    // Clear any auxiliary parsed strings
+    aHomoStorageSTR.clear();
+    aLumoStorageSTR.clear();
+    bHomoStorageSTR.clear();
+    bLumoStorageSTR.clear();
+    polarSTR.clear();
+    moleculeSTR.clear();
+
+    // Clear molecule
+    mol.clear();
+}
 
 //!----------------------- Notepad -----------------------//
 
-//! TODO:
+// TODO:
 
-// TODO:getAlpha
-// TODO:getBeta
-// TODO:getGamma
 // TODO:getGradient
 // TODO:getTransitions_str    // Create a vector to store the lines of the stringstream
-
 // TODO:getWavelengths
 // TODO:getSymmetries
 // TODO:getSymmetry
@@ -1820,25 +1865,6 @@ G16LOGfile::~G16LOGfile()
 // TODO:getTransContributions
 // TODO:destructor for streamstrings sdip and sinp
 
-//! Done:
-
-//*  getEnergy | scfEnergy
-//*  getMolecule
-//*  getDipole
-//*  getTransitions
-//*  toStr()
-
-//! New Features (didn't exist before):
-
-//? getDate
-//? getBasis
-//? getMethod
-//? getMolecule
-//? getOrbitals
-//? getHOMO() -> getHOMO(-n)
-//? getLUMO -> getLUMO(+n)
-
-
 //! BUGS:
 
-// Wrong HOMO for NLO calculations; Need to make a storage like Molecule;
+
