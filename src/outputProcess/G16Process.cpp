@@ -57,6 +57,13 @@ G16LOGfile::G16LOGfile(string filePath, bool polarAsw, bool tdAsw, bool thermoAs
         };
     };
 
+    // sorting this->existentsMethods by length to avoid partial matches
+
+    sort(this->existentsMethods.begin(), this->existentsMethods.end(),
+         [](const string &a, const string &b) {
+             return a.length() > b.length();
+    });
+
     readLOGFile();
     setMolecule();
     setDipole();
@@ -156,9 +163,66 @@ void G16LOGfile::readLOGFile()
         tdFinder = line.find("Excited State ");
         polarFinder = line.find(" Dipole moment:");
         chargeMultiFinder = line.find(" Charge =");
-        normalT = line.find(" Normal termination of Gaussian");      
+        normalT = line.find(" Normal termination of Gaussian");    
+        routeFinder1 = line.find(" #");
+        routeFinder2 = line.find(" #p");
+        routeFinder3 = line.find(" #P");
+        
+        // method that will look for the route section, and compare with the existentsMethods vector to extract the method used in the calculation, dont matter if its lowercase, uppercase or mixed. The rout section is specified by a blank space followed by a # symbol, or a blank space followed by a #p symbol.
+        if (routeFinder1 != string::npos || routeFinder2 != string::npos || routeFinder3 != string::npos)
+        {
+            // case-insensitive search for method names
+            string lowerLine = line;
+            transform(lowerLine.begin(), lowerLine.end(), lowerLine.begin(),
+                      [](unsigned char c){ return std::tolower(c); });
 
-        // If the line contains "Standard orientation:", set stdFound to true
+            for (const auto& methodName : this->existentsMethods)
+            {
+                string lowerMethod = methodName;
+                transform(lowerMethod.begin(), lowerMethod.end(), lowerMethod.begin(),
+                          [](unsigned char c){ return std::tolower(c); });
+
+                size_t methodPos = lowerLine.find(lowerMethod);
+                if (methodPos != string::npos)
+                {
+                    this->method = methodName;
+                    break;
+                }
+            }
+        };
+        // If the line contains "SCF Done:", extract the SCF value
+        if (this->method != "MP2" && this->method != "MP3" && this->method != "MP4" && this->method != "MP5")
+        {
+            if (scf != string::npos) //Looking for SCF Done:
+            {
+                value = line.substr(scf);
+
+                starterSCF = value.find("=");
+                endSCF = value.find("A.U.");
+
+                starterMethod = value.find("E(R");
+
+                this->scfValue = stod(value.substr(starterSCF + 2, endSCF - starterSCF - 3));
+            };
+        }
+        else
+        {
+            string target = "EU" + this->method + " =";
+            size_t pos = line.find(target);
+
+            if (pos != string::npos)
+            {
+                size_t start;
+                if (pos != string::npos)
+                {
+                    value = line.substr(pos + target.length());
+                    replace(value.begin(), value.end(), 'D', 'E');
+                    this->scfValue = stod(value);
+                }
+            };
+        };
+
+        //If the line contains "Standard orientation:", set stdFound to true
         if (stdT != string::npos)
         {
             stdFound = true;
@@ -168,26 +232,13 @@ void G16LOGfile::readLOGFile()
         {
             this->scfConvergence = false;
         };
-        // If the line contains "SCF Done:", extract the SCF value and calculation method used
-        if (scf != string::npos)
-        {
-            value = line.substr(scf);
-
-            starterSCF = value.find("=");
-            endSCF = value.find("A.U.");
-
-            starterMethod = value.find("E(R");
-
-            this->scfValue = stod(value.substr(starterSCF + 2, endSCF - starterSCF - 3));
-            this->method = value.substr(starterMethod + 3, starterSCF - starterMethod - 5);
-        };
-        // Getting the charge and multiplicity
+        // Getting the charge and multiplicity, looking for " Charge =" string
         if (chargeMultiFinder != string::npos)
         {   
             this->charge = stoi((line.substr(chargeMultiFinder + 11, 1)));
             this->multiplicity = stoi((line.substr(chargeMultiFinder + 28, 1)));
         };
-        // Getting the dipoleValue
+        // Getting the dipoleValue, looking for " Tot=" string
         if (dipoleFinder != string::npos)
         {
             // only append if "Dipole=" and "NTot=" not in line
@@ -196,7 +247,7 @@ void G16LOGfile::readLOGFile()
                 this->dipoleStorage.emplace_back(line);
             };
         };
-        // Getting HOMO and LUMO lines and appending into a vector;
+        // Getting HOMO and LUMO lines and appending into a vector; Looking for " Alpha occ. eigenvalues --" string
         if (aHomoFinder != string::npos)
         {
             aHomoStorageSTR += line + "\n";
@@ -313,7 +364,7 @@ void G16LOGfile::readLOGFile()
         };
         if (cpAsw)
         {
-            if (cpFinder != string::npos)
+            if (cpFinder != string::npos) // Looking for Point Charges:
             {
                 //cpSTR += line + "\n";
                 while (getline(this->logfile, line))
@@ -330,7 +381,7 @@ void G16LOGfile::readLOGFile()
         // If the line contains "Excited State", extract the TD-DFT information
         if (tdAsw)
         {
-            if (tdFinder != string::npos)
+            if (tdFinder != string::npos) // Looking for Excited State
             {
                 // only append if "Dipole=" and "NTot=" not in line
                 if ((line.find("Excited State =") == string::npos) && (line.find("symmetry could not be determined.") == string::npos))
@@ -342,7 +393,7 @@ void G16LOGfile::readLOGFile()
 
         if (thermoAsw)
         {
-            if (line.find(" Frequencies --") != string::npos)
+            if (line.find(" Frequencies --") != string::npos) // Looking for Frequencies --
             {
                 vibFreqSTR += line + "\n";
                 vibFrequenciesStorage.emplace_back(vibFreqSTR);
@@ -1473,13 +1524,15 @@ void G16LOGfile::set_qRot(double Temperature)
     {
         if (this->isLinear)
         {
-            {
-                this->qRot = (Temperature)/(this->sigma_r * this->thetha_r);
+            {   
+                this->qRot = (Temperature)/(this->thetha_r);
+                //this->qRot = (Temperature)/(this->sigma_r * this->thetha_r);
             }
         }
         else
         {
-            double f1 = pow(this->PI, 0.5)/this->sigma_r;
+            //double f1 = pow(this->PI, 0.5)/this->sigma_r;
+            double f1 = sqrt(pow(this->PI, 0.5));
             double f2 = pow(Temperature, 1.5);
             double f3 = pow((this->vecThetha_r[0]*this->vecThetha_r[1]*this->vecThetha_r[2]), 0.5);
 
@@ -1501,6 +1554,11 @@ void G16LOGfile::set_qTrans(double Temperature)
 void G16LOGfile::set_qTot()
 {
     this->qTot = this->qEle * this->qTrans * this->qRot * this->qVib;
+};
+
+double G16LOGfile::get_sigmaR()
+{
+    return this->sigma_r;
 };
 
 double G16LOGfile::get_qTrans(double Temperature)

@@ -82,6 +82,9 @@ private:
     size_t basis; 
     size_t chargeMultiFinder;
     size_t polarFinder;
+    size_t routeFinder1;
+    size_t routeFinder2;
+    size_t routeFinder3;
 
     //* string
     string basisValue;    
@@ -182,7 +185,36 @@ private:
     vector<double> vecFrecInp;
     vector<double> vecPrincipalAxesInertia;
     vector<double> vecThetha_r;
-    
+    vector<string> existentsMethods = {
+        // Semi-empirical
+        "AM1", "PM3", "PM6", "PM7", "PM3MM", "PDDG",
+        "PM7MOPAC", "PM7R6",
+        // HF and related SCF
+        "HF", "RHF", "UHF", "ROHF",
+        "CASSCF", 
+        // DFT
+        "B3LYP", "B3P86", "O3LYP", "APFD",
+        "wB98XD", "LC-wHPBE", "CAM-B3LYP", "LC-BLYP",
+        "MN15", "M11", "SOGGA11X", "N12SX", "MN12SX",
+        "PW6B95", "PW6B95D3", "M08HX", "M06", "M06HF",
+        "M062X", "M05", "M052X", "HSEH1PBE", "OHSE2PBE",
+        "OHSE1PBE", "PBEh1PBE", "PBE1PBE", "PBE0",
+        "B1B95", "B1LYP", "mPW1PW91", "mPW1LYP", "mPW1PBE",
+        "mPW3PBE", "B97", "B98", "B971", "B972", "TPSSh",
+        "tHCTHhyb", "BMK", "HISSbPBE", "X3LYP", "BHandH",
+        "bHANDHLYP", "B2PLYP",
+        // Post-HF correlation
+        "MP2", "MP3", "MP4", "MP5",
+        "CISD", "QCISD", "QCISD(T)",
+        "CCD", "CCSD", "CCSD(T)",
+        "BD", "BD(T)",
+        // Excited states
+        "TD-DFT", "TD-HF", "CIS", "ZINDO", "SAC-CI", "EOM-CCSD",
+        // High-accuracy composite methods
+        "G1", "G2", "G3", "G4",
+        "CBS-4", "CBS-QB3", "CBS-APNO", "ROCBS-QB3",
+    };
+
     //* teste
 
     string aLumoStorageSTR = "";
@@ -218,6 +250,7 @@ private:
     void set_qTot();
     vector<string> customSplit(string str, char separator = ' ');
 
+
 public:
     G16LOGfile(string filePath, bool polarAsw = 0, bool tdAsw = 0, bool thermoAsw = 0, bool cpAsw = 0, int link = -1);   
     ~G16LOGfile();      
@@ -234,6 +267,7 @@ public:
     double get_qRot(double Temperature = 298.15);
     double get_qTrans(double Temperature = 298.15);
     double get_qTot(double Temperature = 298.15);
+    double get_sigmaR();
     vector<double> getHOMO(int index = -1);
     vector<double> getLUMO(int index = 0);    
     double getDipole(string axis = "tot");
