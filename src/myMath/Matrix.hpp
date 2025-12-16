@@ -7,7 +7,7 @@
 //   Email(s):    ['heibbe@ufg.br']
 //   Credits:     ['Copyright © 2023 LEEDMOL. All rights reserved.']
 //   Date:        ['17.01.2023']
-//   Version:     ['1.5.4']
+//   Version:     ['1.6.0']
 //   Status:      ['Development']
 //   Language:    ['C++','Python']
 //   Description: ['A python module written in C++ for theoretical chemestry']
