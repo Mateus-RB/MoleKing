@@ -40,15 +40,15 @@ private:
     //periodic table from PeriodicTable class
     PeriodicTable pt;
 
-    const double k_B = 1.3806503E-23;                    // Boltzmann (J/K)
-    const double h = 6.62607004E-34;                     // Planck (J*s)
-    const double hbar = 1.0545718e-34;                   // Planck reduced (J*s)
-    const double c = 2.99792458e10;                      // Speed of light (cm/s)
-    const double R = 1.98720425864083;                   // Gas constant (cal/(mol*K))
-    const double PI = 3.14159265358979323846;            // Pi
-    const double P_0  = 101325;                          // Pressure (Pa)
-    const double AMU_2_KG = 1.660538921E-27;             // Conversion from AMU to Kg
-    const double AMU_2_KG_M2 = 4.65082513926e-48;        // Conversion from AMU to Kg/m^2  
+    // const double k_B = 1.3806503E-23;                    // Boltzmann (J/K)
+    // const double h = 6.62607004E-34;                     // Planck (J*s)
+    // const double hbar = 1.0545718e-34;                   // Planck reduced (J*s)
+    // const double c = 2.99792458e10;                      // Speed of light (cm/s)
+    // const double R = 1.98720425864083;                   // Gas constant (cal/(mol*K))
+    // const double PI = 3.14159265358979323846;            // Pi
+    // const double P_0  = 101325;                          // Pressure (Pa)
+    // const double AMU_2_KG = 1.660538921E-27;             // Conversion from AMU to Kg
+    // const double AMU_2_KG_M2 = 4.65082513926e-48;        // Conversion from AMU to Kg/m^2  
 
 
     //* istringstream

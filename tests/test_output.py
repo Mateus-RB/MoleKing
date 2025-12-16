@@ -83,6 +83,35 @@ class TestG16Output:
 
         assert g1 == 31.0094
         assert g2 == 61491.6
+
+    def test_thermo(self):
+        f = G16LOGfile(os.path.join(self.home_path,'MK_Thermo.out'), thermoAsw=True)
+        freq = f.getVibFrequencies()[-1]
+        zpe = f.getZPE()
+        zpve = f.getZPVE()
+        h = f.getH()
+        s = f.getS()
+        g = f.getG()
+
+        assert freq == 3864.4767
+        assert zpe == -76.451023
+        assert zpve == 13.20417 
+        assert h == -76.447243
+        assert s == 45.112
+        assert g == -76.468677
+
+    def test_partition(self):
+        f = G16LOGfile(os.path.join(self.home_path,'MK_Thermo.log'), thermoAsw=True)
+        ele = abs(f.get_qEle() - 0.100000E+01)
+        vib = abs(f.get_qVib() - 0.100047E+01)
+        rot = abs(f.get_qRot() - 0.438927E+02)
+        trans = abs(f.get_qTrans() - 0.300431E+07)
+
+        assert ele < 0.011
+        assert vib < 0.011
+        assert rot < 0.012
+        assert trans < 0.011
+
 class TestPSI4Output():
 
     @classmethod

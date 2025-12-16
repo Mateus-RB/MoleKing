@@ -141,7 +141,7 @@ PeriodicTable::PeriodicTable(){
     this->symbolMap.insert(pair<string, int>("00", 0));
     this->symbolMap.insert(pair<string, int>("dice_ghost_label", 0));
     // Mass Table
-    this->massMap.insert(pair<string, double>("H", 1.0079));
+    this->massMap.insert(pair<string, double>("H", 1.00790));
     this->massMap.insert(pair<string, double>("H(iso=2)", 2.0079));
     this->massMap.insert(pair<string, double>("He", 4.0026));
     this->massMap.insert(pair<string, double>("Li", 6.941));
@@ -149,7 +149,7 @@ PeriodicTable::PeriodicTable(){
     this->massMap.insert(pair<string, double>("B", 10.811));
     this->massMap.insert(pair<string, double>("C", 12.011));
     this->massMap.insert(pair<string, double>("N", 14.007));
-    this->massMap.insert(pair<string, double>("O", 15.999));
+    this->massMap.insert(pair<string, double>("O", 15.9994));
     this->massMap.insert(pair<string, double>("F", 18.998));
     this->massMap.insert(pair<string, double>("Ne", 20.180));
     this->massMap.insert(pair<string, double>("Na", 22.990));
@@ -518,7 +518,7 @@ PeriodicTable::PeriodicTable(){
     this->ConstantMap.insert(pair<string, double>("me", 9.10938291e-31)); // in kg
     this->ConstantMap.insert(pair<string, double>("R_cal", 1.9872036)); // in cal/(mol*K)
     this->ConstantMap.insert(pair<string, double>("R_J", 8.3144621)); // in J/(mol*K)
-    this->ConstantMap.insert(pair<string, double>("P_0", 101325)); // in Pa
+    this->ConstantMap.insert(pair<string, double>("P_0", 100000)); // in Pa
 
     this->ConversionMap.insert(pair<string, double>("Hartree_to_ev", 27.21138602)); // Hartree to eV conversion
     this->ConversionMap.insert(pair<string, double>("Hartree_to_KJ", 2625.499638)); // Hartree to KJ/mol conversion

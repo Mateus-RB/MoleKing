@@ -1497,7 +1497,7 @@ void G16LOGfile::set_qVib(double Temperature)
                 continue;
             };
         
-            thetha_v = (this->h * this->vibFrequencies[i] * this->c)/(this->pt.getConstant("k_B"));
+            thetha_v = (this->pt.getConstant("h") * this->vibFrequencies[i] * this->pt.getConstant("C"))/(this->pt.getConstant("k_B"));
 
             double upper = 1.0;
             double lower = 1.0 - exp(-thetha_v/(Temperature));
@@ -1523,16 +1523,16 @@ void G16LOGfile::set_thetha_r()
 
         if (not this->isLinear)
         {
-            double thetha_x = pow(this->h, 2) / (8 * pow(this->PI, 2) * this->pt.getConstant("k_B") * inertia_x);
-            double thetha_y = pow(this->h, 2) / (8 * pow(this->PI, 2) * this->pt.getConstant("k_B") * inertia_y);
-            double thetha_z = pow(this->h, 2) / (8 * pow(this->PI, 2) * this->pt.getConstant("k_B") * inertia_z);
+            double thetha_x = pow(this->pt.getConstant("h"), 2) / (8 * pow(this->pt.getConstant("PI"), 2) * this->pt.getConstant("k_B") * inertia_x);
+            double thetha_y = pow(this->pt.getConstant("h"), 2) / (8 * pow(this->pt.getConstant("PI"), 2) * this->pt.getConstant("k_B") * inertia_y);
+            double thetha_z = pow(this->pt.getConstant("h"), 2) / (8 * pow(this->pt.getConstant("PI"), 2) * this->pt.getConstant("k_B") * inertia_z);
 
             this->vecThetha_r = {thetha_x, thetha_y, thetha_z};
         }
 
         else
         {
-            this->thetha_r = pow(this->h, 2) / (8 * pow(this->PI, 2) * this->pt.getConstant("k_B") * inertia_y);
+            this->thetha_r = pow(this->pt.getConstant("h"), 2) / (8 * pow(this->pt.getConstant("PI"), 2) * this->pt.getConstant("k_B") * inertia_y);
         };
     };
 };
@@ -1550,14 +1550,14 @@ void G16LOGfile::set_qRot(double Temperature)
         if (this->isLinear)
         {
             {   
-                this->qRot = (Temperature)/(this->thetha_r);
-                //this->qRot = (Temperature)/(this->sigma_r * this->thetha_r);
+                //this->qRot = (Temperature)/(this->thetha_r);
+                this->qRot = (Temperature)/(this->sigma_r * this->thetha_r);
             }
         }
         else
         {
-            //double f1 = pow(this->PI, 0.5)/this->sigma_r;
-            double f1 = sqrt(pow(this->PI, 0.5));
+            double f1 = pow(this->pt.getConstant("PI"), 0.5)/this->sigma_r;
+            //double f1 = sqrt(pow(this->PI, 0.5));
             double f2 = pow(Temperature, 1.5);
             double f3 = pow((this->vecThetha_r[0]*this->vecThetha_r[1]*this->vecThetha_r[2]), 0.5);
 
