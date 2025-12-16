@@ -60,7 +60,7 @@ class TestG16Output:
         assert len(Ob2['Occupied']) == 5
 
     def test_getAlpha(self):
-        f = G16LOGfile(os.path.join(self.home_path,'MK_polar.log'), polarAsw=True).getFrequency()
+        f = G16LOGfile(os.path.join(self.home_path,'MK_polar.log'), polarAsw=True).getNLOFrequency()
         a1 = G16LOGfile(os.path.join(self.home_path,'MK_polar.log'), polarAsw=True).getAlpha(unit='esu', frequency=f[0])['iso']
         a2 = G16LOGfile(os.path.join(self.home_path,'MK_polar.log'), polarAsw=True).getAlpha(unit='SI', frequency=f[1])['xx']
 
@@ -69,7 +69,7 @@ class TestG16Output:
         assert a2 == 103.56
 
     def test_getBeta(self):
-        f = G16LOGfile(os.path.join(self.home_path,'MK_polar.log'), polarAsw=True).getFrequency()
+        f = G16LOGfile(os.path.join(self.home_path,'MK_polar.log'), polarAsw=True).getNLOFrequency()
         b1 = G16LOGfile(os.path.join(self.home_path,'MK_polar.log'), polarAsw=True).getBeta(unit='esu', frequency=f[0])['||']
         b2 = G16LOGfile(os.path.join(self.home_path,'MK_polar.log'), polarAsw=True).getBeta(unit='au', frequency=f[1], BSHG=1)['_|_(z)']
 
@@ -77,7 +77,7 @@ class TestG16Output:
         assert b2 == -0.0219886
 
     def test_getGamma(self):
-        f = G16LOGfile(os.path.join(self.home_path,'MK_polar.log'), polarAsw=True).getFrequency()
+        f = G16LOGfile(os.path.join(self.home_path,'MK_polar.log'), polarAsw=True).getNLOFrequency()
         g1 = G16LOGfile(os.path.join(self.home_path,'MK_polar.log'), polarAsw=True).getGamma(unit='esu', frequency=f[0])['||']
         g2 = G16LOGfile(os.path.join(self.home_path,'MK_polar.log'), polarAsw=True).getGamma(unit='au', frequency=f[1], GSHG=1)['xxxx']
 
