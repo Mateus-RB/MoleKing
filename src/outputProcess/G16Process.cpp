@@ -1323,7 +1323,7 @@ void G16LOGfile::setBeta()
 
 
 void G16LOGfile::setVibFrequencies()
-{
+{   
     if ( this->vibFrequenciesStorage.size() == 0 )
     {
         this->vibFrequencies.emplace_back(0.0);
@@ -1332,19 +1332,21 @@ void G16LOGfile::setVibFrequencies()
     if ( this->vibFrequenciesStorage.size() > 0 )
     {
         for (int i = 0; i < this->vibFrequenciesStorage.size(); i++)
-        {
+        {   
             stringstream ss(this->vibFrequenciesStorage[i]);
             string line;
             while (getline(ss, line))
             {
                 if (line.find("Frequencies --") != string::npos)
-                {
-                    istringstream iss(line);
+                { 
+                    istringstream iss(line);                    
                     vector<string> results((istream_iterator<string>(iss)), istream_iterator<string>());
+
                     for (int j = 2; j < results.size(); j++)
                     {
                         this->vibFrequencies.emplace_back(stod(results[j])); 
                     };
+
                 };
             };
         };
@@ -1359,61 +1361,84 @@ vector<double> G16LOGfile::getVibFrequencies()
 
 void G16LOGfile::setPrincipalAxesInertia()
 {
+    // Ensure empty on entry; if parsing fails we will keep it empty
+    this->vecPrincipalAxesInertia.clear();
+
     stringstream ss(this->principalAxisSTR);
     string line;
+    bool parsed = false;
 
     while (getline(ss, line))
     {
         if (line.find("Eigenvalues --") != string::npos)
         {
-            vector<string> results;
+            try
             {
-                istringstream iss(line);
-                for (string w; iss >> w; )
-                    results.push_back(w);
-            }
-
-            if (results.size() == 5)
-            {
-                double ix = stod(results[2]);
-                double iy = stod(results[3]);
-                double iz = stod(results[4]);
-
-                this->vecPrincipalAxesInertia.push_back(ix);
-                this->vecPrincipalAxesInertia.push_back(iy);
-                this->vecPrincipalAxesInertia.push_back(iz);
-            }
-
-            else
-            {
-                string raw = results[2];
-
-                vector<string> base;
+                vector<string> results;
                 {
-                    size_t start = 0;
-                    size_t pos;
-                    while ((pos = raw.find('.', start)) != string::npos)
-                    {
-                        base.push_back(raw.substr(start, pos - start));
-                        start = pos + 1;
-                    }
-                    base.push_back(raw.substr(start));
+                    istringstream iss(line);
+                    for (string w; iss >> w; )
+                        results.push_back(w);
                 }
 
-                string inertia_x = base[0] + "." + base[1].substr(0, 5);
-                string inertia_y = base[1].substr(5, 4) + "." + base[2].substr(0, 5);
-                string inertia_z = base[2].substr(5, 4) + "." + base[3].substr(0, 5);
+                if (results.size() >= 5)
+                {
+                    double ix = stod(results[2]);
+                    double iy = stod(results[3]);
+                    double iz = stod(results[4]);
 
-                double ix = stod(inertia_x); 
-                double iy = stod(inertia_y); 
-                double iz = stod(inertia_z); 
+                    this->vecPrincipalAxesInertia.push_back(ix);
+                    this->vecPrincipalAxesInertia.push_back(iy);
+                    this->vecPrincipalAxesInertia.push_back(iz);
+                    parsed = true;
+                }
+                else if (results.size() >= 3)
+                {
+                    string raw = results[2];
 
-                this->vecPrincipalAxesInertia.push_back(ix);
-                this->vecPrincipalAxesInertia.push_back(iy);
-                this->vecPrincipalAxesInertia.push_back(iz);
-            };
-        };
-    };
+                    vector<string> base;
+                    {
+                        size_t start = 0;
+                        size_t pos;
+                        while ((pos = raw.find('.', start)) != string::npos)
+                        {
+                            base.push_back(raw.substr(start, pos - start));
+                            start = pos + 1;
+                        }
+                        base.push_back(raw.substr(start));
+                    }
+
+                    if (base.size() >= 4)
+                    {
+                        string inertia_x = base[0] + "." + base[1].substr(0, min<size_t>(5, base[1].size()));
+                        string inertia_y = base[1].substr(min<size_t>(5, base[1].size())) + "." + base[2].substr(0, min<size_t>(5, base[2].size()));
+                        string inertia_z = base[2].substr(min<size_t>(5, base[2].size())) + "." + base[3].substr(0, min<size_t>(5, base[3].size()));
+
+                        double ix = stod(inertia_x);
+                        double iy = stod(inertia_y);
+                        double iz = stod(inertia_z);
+
+                        this->vecPrincipalAxesInertia.push_back(ix);
+                        this->vecPrincipalAxesInertia.push_back(iy);
+                        this->vecPrincipalAxesInertia.push_back(iz);
+                        parsed = true;
+                    }
+                }
+            }
+            catch (const std::exception &)
+            {
+                // on any error leave vector empty and return
+                this->vecPrincipalAxesInertia.clear();
+                return;
+            }
+
+            // Stop after first successful/evaluated Eigenvalues line
+            if (parsed) return;
+        }
+    }
+
+    // if nothing parsed, ensure vector is empty (as requested)
+    if (!parsed) this->vecPrincipalAxesInertia.clear();
 };
 
 double G16LOGfile::getZPE()
@@ -1484,7 +1509,7 @@ void G16LOGfile::set_qVib(double Temperature)
 };
 
 void G16LOGfile::set_thetha_r()
-{
+{   
     if (this->vecPrincipalAxesInertia.size() == 0)
     {
         this->thetha_r = 1.0;
@@ -1575,6 +1600,11 @@ double G16LOGfile::get_qTot(double Temperature)
     this->set_qTrans(Temperature);
     this->set_qTot();
     return this->qTot;
+};
+
+double G16LOGfile::getLinkSize()
+{
+    return this->linkStorage.size();
 };
 
 double G16LOGfile::get_qRot(double Temperature)

@@ -258,6 +258,7 @@ PYBIND11_MODULE(MoleKing, m) {
         .def("get_qTrans", &G16LOGfile::get_qTrans, py::arg("Temperature") = 298.15)
         .def("get_qTot", &G16LOGfile::get_qTot, py::arg("Temperature") = 298.15)
         .def("get_sigmaR", &G16LOGfile::get_sigmaR)
+        .def("getLinkSize", &G16LOGfile::getLinkSize)
         .def("getHOMO", [](G16LOGfile &self, int index) {
             auto values = self.getHOMO(index);
             if (values.size() == 1)

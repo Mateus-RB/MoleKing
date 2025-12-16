@@ -268,6 +268,7 @@ public:
     double get_qTrans(double Temperature = 298.15);
     double get_qTot(double Temperature = 298.15);
     double get_sigmaR();
+    double getLinkSize();
     vector<double> getHOMO(int index = -1);
     vector<double> getLUMO(int index = 0);    
     double getDipole(string axis = "tot");
