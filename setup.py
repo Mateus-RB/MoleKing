@@ -160,7 +160,7 @@ setup(
     cmdclass={"build_ext": CMakeBuild},
     zip_safe=False,
     extras_require={"test": ["pytest>=6.0"]},
-    python_requires=">=3.8",
+    python_requires=">=3.9",
     classifiers=[
         "License :: OSI Approved :: MIT License",
         "Programming Language :: C++",
