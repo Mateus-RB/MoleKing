@@ -3,8 +3,8 @@ requires = ["setuptools>=68.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "MoleKing"
-version = "1.6.0"
+name = "moleking"
+version = "0.1.0"
 description = "A Python project for molecular analysis and structure manipulation"
 readme = "README.md"
 requires-python = ">=3.8"
@@ -99,7 +99,7 @@ warn_no_return = true
 strict_optional = true
 
 [tool.pytest.ini_options]
-minversion = "6.0"
+minversion = "7.0"
 testpaths = ["tests"]
 python_files = ["test_*.py", "*_test.py"]
 addopts = "-v --cov=moleking --cov-report=html --cov-report=term-missing"
