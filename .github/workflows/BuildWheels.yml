@@ -14,43 +14,43 @@ on:
 jobs:
 
   
-  # build-linux:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #       with:
-  #         submodules: true
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
 
-  #     - name: Set up Python
-  #       uses: actions/setup-python@v5
-  #       with:
-  #         python-version: '3.11'
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
 
-  #     - name: Install cibuildwheel
-  #       run: |
-  #         python -m pip install --upgrade pip
-  #         python -m pip install --upgrade setuptools
-  #         pip install cibuildwheel
+      - name: Install cibuildwheel
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade setuptools
+          pip install cibuildwheel
 
-  #     - name: Clean previous builds
-  #       run: |
-  #         rm -rf build/ dist/ *.egg-info wheelhouse/
+      - name: Clean previous builds
+        run: |
+          rm -rf build/ dist/ *.egg-info wheelhouse/
 
-  #     - name: Build wheels
-  #       run: |
-  #         mkdir -p wheelhouse/linux
-  #         cibuildwheel --output-dir wheelhouse/linux --platform linux
+      - name: Build wheels
+        run: |
+          mkdir -p wheelhouse/linux
+          cibuildwheel --output-dir wheelhouse/linux --platform linux
 
-  #     - name: List contents of wheelhouse
-  #       run: |
-  #         echo "Contents of wheelhouse directory:"
-  #         ls -R wheelhouse
+      - name: List contents of wheelhouse
+        run: |
+          echo "Contents of wheelhouse directory:"
+          ls -R wheelhouse
 
-  #     - name: Upload wheels
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: linux-wheels
-  #         path: wheelhouse/linux
+      - name: Upload wheels
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-wheels
+          path: wheelhouse/linux
 
   build-macos:
     runs-on: macos-latest
