@@ -117,27 +117,6 @@ jobs:
         with:
           name: windows-wheels
           path: wheelhouse/windows
-
-      - name: Inspect wheel contents (Windows)
-        shell: pwsh
-        run: |
-          python - <<'PY'
-          import glob, zipfile
-          wheels = glob.glob("wheelhouse/*.whl") + glob.glob("wheelhouse/**/*.whl", recursive=True)
-          print("Found wheels:", wheels)
-          if not wheels:
-            raise SystemExit("No wheels found in wheelhouse/")
-          z = zipfile.ZipFile(wheels[0])
-          names = z.namelist()
-          print("---- .pyd files in wheel ----")
-          for n in names:
-            if n.lower().endswith(".pyd"):
-              print(n)
-          print("---- anything containing 'moleking' or 'MoleKing' ----")
-          for n in names:
-            if "moleking" in n.lower() or "MoleKing" in n:
-              print(n)
-          PY
   
   build-sdist:
     runs-on: ubuntu-latest

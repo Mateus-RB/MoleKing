@@ -28,13 +28,13 @@ filterwarnings = ["error"]
 testpaths = ["tests"]
 
 [tool.cibuildwheel.linux]
-test-command = "python -m pytest {project}/tests"
+test-command = "pytest {project}/tests"
 test-extras = ["test"]
 test-skip = ["*universal2:arm64"]
 before-build = "rm -rf {project}/build"
 
 [tool.cibuildwheel.windows]
-test-command = "python -m pytest {project}/tests"
+test-command = "pytest {project}/tests"
 test-extras = ["test"]
 
 
