@@ -10,7 +10,7 @@
 //   Version:     ['1.6.0']
 //   Status:      ['Development']
 //   Language:    ['C++','Python']
-//   Description: ['A python module written in C++ for theoretical chemestry']
+//   Description: ['A python module written in C++ for theoretical chemistry']
 
 #include "G16Process.hpp"
 
@@ -1521,7 +1521,7 @@ void G16LOGfile::set_thetha_r()
         double inertia_y = this->vecPrincipalAxesInertia[1]*this->pt.getConversion("amu_to_kg_m2"); // kg*m^2
         double inertia_z = this->vecPrincipalAxesInertia[2]*this->pt.getConversion("amu_to_kg_m2"); // kg*m^2
 
-        if (not this->isLinear)
+        if (! this->isLinear)
         {
             double thetha_x = pow(this->pt.getConstant("h"), 2) / (8 * pow(this->pt.getConstant("PI"), 2) * this->pt.getConstant("k_B") * inertia_x);
             double thetha_y = pow(this->pt.getConstant("h"), 2) / (8 * pow(this->pt.getConstant("PI"), 2) * this->pt.getConstant("k_B") * inertia_y);

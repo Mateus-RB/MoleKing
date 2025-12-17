@@ -10,7 +10,7 @@
 //   Version:     ['1.6.0']
 //   Status:      ['Development']
 //   Language:    ['C++','Python']
-//   Description: ['A python module written in C++ for theoretical chemestry']
+//   Description: ['A python module written in C++ for theoretical chemistry']
 
 
 #ifndef MassCenter_hpp

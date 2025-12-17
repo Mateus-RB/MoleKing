@@ -10,7 +10,7 @@
 //   Version:     ['1.6.0']
 //   Status:      ['Development']
 //   Language:    ['C++','Python']
-//   Description: ['A python module written in C++ for theoretical chemestry']
+//   Description: ['A python module written in C++ for theoretical chemistry']
 
 #ifndef Psi4Process_hpp
 #define Psi4Process_hpp
