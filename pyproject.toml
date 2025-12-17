@@ -19,6 +19,9 @@ warn_unreachable = true
 module = ["ninja"]
 ignore_missing_imports = true
 
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["MoleKing*"]
 
 [tool.pytest.ini_options]
 minversion = "6.0"
