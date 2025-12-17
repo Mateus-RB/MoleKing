@@ -1,78 +1,127 @@
-[project]
-name = "MoleKing"
-
 [build-system]
-requires = [
-    "setuptools>=66",
-    "wheel",
-    "ninja",
-    "cmake>=3.12"
-]
+requires = ["setuptools>=68.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
+[project]
+name = "moleking"
+version = "0.1.0"
+description = "A Python project for molecular analysis and structure manipulation"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+authors = [
+    {name = "Mateus RB", email = "mateus@example.com"},
+]
+keywords = [
+    "molecular",
+    "chemistry",
+    "structure",
+    "analysis",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Chemistry",
+]
+
+dependencies = [
+    "numpy>=1.21.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "black>=23.0",
+    "flake8>=6.0",
+    "isort>=5.0",
+    "mypy>=1.0",
+    "pre-commit>=3.0",
+]
+docs = [
+    "sphinx>=5.0",
+    "sphinx-rtd-theme>=1.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/Mateus-RB/MoleKing"
+Repository = "https://github.com/Mateus-RB/MoleKing.git"
+Documentation = "https://github.com/Mateus-RB/MoleKing/wiki"
+"Bug Tracker" = "https://github.com/Mateus-RB/MoleKing/issues"
+
+[tool.setuptools]
+packages = ["moleking"]
+
+[tool.black]
+line-length = 100
+target-version = ["py38", "py39", "py310", "py311", "py312"]
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 100
+skip_gitignore = true
+known_first_party = ["moleking"]
+
 [tool.mypy]
-files = "setup.py"
-python_version = "3.7"
-strict = true
-show_error_codes = true
-enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
-warn_unreachable = true
-
-[[tool.mypy.overrides]]
-module = ["ninja"]
-ignore_missing_imports = true
-
-[tool.setuptools.packages.find]
-where = ["."]
-include = ["MoleKing*"]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+check_untyped_defs = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+strict_optional = true
 
 [tool.pytest.ini_options]
-minversion = "6.0"
-addopts = ["-ra", "--showlocals", "--strict-markers", "--strict-config"]
-xfail_strict = true
-filterwarnings = ["error"]
+minversion = "7.0"
 testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+addopts = "-v --cov=moleking --cov-report=html --cov-report=term-missing"
 
-# =========================
-# cibuildwheel — Linux
-# =========================
-[tool.cibuildwheel.linux]
-test-command = "python -m pytest {project}/tests"
-test-extras = ["test"]
-# Clean build artifacts between Python versions
-before-build = "rm -rf {project}/build"
-
-# =========================
-# cibuildwheel — Windows
-# =========================
-[tool.cibuildwheel.windows]
-test-command = "python -c \"import MoleKing; print(MoleKing.__file__)\""
-test-extras = ["test"]
-#test-skip = ["cp38-win_amd64", "cp39-macosx_arm64"]
-# Proper Windows cleanup (PowerShell, not rm)
-before-build = "powershell -NoProfile -Command \"if (Test-Path build) { Remove-Item -Recurse -Force build }\""
-
-# =========================
-# cibuildwheel — macOS
-# =========================
-[tool.cibuildwheel.macos]
-test-command = "python -c \"import MoleKing; print(MoleKing.__file__)\""
-test-extras = ["test"]
-# Skip tests ONLY for macOS universal2 arm64 (Apple Silicon)
-#test-skip = ["*universal2:arm64", "cp38-macosx_arm64", "cp39-macosx_arm64"]
-# macOS cleanup (POSIX shell)
-before-build = "rm -rf {project}/build"
-
-[tool.ruff]
-extend-select = [
-  "B",    # flake8-bugbear
-  "B904",
-  "I",    # isort
-  "PGH",  # pygrep-hooks
-  "RUF",  # Ruff-specific
-  "UP",   # pyupgrade
+[tool.coverage.run]
+branch = true
+source = ["moleking"]
+omit = [
+    "*/tests/*",
+    "*/test_*.py",
 ]
-extend-ignore = [
-  "E501",   # Line too long
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "if 0:",
+    "if False:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
 ]
-target-version = "py37"
