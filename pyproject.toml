@@ -40,6 +40,7 @@ testpaths = ["tests"]
 # =========================
 [tool.cibuildwheel.linux]
 test-command = "pytest"
+test-sources = ["tests/test_molecule.py", "tests/test_output.py"]
 test-extras = ["test"]
 
 # Clean build artifacts between Python versions
@@ -51,6 +52,7 @@ before-build = "rm -rf {project}/build"
 # =========================
 [tool.cibuildwheel.windows]
 test-command = "pytest"
+test-sources = ["tests/test_molecule.py", "tests/test_output.py"]
 test-extras = ["test"]
 # Proper Windows cleanup (PowerShell, not rm)
 before-build = "powershell -NoProfile -Command \"if (Test-Path build) { Remove-Item -Recurse -Force build }\""
@@ -61,6 +63,7 @@ before-build = "powershell -NoProfile -Command \"if (Test-Path build) { Remove-I
 # =========================
 [tool.cibuildwheel.macos]
 test-command = "pytest"
+test-sources = ["tests/test_molecule.py", "tests/test_output.py"]
 test-extras = ["test"]
 
 # Skip tests ONLY for macOS universal2 arm64 (Apple Silicon)
