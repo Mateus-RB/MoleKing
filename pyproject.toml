@@ -3,17 +3,13 @@ requires = [
     "setuptools>=66",
     "wheel",
     "ninja",
-    "cmake>=3.15"
+    "cmake>=3.12"
 ]
 build-backend = "setuptools.build_meta"
 
-
-# =========================
-# Static typing (unchanged)
-# =========================
 [tool.mypy]
 files = "setup.py"
-python_version = "3.8"
+python_version = "3.7"
 strict = true
 show_error_codes = true
 enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
@@ -24,9 +20,6 @@ module = ["ninja"]
 ignore_missing_imports = true
 
 
-# =========================
-# Pytest configuration
-# =========================
 [tool.pytest.ini_options]
 minversion = "6.0"
 addopts = ["-ra", "--showlocals", "--strict-markers", "--strict-config"]
@@ -34,46 +27,18 @@ xfail_strict = true
 filterwarnings = ["error"]
 testpaths = ["tests"]
 
-
-# =========================
-# cibuildwheel — Linux
-# =========================
 [tool.cibuildwheel.linux]
 test-command = "python -m pytest {project}/tests"
 test-extras = ["test"]
-
-# Clean build artifacts between Python versions
+test-skip = ["*universal2:arm64"]
 before-build = "rm -rf {project}/build"
 
-
-# =========================
-# cibuildwheel — Windows
-# =========================
 [tool.cibuildwheel.windows]
 test-command = "python -m pytest {project}/tests"
+test-skip = ["*universal2:arm64"]
 test-extras = ["test"]
 
-# Proper Windows cleanup (PowerShell, not rm)
-before-build = "powershell -NoProfile -Command \"if (Test-Path build) { Remove-Item -Recurse -Force build }\""
 
-
-# =========================
-# cibuildwheel — macOS
-# =========================
-[tool.cibuildwheel.macos]
-test-command = "python -m pytest {project}/tests"
-test-extras = ["test"]
-
-# Skip tests ONLY for macOS universal2 arm64 (Apple Silicon)
-#test-skip = ["*universal2:arm64"]
-
-# macOS cleanup (POSIX shell)
-before-build = "rm -rf {project}/build"
-
-
-# =========================
-# Ruff (unchanged)
-# =========================
 [tool.ruff]
 extend-select = [
   "B",    # flake8-bugbear
