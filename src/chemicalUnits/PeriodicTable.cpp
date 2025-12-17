@@ -18,7 +18,6 @@
 PeriodicTable::PeriodicTable(){
     //Atomic number table
     this->symbolMap.insert(pair<string, int>("H", 1));
-    this->symbolMap.insert(pair<string, int>("H(iso=2)", 1));
     this->symbolMap.insert(pair<string, int>("He", 2));
     this->symbolMap.insert(pair<string, int>("Li", 3));
     this->symbolMap.insert(pair<string, int>("Be", 4));
@@ -130,144 +129,139 @@ PeriodicTable::PeriodicTable(){
     this->symbolMap.insert(pair<string, int>("Ds", 110));
     this->symbolMap.insert(pair<string, int>("Rg", 111));
     this->symbolMap.insert(pair<string, int>("Cn", 112));
-    this->symbolMap.insert(pair<string, int>("Uut", 113));
+    this->symbolMap.insert(pair<string, int>("Nh", 113));
     this->symbolMap.insert(pair<string, int>("Fl", 114));
-    this->symbolMap.insert(pair<string, int>("Uup", 115));
+    this->symbolMap.insert(pair<string, int>("Mc", 115));
     this->symbolMap.insert(pair<string, int>("Lv", 116));
-    this->symbolMap.insert(pair<string, int>("Uus", 117));
-    this->symbolMap.insert(pair<string, int>("Uuo", 118));
-    this->symbolMap.insert(pair<string, int>("Uue", 119));
-    this->symbolMap.insert(pair<string, int>("Ubn", 120));
+    this->symbolMap.insert(pair<string, int>("Og", 117));
+    this->symbolMap.insert(pair<string, int>("Ts", 118));
     this->symbolMap.insert(pair<string, int>("00", 0));
     this->symbolMap.insert(pair<string, int>("dice_ghost_label", 0));
-    // Mass Table
-    this->massMap.insert(pair<string, double>("H", 1.00790));
-    this->massMap.insert(pair<string, double>("H(iso=2)", 2.0079));
-    this->massMap.insert(pair<string, double>("He", 4.0026));
-    this->massMap.insert(pair<string, double>("Li", 6.941));
-    this->massMap.insert(pair<string, double>("Be", 9.0122));
-    this->massMap.insert(pair<string, double>("B", 10.811));
-    this->massMap.insert(pair<string, double>("C", 12.011));
-    this->massMap.insert(pair<string, double>("N", 14.007));
-    this->massMap.insert(pair<string, double>("O", 15.9994));
-    this->massMap.insert(pair<string, double>("F", 18.998));
-    this->massMap.insert(pair<string, double>("Ne", 20.180));
-    this->massMap.insert(pair<string, double>("Na", 22.990));
-    this->massMap.insert(pair<string, double>("Mg", 24.305));
-    this->massMap.insert(pair<string, double>("Al", 26.982));
-    this->massMap.insert(pair<string, double>("Si", 28.086));
-    this->massMap.insert(pair<string, double>("P", 30.974));
-    this->massMap.insert(pair<string, double>("S", 32.065));
-    this->massMap.insert(pair<string, double>("Cl", 35.453));
-    this->massMap.insert(pair<string, double>("Ar", 39.948));
-    this->massMap.insert(pair<string, double>("K", 39.098));
-    this->massMap.insert(pair<string, double>("Ca", 40.078));
-    this->massMap.insert(pair<string, double>("Sc", 44.956));
-    this->massMap.insert(pair<string, double>("Ti", 47.867));
-    this->massMap.insert(pair<string, double>("V", 50.942));
-    this->massMap.insert(pair<string, double>("Cr", 51.996));
-    this->massMap.insert(pair<string, double>("Mn", 54.938));
-    this->massMap.insert(pair<string, double>("Fe", 55.845));
-    this->massMap.insert(pair<string, double>("Co", 58.933));
-    this->massMap.insert(pair<string, double>("Ni", 58.693));
-    this->massMap.insert(pair<string, double>("Cu", 63.546));
-    this->massMap.insert(pair<string, double>("Zn", 65.409));
-    this->massMap.insert(pair<string, double>("Ga", 69.723));
-    this->massMap.insert(pair<string, double>("Ge", 72.640));
-    this->massMap.insert(pair<string, double>("As", 74.922));
-    this->massMap.insert(pair<string, double>("Se", 78.960));
-    this->massMap.insert(pair<string, double>("Br", 79.904));
-    this->massMap.insert(pair<string, double>("Kr", 83.798));
-    this->massMap.insert(pair<string, double>("Rb", 85.468));
-    this->massMap.insert(pair<string, double>("Sr", 87.620));
-    this->massMap.insert(pair<string, double>("Y", 88.906));
-    this->massMap.insert(pair<string, double>("Zr", 91.224));
-    this->massMap.insert(pair<string, double>("Nb", 92.906));
-    this->massMap.insert(pair<string, double>("Mo", 95.940));
-    this->massMap.insert(pair<string, double>("Tc", 98.000));
-    this->massMap.insert(pair<string, double>("Ru", 101.07));
-    this->massMap.insert(pair<string, double>("Rh", 102.91));
-    this->massMap.insert(pair<string, double>("Pd", 106.42));
-    this->massMap.insert(pair<string, double>("Ag", 107.87));
-    this->massMap.insert(pair<string, double>("Cd", 112.41));
-    this->massMap.insert(pair<string, double>("In", 114.82));
-    this->massMap.insert(pair<string, double>("Sn", 118.71));
-    this->massMap.insert(pair<string, double>("Sb", 121.76));
-    this->massMap.insert(pair<string, double>("Te", 127.6));
-    this->massMap.insert(pair<string, double>("I", 126.9));
-    this->massMap.insert(pair<string, double>("Xe", 131.29));
-    this->massMap.insert(pair<string, double>("Cs", 132.91));
-    this->massMap.insert(pair<string, double>("Ba", 137.33));
-    this->massMap.insert(pair<string, double>("La", 138.91));
-    this->massMap.insert(pair<string, double>("Ce", 140.12));
-    this->massMap.insert(pair<string, double>("Pr", 140.91));
-    this->massMap.insert(pair<string, double>("Nd", 144.24));
-    this->massMap.insert(pair<string, double>("Pm", 145.00));
-    this->massMap.insert(pair<string, double>("Sm", 150.36));
-    this->massMap.insert(pair<string, double>("Eu", 151.96));
-    this->massMap.insert(pair<string, double>("Gd", 157.25));
-    this->massMap.insert(pair<string, double>("Tb", 158.93));
-    this->massMap.insert(pair<string, double>("Dy", 162.5));
-    this->massMap.insert(pair<string, double>("Ho", 164.93));
-    this->massMap.insert(pair<string, double>("Er", 167.26));
-    this->massMap.insert(pair<string, double>("Tm", 168.93));
-    this->massMap.insert(pair<string, double>("Yb", 173.04));
-    this->massMap.insert(pair<string, double>("Lu", 174.97));
-    this->massMap.insert(pair<string, double>("Hf", 178.49));
-    this->massMap.insert(pair<string, double>("Ta", 180.95));
-    this->massMap.insert(pair<string, double>("W", 183.84));
-    this->massMap.insert(pair<string, double>("Re", 186.21));
-    this->massMap.insert(pair<string, double>("Os", 190.23));
-    this->massMap.insert(pair<string, double>("Ir", 192.22));
-    this->massMap.insert(pair<string, double>("Pt", 195.08));
-    this->massMap.insert(pair<string, double>("Au", 196.97));
-    this->massMap.insert(pair<string, double>("Hg", 200.59));
-    this->massMap.insert(pair<string, double>("Tl", 204.38));
-    this->massMap.insert(pair<string, double>("Pb", 207.20));
-    this->massMap.insert(pair<string, double>("Bi", 208.98));
-    this->massMap.insert(pair<string, double>("Po", 209.00));
-    this->massMap.insert(pair<string, double>("At", 210.00));
-    this->massMap.insert(pair<string, double>("Rn", 222.00));
-    this->massMap.insert(pair<string, double>("Fr", 223.00));
-    this->massMap.insert(pair<string, double>("Ra", 226.00));
-    this->massMap.insert(pair<string, double>("Ac", 227.00));
-    this->massMap.insert(pair<string, double>("Th", 232.04));
-    this->massMap.insert(pair<string, double>("Pa", 231.04));
-    this->massMap.insert(pair<string, double>("U",  238.03));
-    this->massMap.insert(pair<string, double>("Np", 237.00));
-    this->massMap.insert(pair<string, double>("Pu", 244.00));
-    this->massMap.insert(pair<string, double>("Am", 243.00));
-    this->massMap.insert(pair<string, double>("Cm", 247.00));
-    this->massMap.insert(pair<string, double>("Bk", 247.00));
-    this->massMap.insert(pair<string, double>("Cf", 251.00));
-    this->massMap.insert(pair<string, double>("Es", 252.00));
-    this->massMap.insert(pair<string, double>("Fm", 257.00));
-    this->massMap.insert(pair<string, double>("Md", 258.00));
-    this->massMap.insert(pair<string, double>("No", 259.00));
-    this->massMap.insert(pair<string, double>("Lr", 262.00));
-    this->massMap.insert(pair<string, double>("Rf", 263.00));
-    this->massMap.insert(pair<string, double>("Db", 268.00));
-    this->massMap.insert(pair<string, double>("Sg", 271.00));
-    this->massMap.insert(pair<string, double>("Bh", 270.00));
-    this->massMap.insert(pair<string, double>("Hs", 270.00));
-    this->massMap.insert(pair<string, double>("Mt", 278.00));
-    this->massMap.insert(pair<string, double>("Ds", 281.00));
-    this->massMap.insert(pair<string, double>("Rg", 281.00));
-    this->massMap.insert(pair<string, double>("Cn", 265.00));
-    this->massMap.insert(pair<string, double>("Uut", 286.00));
-    this->massMap.insert(pair<string, double>("Fl", 289.00));
-    this->massMap.insert(pair<string, double>("Uup", 289.00));
-    this->massMap.insert(pair<string, double>("Lv", 293.00));
-    this->massMap.insert(pair<string, double>("Uus", 294.00));
-    this->massMap.insert(pair<string, double>("Uuo", 294.00));
-    this->massMap.insert(pair<string, double>("Uue", 315.00));
-    this->massMap.insert(pair<string, double>("Ubn", 320.00));
-    this->massMap.insert(pair<string, double>("00", 0.0000));
-    this->massMap.insert(pair<string, double>("dice_ghost_label", 0.0000));
+
+    // Mass Table, All masses were taken from: https://doi.org/10.1002/rcm.8864. Atoms that were not listed there were taken elsewhere (references in comments aside).
+    this->massMap.insert(pair<string, double>("H",  1.007975000));
+    this->massMap.insert(pair<string, double>("He", 4.002602000));
+    this->massMap.insert(pair<string, double>("Li", 6.967500000));
+    this->massMap.insert(pair<string, double>("Be", 9.012183100));
+    this->massMap.insert(pair<string, double>("B",  10.813500000));
+    this->massMap.insert(pair<string, double>("C",  12.010600000));
+    this->massMap.insert(pair<string, double>("N",  14.006855000));
+    this->massMap.insert(pair<string, double>("O",  15.999400000));
+    this->massMap.insert(pair<string, double>("F",  18.998403162));
+    this->massMap.insert(pair<string, double>("Ne", 20.179700000));
+    this->massMap.insert(pair<string, double>("Na", 22.989769280));
+    this->massMap.insert(pair<string, double>("Mg", 24.305500000));
+    this->massMap.insert(pair<string, double>("Al", 26.981538400));
+    this->massMap.insert(pair<string, double>("Si", 28.085000000));
+    this->massMap.insert(pair<string, double>("P",  30.973761998));
+    this->massMap.insert(pair<string, double>("S",  32.067500000));
+    this->massMap.insert(pair<string, double>("Cl", 35.451500000));
+    this->massMap.insert(pair<string, double>("Ar", 39.862500000));
+    this->massMap.insert(pair<string, double>("K",  39.098300000));
+    this->massMap.insert(pair<string, double>("Ca", 40.078000000));
+    this->massMap.insert(pair<string, double>("Sc", 44.955907000));
+    this->massMap.insert(pair<string, double>("Ti", 47.867000000));
+    this->massMap.insert(pair<string, double>("V",  50.941500000));
+    this->massMap.insert(pair<string, double>("Cr", 51.996100000));
+    this->massMap.insert(pair<string, double>("Mn", 54.938043000));
+    this->massMap.insert(pair<string, double>("Fe", 55.845000000));
+    this->massMap.insert(pair<string, double>("Co", 58.933194000));
+    this->massMap.insert(pair<string, double>("Ni", 58.693400000));
+    this->massMap.insert(pair<string, double>("Cu", 63.546000000));
+    this->massMap.insert(pair<string, double>("Zn", 65.380000000));
+    this->massMap.insert(pair<string, double>("Ga", 69.723000000));
+    this->massMap.insert(pair<string, double>("Ge", 72.630000000));
+    this->massMap.insert(pair<string, double>("As", 74.921595000));
+    this->massMap.insert(pair<string, double>("Se", 79.971000000));
+    this->massMap.insert(pair<string, double>("Br", 79.904000000));
+    this->massMap.insert(pair<string, double>("Kr", 83.798000000));
+    this->massMap.insert(pair<string, double>("Rb", 85.467800000));
+    this->massMap.insert(pair<string, double>("Sr", 87.620000000));
+    this->massMap.insert(pair<string, double>("Y",  88.905838000));
+    this->massMap.insert(pair<string, double>("Zr", 91.224000000));
+    this->massMap.insert(pair<string, double>("Nb", 92.906370000));
+    this->massMap.insert(pair<string, double>("Mo", 95.950000000));
+    this->massMap.insert(pair<string, double>("Tc", 97.907216000)); // https://www.chem.ualberta.ca/~massspec/atomic_mass_abund.pdf
+    this->massMap.insert(pair<string, double>("Ru", 101.070000000));
+    this->massMap.insert(pair<string, double>("Rh", 102.905490000));
+    this->massMap.insert(pair<string, double>("Pd", 106.420000000));
+    this->massMap.insert(pair<string, double>("Ag", 107.868200000));
+    this->massMap.insert(pair<string, double>("Cd", 112.414000000));
+    this->massMap.insert(pair<string, double>("In", 114.818000000));
+    this->massMap.insert(pair<string, double>("Sn", 118.710000000));
+    this->massMap.insert(pair<string, double>("Sb", 121.760000000));
+    this->massMap.insert(pair<string, double>("Te", 127.600000000));
+    this->massMap.insert(pair<string, double>("I",  126.904470000));
+    this->massMap.insert(pair<string, double>("Xe", 131.293000000));
+    this->massMap.insert(pair<string, double>("Cs", 132.905451960));
+    this->massMap.insert(pair<string, double>("Ba", 137.327000000));
+    this->massMap.insert(pair<string, double>("La", 138.905470000));
+    this->massMap.insert(pair<string, double>("Ce", 140.116000000));
+    this->massMap.insert(pair<string, double>("Pr", 140.907660000));
+    this->massMap.insert(pair<string, double>("Nd", 144.242000000));
+    this->massMap.insert(pair<string, double>("Pm", 144.912744000)); // https://www.chem.ualberta.ca/~massspec/atomic_mass_abund.pdf
+    this->massMap.insert(pair<string, double>("Sm", 150.360000000));
+    this->massMap.insert(pair<string, double>("Eu", 151.964000000));
+    this->massMap.insert(pair<string, double>("Gd", 157.250000000));
+    this->massMap.insert(pair<string, double>("Tb", 158.925354000));
+    this->massMap.insert(pair<string, double>("Dy", 162.500000000));
+    this->massMap.insert(pair<string, double>("Ho", 164.930329000));
+    this->massMap.insert(pair<string, double>("Er", 167.259000000));
+    this->massMap.insert(pair<string, double>("Tm", 168.934219000));
+    this->massMap.insert(pair<string, double>("Yb", 173.045000000));
+    this->massMap.insert(pair<string, double>("Lu", 174.966800000));
+    this->massMap.insert(pair<string, double>("Hf", 178.486000000));
+    this->massMap.insert(pair<string, double>("Ta", 180.947880000));
+    this->massMap.insert(pair<string, double>("W",  183.840000000));
+    this->massMap.insert(pair<string, double>("Re", 186.207000000));
+    this->massMap.insert(pair<string, double>("Os", 190.230000000));
+    this->massMap.insert(pair<string, double>("Ir", 192.217000000));
+    this->massMap.insert(pair<string, double>("Pt", 195.084000000));
+    this->massMap.insert(pair<string, double>("Au", 196.966570000));
+    this->massMap.insert(pair<string, double>("Hg", 200.592000000));
+    this->massMap.insert(pair<string, double>("Tl", 204.383500000));
+    this->massMap.insert(pair<string, double>("Pb", 207.040000000));
+    this->massMap.insert(pair<string, double>("Bi", 208.980400000));
+    this->massMap.insert(pair<string, double>("Po", 208.982416000)); // https://www.chem.ualberta.ca/~massspec/atomic_mass_abund.pdf
+    this->massMap.insert(pair<string, double>("At", 209.987131000)); // https://www.chem.ualberta.ca/~massspec/atomic_mass_abund.pdf
+    this->massMap.insert(pair<string, double>("Rn", 222.017570000));  // https://www.chem.ualberta.ca/~massspec/atomic_mass_abund.pdf
+    this->massMap.insert(pair<string, double>("Fr", 223.019731000)); // https://www.chem.ualberta.ca/~massspec/atomic_mass_abund.pdf
+    this->massMap.insert(pair<string, double>("Ra", 226.025403000)); // https://www.chem.ualberta.ca/~massspec/atomic_mass_abund.pdf
+    this->massMap.insert(pair<string, double>("Ac", 227.027747000)); // https://www.chem.ualberta.ca/~massspec/atomic_mass_abund.pdf
+    this->massMap.insert(pair<string, double>("Th", 232.037700000)); 
+    this->massMap.insert(pair<string, double>("Pa", 231.035880000));
+    this->massMap.insert(pair<string, double>("U",  238.028910000));
+    this->massMap.insert(pair<string, double>("Np", 237.048167000)); // https://www.chem.ualberta.ca/~massspec/atomic_mass_abund.pdf 
+    this->massMap.insert(pair<string, double>("Pu", 244.064198000)); // https://www.chem.ualberta.ca/~massspec/atomic_mass_abund.pdf
+    this->massMap.insert(pair<string, double>("Am", 243.061373000)); // https://www.chem.ualberta.ca/~massspec/atomic_mass_abund.pdf
+    this->massMap.insert(pair<string, double>("Cm", 247.070347000)); // https://www.chem.ualberta.ca/~massspec/atomic_mass_abund.pdf
+    this->massMap.insert(pair<string, double>("Bk", 247.070299000)); // https://www.chem.ualberta.ca/~massspec/atomic_mass_abund.pdf
+    this->massMap.insert(pair<string, double>("Cf", 251.079580000)); // https://www.chem.ualberta.ca/~massspec/atomic_mass_abund.pdf
+    this->massMap.insert(pair<string, double>("Es", 252.082972000)); // https://www.chem.ualberta.ca/~massspec/atomic_mass_abund.pdf
+    this->massMap.insert(pair<string, double>("Fm", 257.095099000)); // https://www.chem.ualberta.ca/~massspec/atomic_mass_abund.pdf
+    this->massMap.insert(pair<string, double>("Md", 258.098425000)); // https://www.chem.ualberta.ca/~massspec/atomic_mass_abund.pdf
+    this->massMap.insert(pair<string, double>("No", 259.101024000)); // https://www.chem.ualberta.ca/~massspec/atomic_mass_abund.pdf
+    this->massMap.insert(pair<string, double>("Lr", 262.109692000)); // https://www.chem.ualberta.ca/~massspec/atomic_mass_abund.pdf
+    this->massMap.insert(pair<string, double>("Rf", 263.118313000)); // https://www.chem.ualberta.ca/~massspec/atomic_mass_abund.pdf
+    this->massMap.insert(pair<string, double>("Db", 262.011437000)); // https://www.chem.ualberta.ca/~massspec/atomic_mass_abund.pdf
+    this->massMap.insert(pair<string, double>("Sg", 266.012238000)); // https://www.chem.ualberta.ca/~massspec/atomic_mass_abund.pdf
+    this->massMap.insert(pair<string, double>("Bh", 264.012496000)); // https://www.chem.ualberta.ca/~massspec/atomic_mass_abund.pdf
+    this->massMap.insert(pair<string, double>("Hs", 269.001341000)); // https://www.chem.ualberta.ca/~massspec/atomic_mass_abund.pdf
+    this->massMap.insert(pair<string, double>("Mt", 268.001388000)); // https://www.chem.ualberta.ca/~massspec/atomic_mass_abund.pdf
+    this->massMap.insert(pair<string, double>("Ds", 272.001463000)); // https://www.chem.ualberta.ca/~massspec/atomic_mass_abund.pdf
+    this->massMap.insert(pair<string, double>("Rg", 272.001535000)); // https://www.chem.ualberta.ca/~massspec/atomic_mass_abund.pdf
+    this->massMap.insert(pair<string, double>("Cn", 285.177120000)); // https://physics.nist.gov/cgi-bin/Compositions/stand_alone.pl
+    this->massMap.insert(pair<string, double>("Nh", 284.178730000)); // https://physics.nist.gov/cgi-bin/Compositions/stand_alone.pl
+    this->massMap.insert(pair<string, double>("Fl", 289.190420000)); // https://physics.nist.gov/cgi-bin/Compositions/stand_alone.pl
+    this->massMap.insert(pair<string, double>("Mc", 288.192740000)); // https://physics.nist.gov/cgi-bin/Compositions/stand_alone.pl
+    this->massMap.insert(pair<string, double>("Lv", 293.204490000)); // https://physics.nist.gov/cgi-bin/Compositions/stand_alone.pl
+    this->massMap.insert(pair<string, double>("Ts", 292.207460000)); // https://physics.nist.gov/cgi-bin/Compositions/stand_alone.pl
+    this->massMap.insert(pair<string, double>("Og", 294.213920000)); // https://physics.nist.gov/cgi-bin/Compositions/stand_alone.pl
+    this->massMap.insert(pair<string, double>("00", 0.000000000));
+    this->massMap.insert(pair<string, double>("dice_ghost_label", 0.000000000));
 
     //Covalent Raddi as in https://pubs.acs.org/doi/pdf/10.1021/jp5065819 R1
     this->radiiMap.insert(pair<string, double>("H", 0.320));
-    this->radiiMap.insert(pair<string, double>("H(iso=2)", 0.320)); //Look up
     this->radiiMap.insert(pair<string, double>("He", 0.460));
     this->radiiMap.insert(pair<string, double>("Li", 1.330));
     this->radiiMap.insert(pair<string, double>("Be", 1.020));
@@ -379,19 +373,17 @@ PeriodicTable::PeriodicTable(){
     this->radiiMap.insert(pair<string, double>("Ds", 1.280));
     this->radiiMap.insert(pair<string, double>("Rg", 1.210));
     this->radiiMap.insert(pair<string, double>("Cn", 1.220));
-    this->radiiMap.insert(pair<string, double>("Uut", 1.360));
+    this->radiiMap.insert(pair<string, double>("Nh", 1.360));
     this->radiiMap.insert(pair<string, double>("Fl", 1.430));
-    this->radiiMap.insert(pair<string, double>("Uup", 1.620));
+    this->radiiMap.insert(pair<string, double>("Mc", 1.620));
     this->radiiMap.insert(pair<string, double>("Lv", 1.750));
-    this->radiiMap.insert(pair<string, double>("Uus", 1.650));
-    this->radiiMap.insert(pair<string, double>("Uuo", 1.570));
-    this->radiiMap.insert(pair<string, double>("Uue", 1.570));
-    this->radiiMap.insert(pair<string, double>("Ubn", 1.570));
+    this->radiiMap.insert(pair<string, double>("Og", 1.650));
+    this->radiiMap.insert(pair<string, double>("Ts", 1.570));
     this->radiiMap.insert(pair<string, double>("00", 0));
     this->radiiMap.insert(pair<string, double>("dice_ghost_label", 0));
 
+    // Color Map in HEX format
     this->ColorMap.insert(pair<string, string>("H",         "FFFFFF"));
-    this->ColorMap.insert(pair<string, string>("H(iso=2)",  "FFFFC0"));
     this->ColorMap.insert(pair<string, string>("He",        "D9FFFF"));
     this->ColorMap.insert(pair<string, string>("Li",        "CC80FF"));
     this->ColorMap.insert(pair<string, string>("Be",        "C2FF00"));
@@ -495,16 +487,15 @@ PeriodicTable::PeriodicTable(){
     this->ColorMap.insert(pair<string, string>("Mt",        "EB0026"));
     this->ColorMap.insert(pair<string, string>("Ds",        "EB0026"));
     this->ColorMap.insert(pair<string, string>("Cn",        "EB0026"));
-    this->ColorMap.insert(pair<string, string>("Uut",       "EB0026"));
+    this->ColorMap.insert(pair<string, string>("Nh",       "EB0026"));
     this->ColorMap.insert(pair<string, string>("Fl",        "EB0026"));
-    this->ColorMap.insert(pair<string, string>("Uup",       "EB0026"));
+    this->ColorMap.insert(pair<string, string>("Mc",       "EB0026"));
     this->ColorMap.insert(pair<string, string>("Lv",        "EB0026"));
-    this->ColorMap.insert(pair<string, string>("Uus",       "EB0026"));
-    this->ColorMap.insert(pair<string, string>("Uuo",       "EB0026"));
-    this->ColorMap.insert(pair<string, string>("Uue",       "EB0026"));
-    this->ColorMap.insert(pair<string, string>("Ubn",       "EB0026"));
+    this->ColorMap.insert(pair<string, string>("Og",       "EB0026"));
+    this->ColorMap.insert(pair<string, string>("Ts",       "EB0026"));
     this->ColorMap.insert(pair<string, string>("00",        "98f58e"));
 
+    // Constants and Conversions were taken from Gaussian'16 manual (https://gaussian.com/constants/)
     this->ConstantMap.insert(pair<string, double>("a0_bohr", 0.52917721092)); // in Angstrom
     this->ConstantMap.insert(pair<string, double>("qe_c", 1.602176565e-19)); // in Coulombs
     this->ConstantMap.insert(pair<string, double>("qe_esu", 4.803204e-10)); // in ESU

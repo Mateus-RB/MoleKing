@@ -317,6 +317,14 @@ Point Molecule::getMassCenter(){
         coordZ.push_back(this->molecule.at(i).getZ());
     };
     Point temp = MassCenter(massVector, coordX, coordY, coordZ).getMassCenter();
+    
+    // Truncates temp coordinates to 6 decimal places
+    vector<double> truncatedCoords(3);
+    truncatedCoords[0] = floor(temp.getCoords('c')[0] * 1e6) / 1e6;
+    truncatedCoords[1] = floor(temp.getCoords('c')[1] * 1e6) / 1e6;
+    truncatedCoords[2] = floor(temp.getCoords('c')[2] * 1e6) / 1e6;
+    temp = Point(truncatedCoords[0], truncatedCoords[1], truncatedCoords[2], 'c');
+
     return temp;
 };
 
