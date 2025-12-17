@@ -1,5 +1,7 @@
+import glob
 import os
 import re
+import shutil
 import subprocess
 import sys
 import platform
@@ -135,6 +137,70 @@ class CMakeBuild(build_ext):
         subprocess.run(
             ["cmake", "--build", "."] + build_args, cwd=build_temp, check=True
         )
+
+        # Copy the built module to the expected location
+        # pybind11 may generate the module in different locations depending on platform
+        ext_fullpath_str = str(ext_fullpath)
+        ext_filename = os.path.basename(ext_fullpath_str)
+        
+        # Ensure destination directory exists
+        extdir.mkdir(parents=True, exist_ok=True)
+        
+        # Possible locations where CMake/pybind11 might have generated the module
+        # Check extdir first (where CMake should put it based on CMAKE_LIBRARY_OUTPUT_DIRECTORY)
+        possible_sources = []
+        
+        # First, check in extdir (CMake should have put it there)
+        if extdir.exists():
+            if platform.system() == "Windows":
+                possible_sources.extend([
+                    extdir / ext_filename,  # Check exact filename first
+                    extdir / f"{ext.name}.pyd",
+                ])
+            else:
+                possible_sources.extend([
+                    extdir / ext_filename,  # Check exact filename first
+                    extdir / f"{ext.name}.so",
+                ])
+                # Also check for cpython-specific names (e.g., MoleKing.cpython-39-x86_64-linux-gnu.so)
+                for pattern in [f"{ext.name}.*.so", f"{ext.name}.cpython-*.so"]:
+                    possible_sources.extend(extdir.glob(pattern))
+        
+        # Then check in build_temp (where CMake might have put it before copying)
+        if platform.system() == "Windows":
+            possible_sources.extend([
+                build_temp / cfg / ext_filename,  # Check config-specific subdirectory
+                build_temp / ext_filename,
+                build_temp / cfg / f"{ext.name}.pyd",
+                build_temp / f"{ext.name}.pyd",
+            ])
+        else:
+            possible_sources.extend([
+                build_temp / ext_filename,
+                build_temp / f"{ext.name}.so",
+            ])
+            # Also check for cpython-specific names
+            for pattern in [f"{ext.name}.*.so", f"{ext.name}.cpython-*.so"]:
+                possible_sources.extend(build_temp.glob(pattern))
+        
+        # Find and copy the module
+        module_found = False
+        for source in possible_sources:
+            if source.exists() and source.is_file():
+                # Only copy if source and destination are different
+                if source.resolve() != ext_fullpath.resolve():
+                    shutil.copy2(source, ext_fullpath)
+                module_found = True
+                break
+        
+        if not module_found:
+            # If we still can't find it, raise an error with helpful information
+            raise RuntimeError(
+                f"Could not find built extension module '{ext.name}'. "
+                f"Looked in: {[str(s) for s in possible_sources]}. "
+                f"Expected destination: {ext_fullpath}. "
+                f"Build directory: {build_temp}"
+            )
 
 # The information here can also be placed in setup.cfg - better separation of
 # logic and declaration, and simpler if you include description/version in a file.
