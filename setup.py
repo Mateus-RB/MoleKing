@@ -146,8 +146,6 @@ setup(
     long_description="MoleKing is a Python module written in C++ with pybind11 Linkage under LEEDMOL Research Group. This module contains several useful classes for those who program python scripts aimed at theoretical chemistry. This package's main goal is to introduce chemistry concepts, such as Molecules, Atoms, and Geometries, to python, making programming more intuitive and understandable to chemists. Additionally, MoleKing is capable of reading and writing inputs and outputs files for several theoretical chemistry programs.",
     ext_modules=[CMakeExtension("MoleKing")],
     packages=find_packages(),
-    #packages=find_packages(where='src'),
-    #package_dir={'': 'src'},
     include_package_data=True,
     package_data={"":["tests/*.log", "tests/*.out"]},
     cmdclass={"build_ext": CMakeBuild},
