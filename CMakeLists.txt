@@ -1,5 +1,5 @@
 #Cmake Requirements
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.15...4.0)
 #project Title and Version
 project(MoleKing VERSION 1.6.0)
 
