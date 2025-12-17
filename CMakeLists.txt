@@ -5,7 +5,12 @@ project(MoleKing VERSION 1.6.0)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
-set( CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} -Wall -O3 -fPIC" )
+if (MSVC)
+  add_compile_options(/W1)
+else()
+  add_compile_options(-Wall)
+endif()
+
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 configure_file(src/MoleKingConfig.hpp.in MoleKing.hpp)
 add_definitions(-DBuild_Python=ON)
@@ -31,18 +36,15 @@ target_include_directories(MoleKing PUBLIC
                            "${PROJECT_BINARY_DIR}/src/myMath"
                            "${PROJECT_BINARY_DIR}/src/chemicalUnits"
                            "${PROJECT_BINARY_DIR}/src/outputProcess"
-                           "${PROJECT_BINARY_DIR}/src/berny"
                            "${PROJECT_BINARY_DIR}/pybind11"
                            )
-SET_TARGET_PROPERTIES (myMath PROPERTIES COMPILE_FLAGS "-fPIC")
-SET_TARGET_PROPERTIES (chemicalUnits PROPERTIES COMPILE_FLAGS "-fPIC")
-SET_TARGET_PROPERTIES (outputProcess PROPERTIES COMPILE_FLAGS "-fPIC")
-SET_TARGET_PROPERTIES (berny PROPERTIES COMPILE_FLAGS "-fPIC")
+set_target_properties(myMath chemicalUnits outputProcess berny
+  PROPERTIES POSITION_INDEPENDENT_CODE ON
+)
 target_link_libraries(MoleKing 
                         PUBLIC myMath
                         PUBLIC chemicalUnits
-                        PUBLIC outputProcess
-                        PUBLIC berny)
+                        PUBLIC outputProcess)
 
 target_compile_definitions(MoleKing
                                 PRIVATE VERSION_INFO=${EXAMPLE_VERSION_INFO})
