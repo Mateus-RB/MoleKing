@@ -4,7 +4,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from setuptools import Extension, setup
+from setuptools import Extension, setup, find_packages
 from setuptools.command.build_ext import build_ext
 
 
@@ -13,13 +13,13 @@ PLAT_TO_CMAKE = {
     "win32": "Win32",
     "win-amd64": "x64",
     "win-arm32": "ARM",
-    "win-arm64":  "ARM64",
+    "win-arm64": "ARM64",
 }
 
 
-# A CMakeExtension needs a sourcedir instead of a file list. 
+# A CMakeExtension needs a sourcedir instead of a file list.
 # The name must be the _single_ output extension from the CMake build.
-# If you need multiple extensions, see scikit-build. 
+# If you need multiple extensions, see scikit-build.
 class CMakeExtension(Extension):
     def __init__(self, name: str, sourcedir: str = "") -> None:
         super().__init__(name, sources=[])
@@ -38,29 +38,29 @@ class CMakeBuild(build_ext):
         debug = int(os.environ.get("DEBUG", 0)) if self.debug is None else self.debug
         cfg = "Debug" if debug else "Release"
 
-        # CMake lets you override the generator - we need to check this. 
-        # Can be set with Conda-Build, for example. 
+        # CMake lets you override the generator - we need to check this.
+        # Can be set with Conda-Build, for example.
         cmake_generator = os.environ.get("CMAKE_GENERATOR", "")
 
         # Set Python_EXECUTABLE instead if you use PYBIND11_FINDPYTHON
         # EXAMPLE_VERSION_INFO shows you how to pass a value into the C++ code
         # from Python.
         cmake_args = [
-            f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={extdir}{os. sep}",
-            f"-DPYTHON_EXECUTABLE={sys. executable}",
+            f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={extdir}{os.sep}",
+            f"-DPYTHON_EXECUTABLE={sys.executable}",
             f"-DCMAKE_BUILD_TYPE={cfg}",  # not used on MSVC, but no harm
             f"-DBuild_Python=ON",
         ]
         build_args = []
         # Adding CMake arguments set as environment variable
-        # (needed e.g.  to build for ARM OSx on conda-forge)
+        # (needed e.g. to build for ARM OSx on conda-forge)
         if "CMAKE_ARGS" in os.environ:
             cmake_args += [item for item in os.environ["CMAKE_ARGS"].split(" ") if item]
 
         # In this example, we pass in the version to C++. You might not need to.
         #cmake_args += [f"-DEXAMPLE_VERSION_INFO={self.distribution.get_version()}"]  # type: ignore[attr-defined]
 
-        if self.compiler.compiler_type != "msvc": 
+        if self.compiler.compiler_type != "msvc":
             # Using Ninja-build since it a) is available as a wheel and b)
             # multithreads automatically. MSVC would require all variables be
             # exported for Ninja to pick it up, which is a little tricky to do.
@@ -68,19 +68,19 @@ class CMakeBuild(build_ext):
             # 3.15+.
             if not cmake_generator or cmake_generator == "Ninja":
                 try:
-                    import ninja  # noqa:  F401
+                    import ninja  # noqa: F401
 
                     ninja_executable_path = Path(ninja.BIN_DIR) / "ninja"
                     cmake_args += [
                         "-GNinja",
-                        f"-DCMAKE_MAKE_PROGRAM: FILEPATH={ninja_executable_path}",
+                        f"-DCMAKE_MAKE_PROGRAM:FILEPATH={ninja_executable_path}",
                         f"-DBuild_Python=ON",
                         f"-DCMAKE_POLICY_VERSION_MINIMUM=3.5",
                     ]
                 except ImportError:
                     pass
 
-        else: 
+        else:
 
             # Single config generators are handled "normally"
             single_config = any(x in cmake_generator for x in {"NMake", "Ninja"})
@@ -91,11 +91,11 @@ class CMakeBuild(build_ext):
             # Specify the arch if using MSVC generator, but only if it doesn't
             # contain a backward-compatibility arch spec already in the
             # generator name.
-            if not single_config and not contains_arch: 
+            if not single_config and not contains_arch:
                 cmake_args += ["-A", PLAT_TO_CMAKE[self.plat_name]]
 
             # Multi-config generators have a different way to specify configs
-            if not single_config: 
+            if not single_config:
                 cmake_args += [
                     f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY_{cfg.upper()}={extdir}"
                 ]
@@ -105,7 +105,7 @@ class CMakeBuild(build_ext):
             # Cross-compile support for macOS - respect ARCHFLAGS if set
             archs = re.findall(r"-arch (\S+)", os.environ.get("ARCHFLAGS", ""))
             if archs:
-                cmake_args += ["-DCMAKE_OSX_ARCHITECTURES={}". format(";".join(archs))]
+                cmake_args += ["-DCMAKE_OSX_ARCHITECTURES={}".format(";".join(archs))]
 
         # Set CMAKE_BUILD_PARALLEL_LEVEL to control the parallel build level
         # across all generators.
@@ -113,7 +113,7 @@ class CMakeBuild(build_ext):
             # self.parallel is a Python 3 only way to set parallel jobs by hand
             # using -j in the build_ext call, not supported by pip or PyPA-build.
             if hasattr(self, "parallel") and self.parallel:
-                # CMake 3.12+ only. 
+                # CMake 3.12+ only.
                 build_args += [f"-j{self.parallel}"]
 
         build_temp = Path(self.build_temp) / ext.name
@@ -124,8 +124,12 @@ class CMakeBuild(build_ext):
             ["cmake", ext.sourcedir] + cmake_args, cwd=build_temp, check=True
         )
         subprocess.run(
-            ["cmake", "--build", ". "] + build_args, cwd=build_temp, check=True
+            ["cmake", "--build", "."] + build_args, cwd=build_temp, check=True
         )
+
+# The information here can also be placed in setup.cfg - better separation of
+# logic and declaration, and simpler if you include description/version in a file.
+
 
 def get_version_from_cmakelists(file_path):
     arq = open(file_path, 'r').readlines()
@@ -133,11 +137,30 @@ def get_version_from_cmakelists(file_path):
         if "MoleKing VERSION" in line:
             return line.split(' ')[-1].split(')')[0]
 
-
-# All metadata is now defined in pyproject.toml
-# setup.py only contains the CMake build logic
 setup(
-    ext_modules=[CMakeExtension("MoleKing")],
-    cmdclass={"build_ext": CMakeBuild},
+    name="MoleKing",
     version = get_version_from_cmakelists('CMakeLists.txt'),
-)
+    author="LEEDMOL Research Group",
+    author_email="mateus_barbosa@ufg.br",
+    description="MoleKing is a python module for chemists aiming to add common principles to python. This module adds new types of python variables, MoleKing_Molecule; MoleKing_Atom; MoleKing_SupraMolecule, and MoleKing_Output, alongside many features considered common knowledge among chemists.",
+    long_description="MoleKing is a Python module written in C++ with pybind11 Linkage under LEEDMOL Research Group. This module contains several useful classes for those who program python scripts aimed at theoretical chemistry. This package's main goal is to introduce chemistry concepts, such as Molecules, Atoms, and Geometries, to python, making programming more intuitive and understandable to chemists. Additionally, MoleKing is capable of reading and writing inputs and outputs files for several theoretical chemistry programs.",
+    ext_modules=[CMakeExtension("MoleKing")],
+    packages=find_packages(),
+    #packages=find_packages(where='src'),
+    #package_dir={'': 'src'},
+    include_package_data=True,
+    package_data={"":["tests/*.log", "tests/*.out"]},
+    cmdclass={"build_ext": CMakeBuild},
+    zip_safe=False,
+    extras_require={"test": ["pytest>=6.0"]},
+    python_requires=">=3.8",
+    classifiers=[
+        "License :: OSI Approved :: MIT License",
+        "Programming Language :: C++",
+        "Programming Language :: Python :: 3",
+        "Operating System :: OS Independent",
+        "Development Status :: 5 - Production/Stable",
+        "Intended Audience :: Science/Research",
+        "Topic :: Scientific/Engineering :: Chemistry",
+    ],
+   )
