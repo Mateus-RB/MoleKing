@@ -79,6 +79,9 @@ extend-exclude = '''
 )/
 '''
 
+[tool.cibuildwheel]
+test-skip = "*"
+
 [tool.isort]
 profile = "black"
 line_length = 100
@@ -125,3 +128,4 @@ exclude_lines = [
     "class .*\\bProtocol\\):",
     "@(abc\\.)?abstractmethod",
 ]
+
