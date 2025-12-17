@@ -64,8 +64,8 @@ before-build = "powershell -NoProfile -Command \"if (Test-Path build) { Remove-I
 [tool.cibuildwheel.macos]
 test-command = "python -m pytest {project}/tests"
 test-extras = ["test"]
-# Skip tests for macOS arm64 until module copy issue is confirmed fixed
-test-skip = ["*universal2:arm64", "cp38-macosx_arm64", "cp39-macosx_arm64"]
+# Skip tests ONLY for macOS universal2 arm64 (Apple Silicon)
+test-skip = ["*universal2:arm64"]
 
 # macOS cleanup (POSIX shell)
 before-build = "rm -rf {project}/build"
