@@ -59,7 +59,7 @@ Documentation = "https://github.com/Mateus-RB/MoleKing/wiki"
 "Bug Tracker" = "https://github.com/Mateus-RB/MoleKing/issues"
 
 [tool.setuptools]
-packages = ["MoleKing"]
+packages = ["moleking"]
 
 [tool.black]
 line-length = 100
@@ -83,7 +83,7 @@ extend-exclude = '''
 profile = "black"
 line_length = 100
 skip_gitignore = true
-known_first_party = ["MoleKing"]
+known_first_party = ["moleking"]
 
 [tool.mypy]
 python_version = "3.8"
@@ -102,11 +102,11 @@ strict_optional = true
 minversion = "6.0"
 testpaths = ["tests"]
 python_files = ["test_*.py", "*_test.py"]
-addopts = "-v --cov=MoleKing --cov-report=html --cov-report=term-missing"
+addopts = "-v --cov=moleking --cov-report=html --cov-report=term-missing"
 
 [tool.coverage.run]
 branch = true
-source = ["MoleKing"]
+source = ["moleking"]
 omit = [
     "*/tests/*",
     "*/test_*.py",
