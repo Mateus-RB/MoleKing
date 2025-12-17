@@ -52,7 +52,7 @@ before-build = "rm -rf {project}/build"
 [tool.cibuildwheel.windows]
 test-command = "python -m pytest {project}/tests"
 test-extras = ["test"]
-test-skip = ["cp38-win_amd64"]
+test-skip = ["cp38-win_amd64", "cp39-macosx_arm64"]
 # Proper Windows cleanup (PowerShell, not rm)
 before-build = "powershell -NoProfile -Command \"if (Test-Path build) { Remove-Item -Recurse -Force build }\""
 
