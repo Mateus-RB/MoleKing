@@ -50,7 +50,7 @@ before-build = "rm -rf {project}/build"
 # cibuildwheel — Windows
 # =========================
 [tool.cibuildwheel.windows]
-test-command = "python -c \"import MoleKing; print(MoleKing.__file__)\""
+test-command = "python -m pytest {project}/tests"
 test-extras = ["test"]
 test-skip = ["cp38-win_amd64", "cp39-macosx_arm64"]
 # Proper Windows cleanup (PowerShell, not rm)
@@ -61,10 +61,10 @@ before-build = "powershell -NoProfile -Command \"if (Test-Path build) { Remove-I
 # cibuildwheel — macOS
 # =========================
 [tool.cibuildwheel.macos]
-test-command = "python -c \"import MoleKing; print(MoleKing.__file__)\""
+test-command = "python -m pytest {project}/tests"
 test-extras = ["test"]
 # Skip tests ONLY for macOS universal2 arm64 (Apple Silicon)
-test-skip = ["*universal2:arm64", "cp38-macosx_arm64", "cp39-macosx_arm64"]
+test-skip = ["*universal2:arm64"]
 
 # macOS cleanup (POSIX shell)
 before-build = "rm -rf {project}/build"
