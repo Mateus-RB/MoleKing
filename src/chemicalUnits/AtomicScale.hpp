@@ -32,8 +32,8 @@ class Atom{
     string opls;
 
     public:
-    Atom(int atomicNumber, double x, double y, double z, double charge = 0.0, bool freezeCode_ = '0');
-    Atom(string atomicSymbol, double x, double y, double z, double charge = 0.0, bool freezeCode_ = '0');
+    Atom(int atomicNumber, double x, double y, double z, double charge = 0.0, bool freezeCode_ = false);
+    Atom(string atomicSymbol, double x, double y, double z, double charge = 0.0, bool freezeCode_ = false);
     double getAtomicMass();
     string getAtomicSymbol();
     int getAtomicNumber();

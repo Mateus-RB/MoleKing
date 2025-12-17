@@ -458,11 +458,11 @@ void Molecule::toGJF(string fileName, string method, string basis, string addKey
         {
             addKeywords += " IOP(3/76=0" + to_string(p1) + "000" + to_string(modHF) + "00) IOP(3/77=0900010000)";
         }
-        else if (modHF > 0 and modHF < 10)
+        else if (modHF > 0 && modHF < 10)
         {
             addKeywords += " IOP(3/76=00" + to_string(modHF) + "000" + to_string(p1) + "00) IOP(3/77=0900010000)";
         }
-        else if (modHF >= 10 and modHF <= 100)
+        else if (modHF >= 10 && modHF <= 100)
         {
             addKeywords += " IOP(3/76=0" + to_string(p1) + "000" + to_string(modHF) + "00) IOP(3/77=0900010000)";
         }
