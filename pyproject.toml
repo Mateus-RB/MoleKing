@@ -35,7 +35,6 @@ before-build = "rm -rf {project}/build"
 
 [tool.cibuildwheel.windows]
 test-command = "python -m pytest {project}/tests"
-test-skip = ["*universal2:arm64"]
 test-extras = ["test"]
 
 
