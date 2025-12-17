@@ -5,23 +5,12 @@ project(MoleKing VERSION 1.6.0)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
-
-# Compiler-aware warnings (portable: MSVC (DOS) vs GCC/Clang(Unix))
-if (MSVC)
-  add_compile_options(/W4)
-else()
-  add_compile_options(-Wall -Wextra)
-endif()
-
+set( CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} -Wall -O3 -fPIC" )
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
-# Generate config header into the build directory
-configure_file(
-  "${PROJECT_SOURCE_DIR}/src/MoleKingConfig.hpp.in"
-  "${PROJECT_BINARY_DIR}/MoleKing.hpp"
-  )
-  
+configure_file(src/MoleKingConfig.hpp.in MoleKing.hpp)
 add_definitions(-DBuild_Python=ON)
 #find_package(pybind11 REQUIRED)
+
 
 if(Build_Python)
 message(STATUS "Python is built")
@@ -45,11 +34,10 @@ target_include_directories(MoleKing PUBLIC
                            "${PROJECT_BINARY_DIR}/src/berny"
                            "${PROJECT_BINARY_DIR}/pybind11"
                            )
-
-set_target_properties(myMath chemicalUnits outputProcess berny
-  PROPERTIES POSITION_INDEPENDENT_CODE ON
-)
-
+SET_TARGET_PROPERTIES (myMath PROPERTIES COMPILE_FLAGS "-fPIC")
+SET_TARGET_PROPERTIES (chemicalUnits PROPERTIES COMPILE_FLAGS "-fPIC")
+SET_TARGET_PROPERTIES (outputProcess PROPERTIES COMPILE_FLAGS "-fPIC")
+SET_TARGET_PROPERTIES (berny PROPERTIES COMPILE_FLAGS "-fPIC")
 target_link_libraries(MoleKing 
                         PUBLIC myMath
                         PUBLIC chemicalUnits
