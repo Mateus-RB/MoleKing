@@ -52,7 +52,7 @@ before-build = "rm -rf {project}/build"
 [tool.cibuildwheel.windows]
 test-command = "python -m pytest {project}/tests"
 test-extras = ["test"]
-
+before-test = "pip install -e . --no-build-isolation"
 # Proper Windows cleanup (PowerShell, not rm)
 before-build = "powershell -NoProfile -Command \"if (Test-Path build) { Remove-Item -Recurse -Force build }\""
 
@@ -63,6 +63,7 @@ before-build = "powershell -NoProfile -Command \"if (Test-Path build) { Remove-I
 [tool.cibuildwheel.macos]
 test-command = "python -m pytest {project}/tests"
 test-extras = ["test"]
+before-test = "pip install -e . --no-build-isolation"
 
 # Skip tests ONLY for macOS universal2 arm64 (Apple Silicon)
 #test-skip = ["*universal2:arm64"]
