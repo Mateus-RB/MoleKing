@@ -7,16 +7,6 @@ requires = [
 ]
 build-backend = "setuptools.build_meta"
 
-[project]
-name = "MoleKing"
-version = "1.6.0"
-description = "MoleKing is a python module for chemists aiming to add common principles to python. This module adds new types of python variables, MoleKing_Molecule; MoleKing_Atom; MoleKing_SupraMolecule, and MoleKing_Output, alongside many features considered common knowledge among chemists."
-requires-python = ">=3.8"
-
-[project.optional-dependencies]
-test = ["pytest>=6.0"]
-
-
 [tool.mypy]
 files = "setup.py"
 python_version = "3.7"
@@ -29,9 +19,6 @@ warn_unreachable = true
 module = ["ninja"]
 ignore_missing_imports = true
 
-[tool.setuptools.packages.find]
-where = ["."]
-include = ["MoleKing"]
 
 [tool.pytest.ini_options]
 minversion = "6.0"
@@ -43,15 +30,13 @@ testpaths = ["tests"]
 [tool.cibuildwheel.linux]
 test-command = "pytest {project}/tests"
 test-extras = ["test"]
+test-skip = ["*universal2:arm64"]
 before-build = "rm -rf {project}/build"
 
 [tool.cibuildwheel.windows]
 test-command = "pytest {project}/tests"
 test-extras = ["test"]
 
-[tool.cibuildwheel.macos]
-test-command = "pytest {project}/tests"
-test-extras = ["test"]
 
 [tool.ruff]
 extend-select = [

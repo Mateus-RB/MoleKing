@@ -1,6 +1,9 @@
-from MoleKing import G16LOGfile, Psi4OUTfile
+import MoleKing
 import os
 import platform
+
+G16LOGfile = MoleKing.G16LOGfile
+Psi4OUTfile = MoleKing.Psi4OUTfile
 
 class TestG16Output:
     @classmethod
