@@ -127,6 +127,18 @@ moleking_apply_warnings(berny)
 # Collect the frequently reused libraries in one list.
 set(MOLEKING_CORE_LIBS myMath chemicalUnits outputProcess berny)
 
+set(MOLEKING_LIB_OUTPUT_DIR "${CMAKE_BINARY_DIR}/MoleKing_Libs")
+
+# Keep intermediate static libs in a dedicated build folder so only the Python
+# module lands in site-packages (or, if artifacts are copied, they're grouped).
+foreach(_lib IN LISTS MOLEKING_CORE_LIBS)
+  set_target_properties(${_lib} PROPERTIES
+    ARCHIVE_OUTPUT_DIRECTORY "${MOLEKING_LIB_OUTPUT_DIR}"
+    LIBRARY_OUTPUT_DIRECTORY "${MOLEKING_LIB_OUTPUT_DIR}"
+    RUNTIME_OUTPUT_DIRECTORY "${MOLEKING_LIB_OUTPUT_DIR}"
+  )
+endforeach()
+
 # Python extension section.
 if(Build_Python)
   # Require Python 3.8+ headers and libraries because the module targets them.

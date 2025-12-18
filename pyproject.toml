@@ -32,6 +32,11 @@ classifiers = [
 [project.optional-dependencies]
 test = ["pytest>=6.0"]
 
+[tool.setuptools]
+packages = []
+py-modules = []
+include-package-data = false
+
 [tool.mypy]
 files = "setup.py"
 python_version = "3.7"

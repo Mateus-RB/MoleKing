@@ -115,5 +115,8 @@ setup(
     version=get_version_from_cmakelists(CMAKELISTS),
     ext_modules=[CMakeExtension("MoleKing")],
     cmdclass={"build_ext": CMakeBuild},
+    packages=[],
+    py_modules=[],
+    include_package_data=False,
     zip_safe=False,
 )
