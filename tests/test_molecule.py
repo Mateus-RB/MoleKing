@@ -1,6 +1,4 @@
-import MoleKing
-
-Molecule = MoleKing.Molecule
+from MoleKing import Molecule
 
 class TestMolecule():
 
