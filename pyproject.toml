@@ -7,6 +7,9 @@ requires = [
 ]
 build-backend = "setuptools.build_meta"
 
+[project]
+name = "MoleKing"
+
 [tool.mypy]
 files = "setup.py"
 python_version = "3.7"
