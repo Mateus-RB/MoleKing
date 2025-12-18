@@ -107,31 +107,10 @@ jobs:
           mkdir wheelhouse/windows
           cibuildwheel --output-dir wheelhouse/windows --platform windows
 
-      - name: Debug package installation
-        run: |
-          echo "=== Checking installed package ==="
-          # Install the wheel that was just built
-          pip install wheelhouse/windows/*.whl --force-reinstall
-          
-          echo "=== Python path ==="
-          python -c "import sys; [print(p) for p in sys.path]"
-          
-          echo "=== Installed location ==="
-          python -m pip show -f MoleKing
-          
-          echo "=== Files actually installed ==="
-          python -c "import site; print('Site packages:', site.getsitepackages())"
-          # Then check what's in site-packages
-          Get-ChildItem -Recurse -Path (python -c "import site; print(site.getsitepackages()[0])") | Where-Object {$_.Name -like '*mole*'} | ForEach-Object { $_.FullName }
-          
-          echo "=== Trying import with trace ==="
-          python -v -c "import MoleKing" 2>&1 | select -Last 50
-
       - name: List contents of wheelhouse
         run: |
           echo "Contents of wheelhouse directory:"
  
-
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:

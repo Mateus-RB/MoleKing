@@ -28,18 +28,17 @@ filterwarnings = ["error"]
 testpaths = ["tests"]
 
 [tool.cibuildwheel.linux]
-#test-command = "pytest {project}/tests"
+test-command = "pytest {project}/tests"
 test-extras = ["test"]
-test-skip = "*"
 before-build = "rm -rf {project}/build"
 
 [tool.cibuildwheel.windows]
-#test-command = "pytest {project}/tests"
+test-command = "pytest {project}/tests"
 test-extras = ["test"]
-test-skip = "*"
 
 [tool.cibuildwheel.macos]
-test-skip = "*"
+test-command = "pytest {project}/tests"
+test-extras = ["test"]
 
 [tool.ruff]
 extend-select = [
