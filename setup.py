@@ -148,7 +148,6 @@ setup(
     package_data={"":["tests/*.log", "tests/*.out"]},
     cmdclass={"build_ext": CMakeBuild},
     zip_safe=False,
-    extras_require={"test": ["pytest>=6.0"]},
     classifiers=[
         "License :: OSI Approved :: MIT License",
         "Programming Language :: C++",
