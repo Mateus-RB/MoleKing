@@ -1,98 +1,176 @@
-#Cmake Requirements
-cmake_minimum_required(VERSION 3.15...4.0)
-#project Title and Version
-project(MoleKing VERSION 1.6.0)
+# Require modern CMake so we get up-to-date Python and pybind11 helpers.
+cmake_minimum_required(VERSION 3.18)
 
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED True)
-if (MSVC)
-  add_compile_options(/W1)
+# Declare the project metadata once so all targets share a name and version.
+project(MoleKing VERSION 1.6.0 LANGUAGES CXX)
+set(PROJECT_DESCRIPTION "Python extension module for theoretical chemistry workflows")
+
+# Expose our custom CMake modules folder (if any helpers live there).
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
+# Cache the frequently referenced directories for readability.
+set(MOLEKING_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
+set(MOLEKING_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
+
+# Allow toggling optional parts of the build from the command line.
+if(DEFINED MOLEKING_BUILD_PYTHON_MODULE)
+  set(_moleking_build_python_default ${MOLEKING_BUILD_PYTHON_MODULE})
 else()
-  add_compile_options(-Wall)
+  set(_moleking_build_python_default ON)
+endif()
+option(Build_Python "Build the MoleKing pybind11 extension module" ${_moleking_build_python_default})
+
+if(DEFINED MOLEKING_BUILD_CLI)
+  set(_moleking_build_cli_default ${MOLEKING_BUILD_CLI})
+elseif(NOT Build_Python)
+  set(_moleking_build_cli_default ON)
+else()
+  set(_moleking_build_cli_default OFF)
+endif()
+option(MOLEKING_BUILD_CLI "Build the optional MoleKing CLI application" ${_moleking_build_cli_default})
+option(MOLEKING_ENABLE_TESTS "Enable ctest targets (requires the CLI build)" OFF)
+option(MOLEKING_ENABLE_IPO "Enable interprocedural optimization / LTO when available" OFF)
+
+# Use a modern standard across compilers and disable vendor extensions.
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+# Make all targets position independent, which shared libraries require.
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
+# Silence MSVC-specific CRT warnings that are noisy for cross-platform code.
+if(MSVC)
+  add_compile_definitions(_CRT_SECURE_NO_WARNINGS)
 endif()
 
-set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
-configure_file(src/MoleKingConfig.hpp.in MoleKing.hpp)
-add_definitions(-DBuild_Python=ON)
-#find_package(pybind11 REQUIRED)
+# Allow enabling link-time optimization only if the toolchain supports it.
+if(MOLEKING_ENABLE_IPO)
+  include(CheckIPOSupported)
+  check_ipo_supported(RESULT ipo_supported OUTPUT ipo_error)
+  if(ipo_supported)
+    set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ON)
+  else()
+    message(WARNING "IPO/LTO is not supported by this toolchain: ${ipo_error}")
+  endif()
+endif()
 
-
-if(Build_Python)
-message(STATUS "Python is built")
-#Set project directories
-add_subdirectory(src)
-add_subdirectory(src/myMath)
-add_subdirectory(src/outputProcess)
-add_subdirectory(src/berny)
-add_subdirectory(src/chemicalUnits)
-add_subdirectory(pybind11)
-
-
-#add_executable(MoleKing src/main.cpp)
-pybind11_add_module(MoleKing src/main.cpp)
-#Update serash folders
-target_include_directories(MoleKing PUBLIC
-                           "${PROJECT_BINARY_DIR}"
-                           "${PROJECT_BINARY_DIR}/src/myMath"
-                           "${PROJECT_BINARY_DIR}/src/chemicalUnits"
-                           "${PROJECT_BINARY_DIR}/src/outputProcess"
-                           "${PROJECT_BINARY_DIR}/pybind11"
-                           )
-set_target_properties(myMath chemicalUnits outputProcess berny
-  PROPERTIES POSITION_INDEPENDENT_CODE ON
+# Generate the configuration header that exposes version info to C++.
+configure_file(
+  "${MOLEKING_SRC_DIR}/MoleKingConfig.hpp.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/MoleKing.hpp"
+  @ONLY
 )
-target_link_libraries(MoleKing 
-                        PUBLIC myMath
-                        PUBLIC chemicalUnits
-                        PUBLIC outputProcess)
 
-target_compile_definitions(MoleKing
-                                PRIVATE VERSION_INFO=${EXAMPLE_VERSION_INFO})
-else()
-message(STATUS "Python is not built")
-#Set project directories
-add_subdirectory(src)
-add_subdirectory(src/myMath)
-add_subdirectory(src/outputProcess)
-add_subdirectory(src/berny)
-add_subdirectory(src/chemicalUnits)
+# Shared include paths used by multiple libraries/executables.
+set(MOLEKING_INTERFACE_INCLUDE_DIRS
+  $<BUILD_INTERFACE:${MOLEKING_SRC_DIR}>
+  $<BUILD_INTERFACE:${MOLEKING_INCLUDE_DIR}>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+  $<INSTALL_INTERFACE:include>
+)
 
-add_executable(MoleKing src/main2.cpp)
-#pybind11_add_module(MoleKing src/main.cpp)
-#Update serash folders
-target_include_directories(MoleKing PUBLIC
-                           "${PROJECT_BINARY_DIR}"
-                           "${PROJECT_BINARY_DIR}/src/myMath"
-                           "${PROJECT_BINARY_DIR}/src/chemicalUnits"
-                           "${PROJECT_BINARY_DIR}/src/outputProcess"
-                           "${PROJECT_BINARY_DIR}/src/berny"
-                           )
+# Convenience list for private include/search paths.
+set(MOLEKING_PRIVATE_INCLUDE_DIRS
+  "${MOLEKING_SRC_DIR}"
+  "${MOLEKING_INCLUDE_DIR}"
+  "${CMAKE_CURRENT_BINARY_DIR}"
+)
 
-target_link_libraries(MoleKing 
-                        PUBLIC myMath
-                        PUBLIC chemicalUnits
-                        PUBLIC outputProcess
-                        PUBLIC berny)
-                        
-enable_testing()
-# First Test
-add_test(NAME Usage COMMAND MoleKing)
-set_tests_properties(Usage 
-                    PROPERTIES PASS_REGULAR_EXPRESSION "Usage: .* parameter"
-                    )
-# Second Test
-add_test(NAME Version COMMAND MoleKing --version)
-set_tests_properties(Version 
-                    PROPERTIES PASS_REGULAR_EXPRESSION "MoleKing.*Version.*${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}"
-                    )
-# Third Test
-add_test(NAME Water COMMAND MoleKing water)
-set_tests_properties(Water 
-                    PROPERTIES PASS_REGULAR_EXPRESSION "Molecule.*O.*1.*H.*2.*\n.*0.*\n.*1.*\n.*0.*\n.*2.*"
-                    )
-# Fourth Test
-add_test(NAME Methanol COMMAND MoleKing methanol)
-set_tests_properties(Methanol 
-                    PROPERTIES PASS_REGULAR_EXPRESSION ".*1.*0.*2.*\n.*1.*0.*3.*\n.*1.*0.*4.*\n.*2.*0.*3.*\n.*2.*0.*4.*\n.*3.*0.*4.*\n.*0.*4.*5.*\n"
-                    )
+# Small helper to give every target reasonable warning flags.
+function(moleking_apply_warnings target_name)
+  if(MSVC)
+    target_compile_options(${target_name} PRIVATE /W4 /permissive- /EHsc)
+  else()
+    target_compile_options(${target_name} PRIVATE -Wall -Wextra -Wpedantic)
+  endif()
+endfunction()
+
+# Core math utilities reused everywhere else.
+add_library(myMath STATIC
+  "${MOLEKING_SRC_DIR}/myMath/Geometry.cpp"
+  "${MOLEKING_SRC_DIR}/myMath/MassCenter.cpp"
+  "${MOLEKING_SRC_DIR}/myMath/Matrix.cpp"
+  "${MOLEKING_SRC_DIR}/myMath/Vectors.cpp"
+)
+target_include_directories(myMath PUBLIC ${MOLEKING_INTERFACE_INCLUDE_DIRS})
+moleking_apply_warnings(myMath)
+
+# Atomic/molecular primitives.
+add_library(chemicalUnits STATIC
+  "${MOLEKING_SRC_DIR}/chemicalUnits/AtomicScale.cpp"
+  "${MOLEKING_SRC_DIR}/chemicalUnits/Molecule.cpp"
+  "${MOLEKING_SRC_DIR}/chemicalUnits/OPLSff.cpp"
+  "${MOLEKING_SRC_DIR}/chemicalUnits/PeriodicTable.cpp"
+  "${MOLEKING_SRC_DIR}/chemicalUnits/SupraMolecule.cpp"
+  "${MOLEKING_SRC_DIR}/chemicalUnits/pov.cpp"
+)
+target_include_directories(chemicalUnits PUBLIC ${MOLEKING_INTERFACE_INCLUDE_DIRS})
+target_link_libraries(chemicalUnits PUBLIC myMath)
+moleking_apply_warnings(chemicalUnits)
+
+# Quantum output parsers and emitters.
+add_library(outputProcess STATIC
+  "${MOLEKING_SRC_DIR}/outputProcess/G16Process.cpp"
+  "${MOLEKING_SRC_DIR}/outputProcess/Psi4Process.cpp"
+)
+target_include_directories(outputProcess PUBLIC ${MOLEKING_INTERFACE_INCLUDE_DIRS})
+target_link_libraries(outputProcess PUBLIC myMath chemicalUnits)
+moleking_apply_warnings(outputProcess)
+
+# Geometry optimization helpers.
+add_library(berny STATIC "${MOLEKING_SRC_DIR}/berny/Hessian.cpp")
+target_include_directories(berny PUBLIC ${MOLEKING_INTERFACE_INCLUDE_DIRS})
+target_link_libraries(berny PUBLIC myMath chemicalUnits)
+moleking_apply_warnings(berny)
+
+# Collect the frequently reused libraries in one list.
+set(MOLEKING_CORE_LIBS myMath chemicalUnits outputProcess berny)
+
+# Python extension section.
+if(Build_Python)
+  # Require Python 3.8+ headers and libraries because the module targets them.
+  find_package(Python3 3.8 COMPONENTS Interpreter Development REQUIRED)
+  # Try to use a system pybind11; otherwise fall back to the vendored copy.
+  find_package(pybind11 CONFIG QUIET)
+  if(NOT pybind11_FOUND)
+    if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/pybind11/CMakeLists.txt")
+      message(STATUS "pybind11 package not found; using the vendored copy in ${CMAKE_CURRENT_SOURCE_DIR}/pybind11")
+      add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/pybind11")
+    else()
+      message(FATAL_ERROR "pybind11 was not located. Install pybind11 or add it as a submodule under ${CMAKE_CURRENT_SOURCE_DIR}/pybind11.")
+    endif()
+  endif()
+
+  # Build the actual Python module from the pybind11 entry point.
+  pybind11_add_module(MoleKing MODULE "${MOLEKING_SRC_DIR}/main.cpp")
+  target_link_libraries(MoleKing PRIVATE ${MOLEKING_CORE_LIBS})
+  target_include_directories(MoleKing PRIVATE ${MOLEKING_PRIVATE_INCLUDE_DIRS})
+  target_compile_definitions(MoleKing PRIVATE Build_Python=1 MOLEKING_VERSION="${PROJECT_VERSION}")
+  moleking_apply_warnings(MoleKing)
+  set_target_properties(MoleKing PROPERTIES
+    OUTPUT_NAME "MoleKing"
+    CXX_VISIBILITY_PRESET hidden
+    VISIBILITY_INLINES_HIDDEN YES
+  )
+endif()
+
+# Optional CLI executable section (mirrors the legacy main program).
+if(MOLEKING_BUILD_CLI)
+  add_executable(MoleKing_cli "${MOLEKING_SRC_DIR}/main2.cpp")
+  target_link_libraries(MoleKing_cli PRIVATE ${MOLEKING_CORE_LIBS})
+  target_include_directories(MoleKing_cli PRIVATE ${MOLEKING_PRIVATE_INCLUDE_DIRS})
+  target_compile_definitions(MoleKing_cli PRIVATE MOLEKING_VERSION="${PROJECT_VERSION}")
+  moleking_apply_warnings(MoleKing_cli)
+endif()
+
+# Lightweight tests that ensure the CLI reports the expected version.
+if(MOLEKING_ENABLE_TESTS)
+  enable_testing()
+  if(MOLEKING_BUILD_CLI)
+    add_test(NAME MoleKingVersion COMMAND MoleKing_cli --version)
+    set_tests_properties(MoleKingVersion PROPERTIES PASS_REGULAR_EXPRESSION "MoleKing.*${PROJECT_VERSION}")
+  else()
+    message(WARNING "MOLEKING_ENABLE_TESTS is ON but MOLEKING_BUILD_CLI is OFF. No executable is available for testing.")
+  endif()
 endif()

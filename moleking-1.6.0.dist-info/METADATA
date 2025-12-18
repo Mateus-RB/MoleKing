@@ -1,0 +1,95 @@
+Metadata-Version: 2.4
+Name: MoleKing
+Version: 1.6.0
+Summary: A pybind11-powered toolkit that brings theoretical chemistry constructs (molecules, atoms, Gaussian/Psi4 IO) into Python.
+Author-email: LEEDMOL Research Group <mateus_barbosa@ufg.br>
+License: MIT License
+        
+        Copyright (c) 2022 Mateus Rodrigues Barbosa
+        
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
+        
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
+        
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
+        
+Keywords: chemistry,pybind11,gaussian,psi4,molecules
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: C++
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3 :: Only
+Classifier: Operating System :: OS Independent
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Science/Research
+Classifier: Topic :: Scientific/Engineering :: Chemistry
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE.txt
+Provides-Extra: test
+Requires-Dist: pytest>=6.0; extra == "test"
+Dynamic: license-file
+
+# This is a working in progress at LEEDMOL-UFG under manitence of Mateus Rodrigues Barbosa, Pedro Henrique F. Matias and Rafael F. Veríssimo. Refer to the latest release for a stable version.
+
+# MoleKing: A Python Module for Theoretical Chemistry.
+MoleKing is a Python module written in C++ with pybind11 Linkage under [LEEDMOL](leedmol.com) Research Group. This module contains several useful classes for those who program python scripts aimed at theoretical chemistry. This package's main goal is to introduce chemistry concepts, such as Molecules, Atoms, and Geometries, to python, making programming more intuitive and understandable to chemists. Additionally, MoleKing is capable of reading and writing inputs and outputs files for several theoretical chemistry programs.
+
+---
+
+# Requirements:
+
+   <ul>
+   <li> C++11 or greater.</li>
+    <li>Cmake 3.15 or greater;</li>
+    <li>libEingen;</li>
+    <li>pybind11;</li>
+    <li>PIP10 or greater</li>
+    </ul>
+
+---
+
+# Installation:
+
+Clone the repository 
+                  	
+For **python** installation 
+```pip3 install ./MoleKing ``` under the main project directory;
+
+For **Debugging** and **Testing**:
+
+```
+mkdir build
+cd build
+cmake ../ -DBuild_Python=OFF
+cmake --build . 
+```
+
+For **python testing** and **debugging**
+
+```
+mkdir build
+cd build
+cmake ../ -DBuild_Python=ON
+cmake --build . 
+```
+
+---
+
+**Please feel free to report any issues or suggestions to mateus_barbosa@ufg.br or phfmatias@discente.ufg.br**
+
+![MoleKing_Gold](https://github.com/user-attachments/assets/c25a3305-e3bd-4526-9fd3-d7b31700a1c1)
+
+
+

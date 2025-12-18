@@ -7,6 +7,31 @@ requires = [
 ]
 build-backend = "setuptools.build_meta"
 
+[project]
+name = "MoleKing"
+dynamic = ["version"]
+description = "A pybind11-powered toolkit that brings theoretical chemistry constructs (molecules, atoms, Gaussian/Psi4 IO) into Python."
+readme = { file = "README.md", content-type = "text/markdown" }
+requires-python = ">=3.8"
+license = { file = "LICENSE.txt" }
+authors = [
+    { name = "LEEDMOL Research Group", email = "mateus_barbosa@ufg.br" },
+]
+keywords = ["chemistry", "pybind11", "gaussian", "psi4", "molecules"]
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: C++",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Operating System :: OS Independent",
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Chemistry",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=6.0"]
+
 [tool.mypy]
 files = "setup.py"
 python_version = "3.7"
@@ -35,9 +60,17 @@ before-build = "rm -rf {project}/build"
 
 [tool.cibuildwheel.windows]
 test-skip = "*"
+# [tool.cibuildwheel.windows]
+# test-command = "pytest {project}/tests"
+# test-extras = ["test"]
+# before-build = "rmdir /s /q {project}\\build"
 
 [tool.cibuildwheel.macos]
 test-skip = "*"
+# [tool.cibuildwheel.macos]
+# test-command = "pytest {project}/tests"
+# test-extras = ["test"]
+# before-build = "rm -rf {project}/build"
 
 
 [tool.ruff]
