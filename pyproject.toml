@@ -10,7 +10,8 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "MoleKing"
 version = "1.6.0"
-
+description = "MoleKing is a python module for chemists aiming to add common principles to python. This module adds new types of python variables, MoleKing_Molecule; MoleKing_Atom; MoleKing_SupraMolecule, and MoleKing_Output, alongside many features considered common knowledge among chemists."
+requires-python = "3.8"
 
 [tool.mypy]
 files = "setup.py"
