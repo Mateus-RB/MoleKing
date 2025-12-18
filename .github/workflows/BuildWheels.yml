@@ -107,6 +107,10 @@ jobs:
           mkdir wheelhouse/windows
           cibuildwheel --output-dir wheelhouse/windows --platform windows
 
+      - name: Install project (editable)
+        run: |
+          pip install -e .
+
       - name: List contents of wheelhouse
         run: |
           echo "Contents of wheelhouse directory:"
