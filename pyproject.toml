@@ -9,6 +9,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "MoleKing"
+version = "1.6.0"
+
 
 [tool.mypy]
 files = "setup.py"
