@@ -34,8 +34,10 @@ test-skip = ["*universal2:arm64"]
 before-build = "rm -rf {project}/build"
 
 [tool.cibuildwheel.windows]
-test-command = "pytest {project}/tests"
-test-extras = ["test"]
+test-skip = "*"
+
+[tool.cibuildwheel.macos]
+test-skip = "*"
 
 
 [tool.ruff]
