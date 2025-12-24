@@ -84,7 +84,8 @@ jobs:
         with:
           name: macos-wheels
           path: wheelhouse/macos
-
+          
+  build-windows:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
