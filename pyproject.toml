@@ -35,6 +35,17 @@ test-command = "pytest {project}/tests"
 test-extras = ["test"]
 before-build = "rm -rf {project}/build"
 
+# Debug antes dos testes para ver o que está instalado
+before-test = [
+    "python -c \"import sys; print('Platform:', sys.platform, 'Architecture:', sys.maxsize > 2**32)\"",
+    "python -c \"import site; print('Site packages:', site.getsitepackages())\"",
+    "python -c \"import os; print('Files in site-packages:'); [print(f) for root, dirs, files in os.walk(site.getsitepackages()[0]) for f in files if 'molek' in f.lower()]\"",
+    "python -c \"try: import MoleKing; print('✓ MoleKing works:', MoleKing.__file__); except Exception as e: print('✗ MoleKing failed:', e)\"",
+    "python -c \"try: import moleking; print('✓ moleking works:', moleking.__file__); except Exception as e: print('✗ moleking failed:', e)\"",
+]
+
+build-verbosity = 1
+
 [tool.cibuildwheel.windows]
 before-build = "if exist {project}\\build rmdir /s /q {project}\\build"
 
