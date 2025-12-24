@@ -30,20 +30,19 @@ testpaths = ["tests"]
 
 
 [tool.cibuildwheel]
-# Configurações globais (aplicam-se a todas as plataformas)
 test-command = "pytest {project}/tests"
 test-extras = ["test"]
 before-build = "rm -rf {project}/build"
 
-# Debug antes dos testes
 before-test = [
-    "python -c \"import sys; print('Platform:', sys.platform); print('Architecture: 64-bit' if sys.maxsize > 2**32 else 'Architecture: 32-bit')\"",
-    "python -c \"import site, os; print('Site packages:', site.getsitepackages()); files = [f for s in site.getsitepackages() for root, dirs, files in os.walk(s) for f in files if 'molek' in f.lower() or f.endswith('.pyd')]; print('Relevant files:', files[:20])\"",
-    "python -c \"try:\n    import MoleKing\n    print('SUCCESS: MoleKing imported from', MoleKing.__file__)\nexcept Exception as e:\n    print('FAILED MoleKing:', e)\"",
-    "python -c \"try:\n    import moleking\n    print('SUCCESS: moleking imported from', moleking.__file__)\nexcept Exception as e:\n    print('FAILED moleking:', e)\"",
+    "python -c \"import sys; print('Architecture:', '64-bit' if sys.maxsize > 2**32 else '32-bit')\"",
+    "python -c \"import site, os, glob; sp = site.getsitepackages()[1]; print('Site-packages:', sp); print('All files:', os.listdir(sp)[:30]); print('PYD files:', glob.glob(sp + '/**/*.pyd', recursive=True))\"",
 ]
 
 build-verbosity = 1
+
+[tool.cibuildwheel.windows]
+before-build = "if exist {project}\\build rmdir /s /q {project}\\build"
 
 [tool.cibuildwheel.windows]
 before-build = "if exist {project}\\build rmdir /s /q {project}\\build"
