@@ -46,9 +46,17 @@ target_link_libraries(MoleKing
                         PUBLIC chemicalUnits
                         PUBLIC outputProcess)
 
+set_target_properties(MoleKing PROPERTIES 
+    OUTPUT_NAME "MoleKing"
+    PREFIX ""
+
+install(TARGETS MoleKing LIBRARY DESTINATION .)
+
 target_compile_definitions(MoleKing
                                 PRIVATE VERSION_INFO=${EXAMPLE_VERSION_INFO})
 else()
+
+
 message(STATUS "Python is not built")
 #Set project directories
 add_subdirectory(src)
@@ -73,10 +81,6 @@ target_link_libraries(MoleKing
                         PUBLIC chemicalUnits
                         PUBLIC outputProcess
                         PUBLIC berny)
-
-set_target_properties(MoleKing PROPERTIES 
-    OUTPUT_NAME "MoleKing"
-    PREFIX ""
 )
 
 enable_testing()
