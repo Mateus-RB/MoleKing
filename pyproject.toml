@@ -33,11 +33,10 @@ test-command = "pytest {project}/tests"
 test-extras = ["test"]
 
 before-test = [
-    "python -c \"import sys; print('Python:', sys.version); print('Architecture:', '64-bit' if sys.maxsize > 2**32 else '32-bit')\"",
+    "python -c \"import sys; print('Architecture:', '64-bit' if sys.maxsize > 2**32 else '32-bit')\"",
     "python -c \"import site; print('Site-packages:', site.getsitepackages())\"",
-    "python -c \"import os, glob; print('\\nSearching for PYD files everywhere:'); [print(f) for f in glob.glob('C:/Users/runneradmin/AppData/Local/Temp/cibw-run-*/**/*.pyd', recursive=True)]\"",
-    "python -c \"import sys; print('\\nSys.path:', sys.path)\"",
-    "python -c \"try:\\n    import MoleKing\\n    print('SUCCESS MoleKing:', MoleKing.__file__)\\nexcept Exception as e:\\n    print('FAILED MoleKing:', e)\"",
+    "python -c \"import os, glob; files = glob.glob('C:/Users/runneradmin/AppData/Local/Temp/cibw-run-*/**/*.pyd', recursive=True); print('PYD files found:', len(files)); [print(f) for f in files[:10]]\"",
+    "python -c \"import sys; print('sys.path:', sys.path)\"",
 ]
 
 build-verbosity = 1
