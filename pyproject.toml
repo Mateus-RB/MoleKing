@@ -28,7 +28,6 @@ xfail_strict = true
 filterwarnings = ["error"]
 testpaths = ["tests"]
 
-
 [tool.cibuildwheel]
 test-command = "pytest {project}/tests"
 test-extras = ["test"]
@@ -40,9 +39,6 @@ before-test = [
 ]
 
 build-verbosity = 1
-
-[tool.cibuildwheel.windows]
-before-build = "if exist {project}\\build rmdir /s /q {project}\\build"
 
 [tool.cibuildwheel.windows]
 before-build = "if exist {project}\\build rmdir /s /q {project}\\build"
