@@ -27,10 +27,6 @@ xfail_strict = true
 filterwarnings = ["error"]
 testpaths = ["tests"]
 
-[tool.cibuildwheel]
-test-command = "pytest {project}/tests"
-test-extras = ["test"]
-before-build = "rm -rf {project}/build"
 
 [tool.cibuildwheel]
 # Configurações globais (aplicam-se a todas as plataformas)
