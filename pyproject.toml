@@ -31,17 +31,25 @@ testpaths = ["tests"]
 [tool.cibuildwheel]
 test-command = "pytest {project}/tests"
 test-extras = ["test"]
-before-build = "rm -rf {project}/build"
 
 before-test = [
-    "python -c \"import sys; print('Architecture:', '64-bit' if sys.maxsize > 2**32 else '32-bit')\"",
-    "python -c \"import site, os, glob; sp = site.getsitepackages()[1]; print('Site-packages:', sp); print('All files:', os.listdir(sp)[:30]); print('PYD files:', glob.glob(sp + '/**/*.pyd', recursive=True))\"",
+    "python -c \"import sys; print('Python:', sys.version); print('Architecture:', '64-bit' if sys.maxsize > 2**32 else '32-bit')\"",
+    "python -c \"import site; print('Site-packages:', site.getsitepackages())\"",
+    "python -c \"import os, glob; print('\\nSearching for PYD files everywhere:'); [print(f) for f in glob.glob('C:/Users/runneradmin/AppData/Local/Temp/cibw-run-*/**/*.pyd', recursive=True)]\"",
+    "python -c \"import sys; print('\\nSys.path:', sys.path)\"",
+    "python -c \"try:\\n    import MoleKing\\n    print('SUCCESS MoleKing:', MoleKing.__file__)\\nexcept Exception as e:\\n    print('FAILED MoleKing:', e)\"",
 ]
 
 build-verbosity = 1
 
+[tool.cibuildwheel.linux]
+before-build = "rm -rf {project}/build"
+
 [tool.cibuildwheel.windows]
 before-build = "if exist {project}\\build rmdir /s /q {project}\\build"
+
+[tool.cibuildwheel.macos]
+before-build = "rm -rf {project}/build"
 
 [tool.ruff]
 extend-select = [
