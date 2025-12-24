@@ -1,4 +1,4 @@
-from MoleKing import Molecule
+from moleking import Molecule
 
 class TestMolecule():
 
