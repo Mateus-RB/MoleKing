@@ -73,7 +73,12 @@ target_link_libraries(MoleKing
                         PUBLIC chemicalUnits
                         PUBLIC outputProcess
                         PUBLIC berny)
-                        
+
+set_target_properties(MoleKing PROPERTIES 
+    OUTPUT_NAME "MoleKing"
+    PREFIX ""
+)
+
 enable_testing()
 # First Test
 add_test(NAME Usage COMMAND MoleKing)
