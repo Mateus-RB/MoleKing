@@ -85,7 +85,6 @@ jobs:
           name: macos-wheels
           path: wheelhouse/macos
 
-  build-windows:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -107,10 +106,22 @@ jobs:
           mkdir wheelhouse/windows
           cibuildwheel --output-dir wheelhouse/windows --platform windows
 
+      - name: Debug - Check what was built
+        shell: pwsh
+        run: |
+          python -m pip install --force-reinstall (Get-ChildItem wheelhouse/windows/*.whl | Select-Object -First 1).FullName
+          python -c "import sys; print('Python paths:'); [print(p) for p in sys.path]"
+          python -c "import site; print('Site packages:'); print(site.getsitepackages())"
+          Get-ChildItem -Recurse -Filter "*molek*" | Select-Object FullName
+          Get-ChildItem -Recurse -Filter "*.pyd" | Select-Object FullName
+          python -c "import pkgutil; print('Available modules:'); print([x.name for x in pkgutil.iter_modules()])"
+          python -c "try: import MoleKing; print('SUCCESS: MoleKing imported from', MoleKing.__file__); except Exception as e: print('FAILED MoleKing:', e)"
+          python -c "try: import moleking; print('SUCCESS: moleking imported from', moleking.__file__); except Exception as e: print('FAILED moleking:', e)"
+
       - name: List contents of wheelhouse
         run: |
           echo "Contents of wheelhouse directory:"
- 
+          Get-ChildItem -Recurse wheelhouse
 
       - name: Upload wheels
         uses: actions/upload-artifact@v4
