@@ -1,4 +1,7 @@
-from moleking import G16LOGfile, Psi4OUTfile
+try:
+    from MoleKing import G16LOGfile, Psi4OUTfile
+except:    
+    from moleking import G16LOGfile, Psi4OUTfile
 import os
 import platform
 
