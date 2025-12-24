@@ -1,4 +1,7 @@
-from moleking import Molecule
+try:
+    from MoleKing import Molecule 
+except:
+    from moleking import Molecule
 
 class TestMolecule():
 
