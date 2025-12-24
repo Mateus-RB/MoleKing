@@ -51,7 +51,9 @@ set_target_properties(MoleKing PROPERTIES
     PREFIX ""
 )
 
-install(TARGETS MoleKing LIBRARY DESTINATION .)
+install(TARGETS MoleKing 
+        LIBRARY DESTINATION .
+        RUNTIME DESTINATION .)
 
 target_compile_definitions(MoleKing
                                 PRIVATE VERSION_INFO=${EXAMPLE_VERSION_INFO})
