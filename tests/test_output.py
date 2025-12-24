@@ -1,4 +1,4 @@
-from MoleKing import G16LOGfile, Psi4OUTfile
+from moleking import G16LOGfile, Psi4OUTfile
 import os
 import platform
 
