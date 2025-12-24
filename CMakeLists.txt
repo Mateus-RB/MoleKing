@@ -49,6 +49,7 @@ target_link_libraries(MoleKing
 set_target_properties(MoleKing PROPERTIES 
     OUTPUT_NAME "MoleKing"
     PREFIX ""
+)
 
 install(TARGETS MoleKing LIBRARY DESTINATION .)
 
