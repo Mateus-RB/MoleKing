@@ -1,3 +1,6 @@
+[project]
+name = "MoleKing"
+
 [build-system]
 requires = [
     "setuptools>=66",
