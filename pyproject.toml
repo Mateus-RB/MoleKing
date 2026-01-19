@@ -36,6 +36,7 @@ before-build = "rm -rf {project}/build"
 
 [tool.cibuildwheel.windows]
 before-build = "if exist {project}\\build rmdir /s /q {project}\\build"
+repair-wheel-command = "python -m pip install -q delvewheel && delvewheel repair {wheel} -w {dest_dir}"
 
 [tool.ruff]
 extend-select = [
