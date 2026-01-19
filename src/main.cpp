@@ -36,7 +36,7 @@ using namespace std;
 #include <pybind11/stl.h>
 #include <pybind11/pytypes.h>
 namespace py = pybind11;
-PYBIND11_MODULE(MoleKing, m) {
+PYBIND11_MODULE(_core, m) {
     
     py::class_<PeriodicTable>(m, "PeriodicTable", "This class creates a virtual Periodic Table.")
         .def(py::init())

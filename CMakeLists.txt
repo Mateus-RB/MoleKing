@@ -29,9 +29,9 @@ add_subdirectory(pybind11)
 
 
 #add_executable(MoleKing src/main.cpp)
-pybind11_add_module(MoleKing src/main.cpp)
+pybind11_add_module(_core src/main.cpp)
 #Update serash folders
-target_include_directories(MoleKing PUBLIC
+target_include_directories(_core PUBLIC
                            "${PROJECT_BINARY_DIR}"
                            "${PROJECT_BINARY_DIR}/src/myMath"
                            "${PROJECT_BINARY_DIR}/src/chemicalUnits"
@@ -41,12 +41,12 @@ target_include_directories(MoleKing PUBLIC
 set_target_properties(myMath chemicalUnits outputProcess berny
   PROPERTIES POSITION_INDEPENDENT_CODE ON
 )
-target_link_libraries(MoleKing 
+target_link_libraries(_core 
                         PUBLIC myMath
                         PUBLIC chemicalUnits
                         PUBLIC outputProcess)
 
-target_compile_definitions(MoleKing
+target_compile_definitions(_core
                                 PRIVATE VERSION_INFO=${EXAMPLE_VERSION_INFO})
 else()
 message(STATUS "Python is not built")
