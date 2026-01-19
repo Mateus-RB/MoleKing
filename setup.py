@@ -50,10 +50,10 @@ class CMakeBuild(build_ext):
             f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={extdir}{os.sep}",
             f"-DCMAKE_RUNTIME_OUTPUT_DIRECTORY={extdir}{os.sep}",
             f"-DCMAKE_ARCHIVE_OUTPUT_DIRECTORY={extdir}{os.sep}",
-            f"-DPYTHON_EXECUTABLE={sys.executable}",
             f"-DCMAKE_BUILD_TYPE={cfg}",  # not used on MSVC, but no harm
             f"-DBuild_Python=ON",
             f"-DPY_EXT_OUTPUT_DIR={extdir}",  # ensure CMake places the module exactly where setuptools expects
+            f"-DPYBIND11_FINDPYTHON=ON",     # let pybind11/CMake choose the correct target Python
         ]
         build_args = []
         # Adding CMake arguments set as environment variable
