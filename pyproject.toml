@@ -32,7 +32,7 @@ testpaths = ["tests"]
 # Configurações globais (aplicam-se a todas as plataformas)
 test-command = "pytest {project}/tests"
 test-extras = ["test"]
-before-test = "pip install {project}"
+before-test = "pip3 install ."
 before-build = "rm -rf {project}/build"
 
 [tool.cibuildwheel.windows]
