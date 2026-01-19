@@ -2,7 +2,6 @@ import os
 import re
 import subprocess
 import sys
-import shutil
 from pathlib import Path
 
 from setuptools import Extension, setup, find_packages
@@ -48,12 +47,9 @@ class CMakeBuild(build_ext):
         # from Python.
         cmake_args = [
             f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={extdir}{os.sep}",
-            f"-DCMAKE_RUNTIME_OUTPUT_DIRECTORY={extdir}{os.sep}",
-            f"-DCMAKE_ARCHIVE_OUTPUT_DIRECTORY={extdir}{os.sep}",
+            f"-DPYTHON_EXECUTABLE={sys.executable}",
             f"-DCMAKE_BUILD_TYPE={cfg}",  # not used on MSVC, but no harm
             f"-DBuild_Python=ON",
-            f"-DPY_EXT_OUTPUT_DIR={extdir}",  # ensure CMake places the module exactly where setuptools expects
-            f"-DPYBIND11_FINDPYTHON=ON",     # let pybind11/CMake choose the correct target Python
         ]
         build_args = []
         # Adding CMake arguments set as environment variable
@@ -101,9 +97,7 @@ class CMakeBuild(build_ext):
             # Multi-config generators have a different way to specify configs
             if not single_config:
                 cmake_args += [
-                    f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY_{cfg.upper()}={extdir}",
-                    f"-DCMAKE_RUNTIME_OUTPUT_DIRECTORY_{cfg.upper()}={extdir}",
-                    f"-DCMAKE_ARCHIVE_OUTPUT_DIRECTORY_{cfg.upper()}={extdir}",
+                    f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY_{cfg.upper()}={extdir}"
                 ]
                 build_args += ["--config", cfg]
 
@@ -132,37 +126,6 @@ class CMakeBuild(build_ext):
         subprocess.run(
             ["cmake", "--build", "."] + build_args, cwd=build_temp, check=True
         )
-        
-        # Ensure the built extension is placed exactly where setuptools expects
-        extdir.mkdir(parents=True, exist_ok=True)
-
-        def find_built():
-            # First look in extdir (where CMake was instructed to write)
-            for candidate in extdir.glob("_core*.pyd"):
-                return candidate
-            for candidate in extdir.glob("_core*.so"):
-                return candidate
-            # Fallback: search build_temp (covers VS multi-config subdirs)
-            for root, _, files in os.walk(build_temp):
-                for file in files:
-                    if file.startswith("_core") and (file.endswith(".pyd") or file.endswith(".so")):
-                        return Path(root) / file
-            return None
-
-        built_path = find_built()
-        if not built_path:
-            raise RuntimeError(
-                "Could not find built _core extension. "
-                f"Looked in {extdir} and recursively under {build_temp}"
-            )
-
-        # Avoid copying when source and destination are identical
-        if Path(built_path).resolve() != Path(ext_fullpath).resolve():
-            shutil.copy2(built_path, ext_fullpath)
-            print(f"[setuptools] Copied {built_path} to {ext_fullpath}")
-        else:
-            print(f"[setuptools] Extension already at {ext_fullpath}")
-
 
 # The information here can also be placed in setup.cfg - better separation of
 # logic and declaration, and simpler if you include description/version in a file.
@@ -181,9 +144,8 @@ setup(
     author_email="mateus_barbosa@ufg.br",
     description="MoleKing is a python module for chemists aiming to add common principles to python. This module adds new types of python variables, MoleKing_Molecule; MoleKing_Atom; MoleKing_SupraMolecule, and MoleKing_Output, alongside many features considered common knowledge among chemists.",
     long_description="MoleKing is a Python module written in C++ with pybind11 Linkage under LEEDMOL Research Group. This module contains several useful classes for those who program python scripts aimed at theoretical chemistry. This package's main goal is to introduce chemistry concepts, such as Molecules, Atoms, and Geometries, to python, making programming more intuitive and understandable to chemists. Additionally, MoleKing is capable of reading and writing inputs and outputs files for several theoretical chemistry programs.",
-    ext_modules=[CMakeExtension("MoleKing._core")],
-    packages=["MoleKing"],
-    package_dir={"MoleKing": "src/MoleKing"},
+    ext_modules=[CMakeExtension("MoleKing")],
+    py_modules=["MoleKing"],
     include_package_data=True,
     package_data={"":["tests/*.log", "tests/*.out"]},
     cmdclass={"build_ext": CMakeBuild},

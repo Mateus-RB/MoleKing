@@ -6,10 +6,6 @@ project(MoleKing VERSION 1.6.0)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 if (MSVC)
-  # Statically link the MSVC runtime to avoid missing DLLs in wheels
-  set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-endif()
-if (MSVC)
   add_compile_options(/W1)
 else()
   add_compile_options(-Wall)
@@ -33,28 +29,9 @@ add_subdirectory(pybind11)
 
 
 #add_executable(MoleKing src/main.cpp)
-pybind11_add_module(_core src/main.cpp)
-# Force the Python extension to land where setuptools expects (passed via PY_EXT_OUTPUT_DIR)
-if(PY_EXT_OUTPUT_DIR)
-  foreach(_cfg IN ITEMS "" DEBUG RELEASE RELWITHDEBINFO MINSIZEREL)
-    string(TOUPPER "${_cfg}" _ucfg)
-    if(_cfg STREQUAL "")
-      set_target_properties(_core PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY ${PY_EXT_OUTPUT_DIR}
-        LIBRARY_OUTPUT_DIRECTORY ${PY_EXT_OUTPUT_DIR}
-        ARCHIVE_OUTPUT_DIRECTORY ${PY_EXT_OUTPUT_DIR}
-      )
-    else()
-      set_target_properties(_core PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY_${_ucfg} ${PY_EXT_OUTPUT_DIR}
-        LIBRARY_OUTPUT_DIRECTORY_${_ucfg} ${PY_EXT_OUTPUT_DIR}
-        ARCHIVE_OUTPUT_DIRECTORY_${_ucfg} ${PY_EXT_OUTPUT_DIR}
-      )
-    endif()
-  endforeach()
-endif()
+pybind11_add_module(MoleKing src/main.cpp)
 #Update serash folders
-target_include_directories(_core PUBLIC
+target_include_directories(MoleKing PUBLIC
                            "${PROJECT_BINARY_DIR}"
                            "${PROJECT_BINARY_DIR}/src/myMath"
                            "${PROJECT_BINARY_DIR}/src/chemicalUnits"
@@ -64,12 +41,12 @@ target_include_directories(_core PUBLIC
 set_target_properties(myMath chemicalUnits outputProcess berny
   PROPERTIES POSITION_INDEPENDENT_CODE ON
 )
-target_link_libraries(_core 
+target_link_libraries(MoleKing 
                         PUBLIC myMath
                         PUBLIC chemicalUnits
                         PUBLIC outputProcess)
 
-target_compile_definitions(_core
+target_compile_definitions(MoleKing
                                 PRIVATE VERSION_INFO=${EXAMPLE_VERSION_INFO})
 else()
 message(STATUS "Python is not built")
