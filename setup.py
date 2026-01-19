@@ -2,6 +2,8 @@ import os
 import re
 import subprocess
 import sys
+import glob
+import shutil
 from pathlib import Path
 
 from setuptools import Extension, setup, find_packages
@@ -128,6 +130,24 @@ class CMakeBuild(build_ext):
         subprocess.run(
             ["cmake", "--build", "."] + build_args, cwd=build_temp, check=True
         )
+        
+        # Explicitly copy the built extension into the package directory
+        # This ensures the .pyd/.so lands in MoleKing/ regardless of platform
+        built_ext_patterns = [
+            str(build_temp / "_core*.so"),
+            str(build_temp / "_core*.pyd"),
+            str(extdir / "_core*.so"),
+            str(extdir / "_core*.pyd"),
+            str(build_temp / "Release" / "_core*.pyd"),
+            str(build_temp / "Debug" / "_core*.pyd"),
+        ]
+        for pattern in built_ext_patterns:
+            for built_file in glob.glob(pattern):
+                dest = extdir / Path(built_file).name
+                if not dest.exists() or os.path.getmtime(built_file) > os.path.getmtime(dest):
+                    shutil.copy2(built_file, dest)
+                    print(f"Copied {built_file} to {dest}")
+
 
 # The information here can also be placed in setup.cfg - better separation of
 # logic and declaration, and simpler if you include description/version in a file.
