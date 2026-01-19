@@ -2,7 +2,6 @@ import os
 import re
 import subprocess
 import sys
-import glob
 import shutil
 from pathlib import Path
 
@@ -50,9 +49,11 @@ class CMakeBuild(build_ext):
         cmake_args = [
             f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={extdir}{os.sep}",
             f"-DCMAKE_RUNTIME_OUTPUT_DIRECTORY={extdir}{os.sep}",
+            f"-DCMAKE_ARCHIVE_OUTPUT_DIRECTORY={extdir}{os.sep}",
             f"-DPYTHON_EXECUTABLE={sys.executable}",
             f"-DCMAKE_BUILD_TYPE={cfg}",  # not used on MSVC, but no harm
             f"-DBuild_Python=ON",
+            f"-DPY_EXT_OUTPUT_DIR={extdir}",  # ensure CMake places the module exactly where setuptools expects
         ]
         build_args = []
         # Adding CMake arguments set as environment variable
@@ -102,6 +103,7 @@ class CMakeBuild(build_ext):
                 cmake_args += [
                     f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY_{cfg.upper()}={extdir}",
                     f"-DCMAKE_RUNTIME_OUTPUT_DIRECTORY_{cfg.upper()}={extdir}",
+                    f"-DCMAKE_ARCHIVE_OUTPUT_DIRECTORY_{cfg.upper()}={extdir}",
                 ]
                 build_args += ["--config", cfg]
 
@@ -131,22 +133,35 @@ class CMakeBuild(build_ext):
             ["cmake", "--build", "."] + build_args, cwd=build_temp, check=True
         )
         
-        # Explicitly copy the built extension into the package directory
-        # This ensures the .pyd/.so lands in MoleKing/ regardless of platform
-        built_ext_patterns = [
-            str(build_temp / "_core*.so"),
-            str(build_temp / "_core*.pyd"),
-            str(extdir / "_core*.so"),
-            str(extdir / "_core*.pyd"),
-            str(build_temp / "Release" / "_core*.pyd"),
-            str(build_temp / "Debug" / "_core*.pyd"),
-        ]
-        for pattern in built_ext_patterns:
-            for built_file in glob.glob(pattern):
-                dest = extdir / Path(built_file).name
-                if not dest.exists() or os.path.getmtime(built_file) > os.path.getmtime(dest):
-                    shutil.copy2(built_file, dest)
-                    print(f"Copied {built_file} to {dest}")
+        # Ensure the built extension is placed exactly where setuptools expects
+        extdir.mkdir(parents=True, exist_ok=True)
+
+        def find_built():
+            # First look in extdir (where CMake was instructed to write)
+            for candidate in extdir.glob("_core*.pyd"):
+                return candidate
+            for candidate in extdir.glob("_core*.so"):
+                return candidate
+            # Fallback: search build_temp (covers VS multi-config subdirs)
+            for root, _, files in os.walk(build_temp):
+                for file in files:
+                    if file.startswith("_core") and (file.endswith(".pyd") or file.endswith(".so")):
+                        return Path(root) / file
+            return None
+
+        built_path = find_built()
+        if not built_path:
+            raise RuntimeError(
+                "Could not find built _core extension. "
+                f"Looked in {extdir} and recursively under {build_temp}"
+            )
+
+        # Avoid copying when source and destination are identical
+        if Path(built_path).resolve() != Path(ext_fullpath).resolve():
+            shutil.copy2(built_path, ext_fullpath)
+            print(f"[setuptools] Copied {built_path} to {ext_fullpath}")
+        else:
+            print(f"[setuptools] Extension already at {ext_fullpath}")
 
 
 # The information here can also be placed in setup.cfg - better separation of

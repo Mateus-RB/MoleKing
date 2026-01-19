@@ -30,6 +30,25 @@ add_subdirectory(pybind11)
 
 #add_executable(MoleKing src/main.cpp)
 pybind11_add_module(_core src/main.cpp)
+# Force the Python extension to land where setuptools expects (passed via PY_EXT_OUTPUT_DIR)
+if(PY_EXT_OUTPUT_DIR)
+  foreach(_cfg IN ITEMS "" DEBUG RELEASE RELWITHDEBINFO MINSIZEREL)
+    string(TOUPPER "${_cfg}" _ucfg)
+    if(_cfg STREQUAL "")
+      set_target_properties(_core PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY ${PY_EXT_OUTPUT_DIR}
+        LIBRARY_OUTPUT_DIRECTORY ${PY_EXT_OUTPUT_DIR}
+        ARCHIVE_OUTPUT_DIRECTORY ${PY_EXT_OUTPUT_DIR}
+      )
+    else()
+      set_target_properties(_core PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY_${_ucfg} ${PY_EXT_OUTPUT_DIR}
+        LIBRARY_OUTPUT_DIRECTORY_${_ucfg} ${PY_EXT_OUTPUT_DIR}
+        ARCHIVE_OUTPUT_DIRECTORY_${_ucfg} ${PY_EXT_OUTPUT_DIR}
+      )
+    endif()
+  endforeach()
+endif()
 #Update serash folders
 target_include_directories(_core PUBLIC
                            "${PROJECT_BINARY_DIR}"
