@@ -47,7 +47,7 @@ jobs:
           ls -R wheelhouse
 
       - name: Upload wheels
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v6
         with:
           name: linux-wheels
           path: wheelhouse/linux
@@ -80,7 +80,7 @@ jobs:
           ls -R wheelhouse
 
       - name: Upload wheels
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v6
         with:
           name: macos-wheels
           path: wheelhouse/macos
@@ -113,7 +113,7 @@ jobs:
  
 
       - name: Upload wheels
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v6
         with:
           name: windows-wheels
           path: wheelhouse/windows
@@ -139,7 +139,7 @@ jobs:
           python setup.py sdist --dist-dir=wheelhouse/dist
           
       - name: Upload source distribution
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v6
         with:
           name: dist
           path: wheelhouse/dist
