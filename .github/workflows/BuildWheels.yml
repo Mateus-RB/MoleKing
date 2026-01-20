@@ -47,7 +47,7 @@ jobs:
       - name: Build wheels
         env:
           CIBW_BUILD: cp39-win_amd64 cp310-win_amd64 cp311-win_amd64 cp312-win_amd64 cp313-win_amd64 cp314-win_amd64
-          CIBW_TEST_COMMAND: python -c "from MoleKing import Molecule; print('MoleKing import successful')"
+          CIBW_TEST_COMMAND: python -c "import sys; print('Python path:', sys.path); from MoleKing import Molecule; print('✓ MoleKing import successful')"
           CIBW_TEST_EXTRAS: test
         run: |
           mkdir -p wheelhouse
