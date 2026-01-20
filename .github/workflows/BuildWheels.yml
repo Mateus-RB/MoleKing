@@ -54,7 +54,8 @@ jobs:
       - name: Build wheels
         env:
           CIBW_BUILD: ${{ env.CIBW_VERSION }}
-          CIBW_TEST_SKIP: "*"
+          CIBW_TEST_COMMAND: pytest {project}/tests -v
+          CIBW_TEST_EXTRAS: test
         run: |
           mkdir -p wheelhouse
           cibuildwheel --output-dir wheelhouse
@@ -68,9 +69,34 @@ jobs:
       - name: Upload wheels artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.os == 'windows-latest' && 'windows-wheels' || matrix.os == 'macos-latest' && 'macos-wheels' || 'linux-wheels' }}
+          name: wheels-${{ matrix.os }}-py${{ matrix.python-version }}
           path: wheelhouse/
           retention-days: 30
+
+  merge-artifacts:
+    needs: build-wheels
+    runs-on: ubuntu-latest
+    steps:
+      - name: Merge Windows wheels
+        uses: actions/upload-artifact/merge@v4
+        with:
+          name: windows-wheels
+          pattern: wheels-windows-latest-*
+          delete-merged: true
+
+      - name: Merge macOS wheels
+        uses: actions/upload-artifact/merge@v4
+        with:
+          name: macos-wheels
+          pattern: wheels-macos-latest-*
+          delete-merged: true
+
+      - name: Merge Linux wheels
+        uses: actions/upload-artifact/merge@v4
+        with:
+          name: linux-wheels
+          pattern: wheels-ubuntu-latest-*
+          delete-merged: true
 
   build-sdist:
     runs-on: ubuntu-latest
@@ -99,7 +125,7 @@ jobs:
           path: wheelhouse/dist
   
   upload-to-pypi:
-    needs: [build-wheels, build-sdist]
+    needs: [merge-artifacts, build-sdist]
     runs-on: ubuntu-latest
     if: ${{ github.event.inputs.upload-to-pypi == 'yes' }}
     steps:
@@ -120,14 +146,21 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: dist
+          pattern: '*-wheels'
+
+      - name: Download sdist
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+          name: dist
 
       - name: Verify package metadata
         run: |
-          python -m twine check dist/**/*
+          python -m twine check dist/*/*
           
       - name: Upload to PyPI
         env:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
         run: |
-          python -m twine upload --skip-existing dist/**/*
+          python -m twine upload --skip-existing dist/*/*
