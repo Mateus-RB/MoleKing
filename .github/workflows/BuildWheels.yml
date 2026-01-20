@@ -39,6 +39,13 @@ jobs:
         run: |
           echo "PYTHONPATH=${{ github.workspace }}/src:$PYTHONPATH" >> $GITHUB_ENV
 
+      - name: Set CIBW_BUILD version
+        shell: bash
+        run: |
+          PYTHON_VERSION="${{ matrix.python-version }}"
+          CIBW_VERSION="cp${PYTHON_VERSION//.}"
+          echo "CIBW_VERSION=${CIBW_VERSION}-*" >> $GITHUB_ENV
+
       - name: Clean previous builds
         run: |
           rm -rf build/ dist/ *.egg-info wheelhouse/
@@ -46,7 +53,7 @@ jobs:
 
       - name: Build wheels
         env:
-          CIBW_BUILD: cp${{ replace(matrix.python-version, '.', '') }}-*
+          CIBW_BUILD: ${{ env.CIBW_VERSION }}
           CIBW_TEST_COMMAND: pytest {project}/tests -v
           CIBW_TEST_EXTRAS: test
         run: |
