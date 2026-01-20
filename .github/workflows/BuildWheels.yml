@@ -32,7 +32,12 @@ jobs:
       - name: Install build dependencies
         run: |
           python -m pip install --upgrade pip setuptools wheel
-          pip install cibuildwheel
+          pip install cibuildwheel pytest
+
+      - name: Add project to PYTHONPATH
+        shell: bash
+        run: |
+          echo "PYTHONPATH=${{ github.workspace }}/src:$PYTHONPATH" >> $GITHUB_ENV
 
       - name: Clean previous builds
         run: |
@@ -42,6 +47,8 @@ jobs:
       - name: Build wheels
         env:
           CIBW_BUILD: cp39-* cp310-* cp311-* cp312-* cp313-* cp314-*
+          CIBW_TEST_COMMAND: bash -c "export PYTHONPATH={project}/src:$PYTHONPATH && pytest {project}/tests -v"
+          CIBW_TEST_EXTRAS: test
         run: |
           mkdir -p wheelhouse
           cibuildwheel --output-dir wheelhouse
