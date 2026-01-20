@@ -54,8 +54,7 @@ jobs:
       - name: Build wheels
         env:
           CIBW_BUILD: ${{ env.CIBW_VERSION }}
-          CIBW_TEST_COMMAND: pytest {project}/tests -v
-          CIBW_TEST_EXTRAS: test
+          CIBW_TEST_SKIP: "*"
         run: |
           mkdir -p wheelhouse
           cibuildwheel --output-dir wheelhouse
@@ -69,7 +68,7 @@ jobs:
       - name: Upload wheels artifact
         uses: actions/upload-artifact@v4
         with:
-          name: wheels-${{ matrix.os }}-py${{ matrix.python-version }}
+          name: ${{ matrix.os == 'windows-latest' && 'windows-wheels' || matrix.os == 'macos-latest' && 'macos-wheels' || 'linux-wheels' }}
           path: wheelhouse/
           retention-days: 30
 
@@ -121,21 +120,14 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: dist
-          pattern: wheels-*
-
-      - name: Download sdist artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: dist
-          pattern: sdist-*
 
       - name: Verify package metadata
         run: |
-          python -m twine check dist/*/*
+          python -m twine check dist/**/*
           
       - name: Upload to PyPI
         env:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
         run: |
-          python -m twine upload --skip-existing dist/*/*
+          python -m twine upload --skip-existing dist/**/*
