@@ -34,11 +34,6 @@ jobs:
           python -m pip install --upgrade pip setuptools wheel
           pip install cibuildwheel pytest
 
-      - name: Add project to PYTHONPATH
-        shell: bash
-        run: |
-          echo "PYTHONPATH=${{ github.workspace }}/src:$PYTHONPATH" >> $GITHUB_ENV
-
       - name: Set CIBW_BUILD version
         shell: bash
         run: |
@@ -54,6 +49,7 @@ jobs:
       - name: Build wheels
         env:
           CIBW_BUILD: ${{ env.CIBW_VERSION }}
+          CIBW_TEST_ENVIRONMENT: "PYTHONPATH="
           CIBW_TEST_COMMAND: pytest {project}/tests -v
           CIBW_TEST_EXTRAS: test
         run: |
