@@ -17,7 +17,6 @@ jobs:
       matrix:
         os: [windows-latest]
         python-version: ['3.9', '3.10', '3.11', '3.12', '3.13', '3.14']
-        python-wheelname: ['39', '310', '311', '312', '313', '314']
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -27,7 +26,7 @@ jobs:
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-wheelname }}
+          python-version: ${{ matrix.python-version }}
           cache: 'pip'
 
       - name: Install build dependencies
@@ -47,7 +46,7 @@ jobs:
 
       - name: Build wheels
         env:
-          CIBW_BUILD: cp39-win_amd64 cp310-win_amd64 cp311-win_amd64 cp312-win_amd64 cp313-win_amd64  cp314-win_amd64
+          CIBW_BUILD: cp${{ replace(matrix.python-version, '.', '') }}-win_amd64
           CIBW_TEST_COMMAND: pytest {project}/tests -v
           CIBW_TEST_EXTRAS: test
         run: |
