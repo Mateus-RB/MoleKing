@@ -141,8 +141,8 @@ endforeach()
 
 # Python extension section.
 if(Build_Python)
-  # Require Python 3.8+ headers and libraries because the module targets them.
-  find_package(Python3 3.8 COMPONENTS Interpreter Development REQUIRED)
+  # Require Python 3.9+ headers and libraries because the module targets them.
+  find_package(Python3 3.9 COMPONENTS Interpreter Development REQUIRED)
   # Try to use a system pybind11; otherwise fall back to the vendored copy.
   find_package(pybind11 CONFIG QUIET)
   if(NOT pybind11_FOUND)
