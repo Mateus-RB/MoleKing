@@ -113,10 +113,11 @@ def get_version_from_cmakelists(path: Path) -> str:
 
 setup(
     version=get_version_from_cmakelists(CMAKELISTS),
-    ext_modules=[CMakeExtension("MoleKing")],
     cmdclass={"build_ext": CMakeBuild},
-    packages=[],
-    py_modules=[],
+    ext_modules=[CMakeExtension("MoleKing")],
+    py_modules=["MoleKing"],
+    include_package_data=True,
+    package_data={"":["tests/*.log", "tests/*.out"]},
     include_package_data=False,
     zip_safe=False,
     extras_require={"test": ["pytest>=6.0"]},
