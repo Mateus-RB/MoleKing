@@ -142,12 +142,8 @@ endforeach()
 # Python extension section.
 if(Build_Python)
   # Require Python 3.9+ headers and libraries because the module targets them.
-  # Try full development support first, fall back to interpreter-only for CI environments
-  find_package(Python3 3.9 COMPONENTS Interpreter Development.Module QUIET)
-  if(NOT Python3_FOUND)
-    message(STATUS "Development.Module not found; attempting fallback with Interpreter only")
-    find_package(Python3 3.9 COMPONENTS Interpreter REQUIRED)
-  endif()
+  find_package(Python3 3.9 COMPONENTS Interpreter Development REQUIRED)
+  # Try to use a system pybind11; otherwise fall back to the vendored copy.
   find_package(pybind11 CONFIG QUIET)
   if(NOT pybind11_FOUND)
     if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/pybind11/CMakeLists.txt")
