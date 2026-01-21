@@ -118,6 +118,7 @@ setup(
     py_modules=["MoleKing"],
     include_package_data=True,
     package_data={"":["tests/*.log", "tests/*.out"]},
+    include_package_data=False,
     zip_safe=False,
     extras_require={"test": ["pytest>=6.0"]},
     python_requires=">=3.9",
