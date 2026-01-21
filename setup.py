@@ -115,7 +115,6 @@ setup(
     version=get_version_from_cmakelists(CMAKELISTS),
     cmdclass={"build_ext": CMakeBuild},
     ext_modules=[CMakeExtension("MoleKing")],
-    py_modules=["MoleKing"],
     include_package_data=True,
     package_data={"":["tests/*.log", "tests/*.out"]},
     zip_safe=False,
