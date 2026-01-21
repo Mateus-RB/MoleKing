@@ -112,17 +112,12 @@ def get_version_from_cmakelists(path: Path) -> str:
 
 
 setup(
-    name="MoleKing",
-    version = get_version_from_cmakelists('CMakeLists.txt'),
-    author="LEEDMOL Research Group",
-    author_email="mateus_barbosa@ufg.br",
-    description="MoleKing is a python module for chemists aiming to add common principles to python. This module adds new types of python variables, MoleKing_Molecule; MoleKing_Atom; MoleKing_SupraMolecule, and MoleKing_Output, alongside many features considered common knowledge among chemists.",
-    long_description="MoleKing is a Python module written in C++ with pybind11 Linkage under LEEDMOL Research Group. This module contains several useful classes for those who program python scripts aimed at theoretical chemistry. This package's main goal is to introduce chemistry concepts, such as Molecules, Atoms, and Geometries, to python, making programming more intuitive and understandable to chemists. Additionally, MoleKing is capable of reading and writing inputs and outputs files for several theoretical chemistry programs.",
+    version=get_version_from_cmakelists(CMAKELISTS),
     ext_modules=[CMakeExtension("MoleKing")],
-    py_modules=["MoleKing"],
-    include_package_data=True,
-    package_data={"":["tests/*.log", "tests/*.out"]},
     cmdclass={"build_ext": CMakeBuild},
+    packages=[],
+    py_modules=[],
+    include_package_data=False,
     zip_safe=False,
     extras_require={"test": ["pytest>=6.0"]},
     python_requires=">=3.9",
