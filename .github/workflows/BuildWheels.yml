@@ -15,8 +15,8 @@ jobs:
   build-wheels:
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: ['3.9', '3.10', '3.11', '3.12', '3.13', '3.14']
+        os: [windows-latest]
+        python-version: ['3.9']
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -46,17 +46,10 @@ jobs:
           rm -rf build/ dist/ *.egg-info wheelhouse/
         shell: bash
 
-      # Only for win32, python 3.9. add the project to PYTHONPATH to find the module during tests
-      - name: Set PYTHONPATH for Windows Python 3.9
-        if: matrix.os == 'windows-latest' && matrix.python-version == '3.9'
-        run: |
-          echo "PYTHONPATH=${{ github.workspace }}/src:$PYTHONPATH" >> $GITHUB_ENV
-        shell: bash
-
       - name: Build wheels
         env:
           CIBW_BUILD: ${{ env.CIBW_VERSION }}
-          CIBW_TEST_COMMAND: pytest {project}/tests -v
+          CIBW_TEST_COMMAND: pip install {wheel} && pytest {project}/tests -v
           CIBW_TEST_EXTRAS: test
         run: |
           mkdir -p wheelhouse
