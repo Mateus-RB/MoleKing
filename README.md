@@ -9,7 +9,7 @@ MoleKing is a Python module written in C++ with pybind11 Linkage under [LEEDMOL]
 
    <ul>
    <li> C++11 or greater.</li>
-    <li>Cmake 3.15 or greater;</li>
+    <li>Cmake 3.18 or greater;</li>
     <li>libEingen;</li>
     <li>pybind11;</li>
     <li>PIP10 or greater</li>
