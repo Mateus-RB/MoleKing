@@ -49,7 +49,7 @@ jobs:
       - name: Build wheels
         env:
           CIBW_BUILD: ${{ env.CIBW_VERSION }}
-          CIBW_TEST_COMMAND: PYTHONPATH={project} pytest {project}/tests -v
+          CIBW_TEST_COMMAND: pytest {project}/tests -v
           CIBW_TEST_EXTRAS: test
         run: |
           mkdir -p wheelhouse
