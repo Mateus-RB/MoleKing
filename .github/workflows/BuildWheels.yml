@@ -49,15 +49,9 @@ jobs:
       - name: Build wheels
         env:
           CIBW_BUILD: ${{ env.CIBW_VERSION }}
-          CIBW_TEST_COMMAND: |
+          CIBW_TEST_COMMAND: >
             pip install {wheel} &&
-            python - <<EOF
-            import sys, pkgutil
-            print("sys.path =", sys.path)
-            print("modules =", [m.name for m in pkgutil.iter_modules() if "mole" in m.name.lower()])
-            import moleking
-            print("moleking file =", moleking.__file__)
-            EOF
+            python -c "import sys, pkgutil, moleking; print('sys.path =', sys.path); print('modules =', [m.name for m in pkgutil.iter_modules() if 'mole' in m.name.lower()]); print('moleking file =', moleking.__file__)" &&
             pytest -v {project}/tests
           CIBW_TEST_EXTRAS: test
         run: |
