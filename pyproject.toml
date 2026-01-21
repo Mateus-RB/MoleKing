@@ -57,10 +57,11 @@ xfail_strict = true
 filterwarnings = ["error"]
 testpaths = ["tests"]
 
-[tool.cibuildwheel.linux]
+
+[tool.cibuildwheel]
+# Configurações globais (aplicam-se a todas as plataformas)
 test-command = "pytest {project}/tests"
 test-extras = ["test"]
-test-skip = ["*universal2:arm64"]
 before-build = "rm -rf {project}/build"
 
 [tool.cibuildwheel.windows]
