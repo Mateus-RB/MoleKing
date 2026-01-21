@@ -46,9 +46,9 @@ jobs:
           rm -rf build/ dist/ *.egg-info wheelhouse/
         shell: bash
         
-      - name: Setting project to PythonPath
+      - name: Setting the project to python path
         run: |
-          echo "project=$(pwd)" >> $GITHUB_ENV
+          echo "PYTHONPATH=${project}:$PYTHONPATH" >> $GITHUB_ENV
         shell: bash
 
       - name: Build wheels
