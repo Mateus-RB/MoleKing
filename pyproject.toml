@@ -61,7 +61,6 @@ testpaths = ["tests"]
 test-command = "pytest {project}/tests"
 test-extras = ["test"]
 before-build = "rm -rf {project}/build"
-environment = { PYTHONPATH = "{project}:" }
 
 [tool.ruff]
 extend-select = [

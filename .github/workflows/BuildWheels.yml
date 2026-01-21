@@ -46,6 +46,13 @@ jobs:
           rm -rf build/ dist/ *.egg-info wheelhouse/
         shell: bash
 
+      # Only for win32, python 3.9. add the project to PYTHONPATH to find the module during tests
+      - name: Set PYTHONPATH for Windows Python 3.9
+        if: matrix.os == 'windows-latest' && matrix.python-version == '3.9'
+        run: |
+          echo "PYTHONPATH=${{ github.workspace }}\\${{ env.PROJECT_NAME }};" >> $GITHUB_ENV
+        shell: bash
+
       - name: Build wheels
         env:
           CIBW_BUILD: ${{ env.CIBW_VERSION }}
