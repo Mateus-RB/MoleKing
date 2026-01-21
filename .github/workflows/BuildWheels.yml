@@ -50,7 +50,7 @@ jobs:
       - name: Set PYTHONPATH for Windows Python 3.9
         if: matrix.os == 'windows-latest' && matrix.python-version == '3.9'
         run: |
-          echo "PYTHONPATH=${{ github.workspace }}\\${{ env.PROJECT_NAME }};" >> $GITHUB_ENV
+          echo "PYTHONPATH=${{ github.workspace }}/src:$PYTHONPATH" >> $GITHUB_ENV
         shell: bash
 
       - name: Build wheels
