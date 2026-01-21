@@ -34,7 +34,6 @@ test = ["pytest>=6.0"]
 
 [tool.setuptools]
 packages = []
-py-modules = ["MoleKing"]
 include-package-data = true
 
 [tool.mypy]
