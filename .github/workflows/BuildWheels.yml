@@ -3,21 +3,22 @@ on:
   workflow_dispatch:
     inputs:
       upload-to-pypi:
-        description: 'Whether to upload wheels to PyPI'
+        description: "Whether to upload wheels to PyPI"
         required: true
-        default: 'no'
+        default: "no"
         type: choice
-        options:
-          - 'yes'
-          - 'no'
+        options: ["yes", "no"]
 
 jobs:
   build-wheels:
+    name: Build wheels (${{ matrix.platform }})
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: ['3.9', '3.10', '3.11', '3.12', '3.13', '3.14']
-    runs-on: ${{ matrix.os }}
+        include:
+          - { os: ubuntu-latest, platform: linux }
+          - { os: macos-latest, platform: macos }
+          - { os: windows-latest, platform: windows }
     steps:
       - uses: actions/checkout@v4
         with:
