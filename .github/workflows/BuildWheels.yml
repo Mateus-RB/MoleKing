@@ -49,6 +49,7 @@ jobs:
       - name: Build wheels
         env:
           CIBW_BUILD: ${{ env.CIBW_VERSION }}
+          CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: "delvewheel repair -w {dest_dir} {wheel}"
           CIBW_TEST_COMMAND: pytest -v {project}/tests
           CIBW_TEST_EXTRAS: test
         run: |
