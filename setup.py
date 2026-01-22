@@ -99,14 +99,40 @@ class CMakeBuild(build_ext):
         print(f"[DEBUG] Build temp directory: {build_temp}")
         print(f"[DEBUG] CMake args: {cmake_args}")
 
-        subprocess.check_call(
-            ["cmake", ext.sourcedir, *cmake_args],
-            cwd=build_temp,
-        )
-        subprocess.check_call(
-            ["cmake", "--build", ".", *build_args],
-            cwd=build_temp,
-        )
+        try:
+            subprocess.check_call(
+                ["cmake", ext.sourcedir, *cmake_args],
+                cwd=build_temp,
+            )
+            print(f"[DEBUG] CMake configure succeeded")
+        except subprocess.CalledProcessError as e:
+            print(f"[DEBUG] CMake configure FAILED with code {e.returncode}")
+            raise
+
+        try:
+            subprocess.check_call(
+                ["cmake", "--build", ".", *build_args],
+                cwd=build_temp,
+            )
+            print(f"[DEBUG] CMake build succeeded")
+        except subprocess.CalledProcessError as e:
+            print(f"[DEBUG] CMake build FAILED with code {e.returncode}")
+            raise
+
+        # Search for .pyd files in the build directory
+        print(f"[DEBUG] Searching for .pyd files in build directory...")
+        build_root = Path(self.build_temp).parent
+        pyd_files = list(build_root.glob("**/*.pyd"))
+        print(f"[DEBUG] Found .pyd files: {pyd_files}")
+        
+        for pyd_file in pyd_files:
+            print(f"[DEBUG]   - {pyd_file}")
+            if "MoleKing" in pyd_file.name:
+                print(f"[DEBUG] Copying {pyd_file} to {ext_path}")
+                extdir.mkdir(parents=True, exist_ok=True)
+                import shutil
+                shutil.copy2(pyd_file, ext_path)
+                print(f"[DEBUG] Copied successfully")
 
         # Check if the extension file was created
         if ext_path.exists():
