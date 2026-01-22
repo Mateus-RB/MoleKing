@@ -37,10 +37,6 @@ packages = []
 py-modules = []
 include-package-data = false
 
-[tool.setuptools.packages.find]
-where = "src"
-include = ["MoleKing*"]
-
 [tool.mypy]
 files = "setup.py"
 python_version = "3.7"
