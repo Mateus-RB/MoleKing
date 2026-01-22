@@ -50,7 +50,7 @@ jobs:
         env:
           CIBW_BUILD: ${{ env.CIBW_VERSION }}
           CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: "delvewheel repair -w {dest_dir} {wheel}"
-          CIBW_TEST_COMMAND: pytest -v {project}/tests
+          CIBW_TEST_COMMAND: "mkdir test_run && cd test_run && python -m pytest {project}/tests"
           CIBW_TEST_EXTRAS: test
         run: |
           mkdir -p wheelhouse
