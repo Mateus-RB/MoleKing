@@ -37,6 +37,11 @@ class CMakeBuild(build_ext):
         ext_path = Path(self.get_ext_fullpath(ext.name))
         extdir = ext_path.parent.resolve()
 
+        print(f"\n[DEBUG] Building extension: {ext.name}")
+        print(f"[DEBUG] Expected output path: {ext_path}")
+        print(f"[DEBUG] Output directory: {extdir}")
+        print(f"[DEBUG] Platform: {self.plat_name}")
+
         debug = bool(self.debug or int(os.environ.get("DEBUG", 0)))
         cfg = "Debug" if debug else "Release"
 
@@ -91,6 +96,9 @@ class CMakeBuild(build_ext):
         build_temp = Path(self.build_temp) / ext.name
         build_temp.mkdir(parents=True, exist_ok=True)
 
+        print(f"[DEBUG] Build temp directory: {build_temp}")
+        print(f"[DEBUG] CMake args: {cmake_args}")
+
         subprocess.check_call(
             ["cmake", ext.sourcedir, *cmake_args],
             cwd=build_temp,
@@ -99,6 +107,20 @@ class CMakeBuild(build_ext):
             ["cmake", "--build", ".", *build_args],
             cwd=build_temp,
         )
+
+        # Check if the extension file was created
+        if ext_path.exists():
+            print(f"[DEBUG] SUCCESS: Extension file created at {ext_path}")
+            print(f"[DEBUG] File size: {ext_path.stat().st_size} bytes")
+        else:
+            print(f"[DEBUG] ERROR: Extension file NOT found at {ext_path}")
+            # List contents of the output directory
+            print(f"[DEBUG] Contents of {extdir}:")
+            if extdir.exists():
+                for item in extdir.iterdir():
+                    print(f"[DEBUG]   - {item.name}")
+            else:
+                print(f"[DEBUG] Directory does not exist!")
 
 
 def get_version_from_cmakelists(path: Path) -> str:
