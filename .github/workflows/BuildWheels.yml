@@ -48,10 +48,7 @@ jobs:
 
       - name: Build wheels
         env:
-          CIBW_TEST_COMMAND: >
-            xcopy /E /I "{project}/tests" temp_tests && 
-            cd temp_tests && 
-            python -m pytest .
+          CIBW_TEST_COMMAND: python3 -m pytest {project}/tests
           CIBW_TEST_EXTRAS: test
         run: |
           mkdir -p wheelhouse
