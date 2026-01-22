@@ -49,10 +49,7 @@ jobs:
       - name: Build wheels
         env:
           CIBW_BUILD: ${{ env.CIBW_VERSION }}
-          CIBW_TEST_COMMAND: >
-            pip install {wheel} &&
-            python -c "import sys, pkgutil, MoleKing; print('sys.path =', sys.path); print('modules =', [m.name for m in pkgutil.iter_modules() if 'mole' in m.name.lower()]); print('moleking file =', MoleKing.__file__)" &&
-            pytest -v {project}/tests
+          CIBW_TEST_COMMAND: pytest -v {project}/tests
           CIBW_TEST_EXTRAS: test
         run: |
           mkdir -p wheelhouse
