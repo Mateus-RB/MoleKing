@@ -96,57 +96,14 @@ class CMakeBuild(build_ext):
         build_temp = Path(self.build_temp) / ext.name
         build_temp.mkdir(parents=True, exist_ok=True)
 
-        print(f"[DEBUG] Build temp directory: {build_temp}")
-        print(f"[DEBUG] CMake args: {cmake_args}")
-
-        try:
-            subprocess.check_call(
-                ["cmake", ext.sourcedir, *cmake_args],
-                cwd=build_temp,
-            )
-            print(f"[DEBUG] CMake configure succeeded")
-        except subprocess.CalledProcessError as e:
-            print(f"[DEBUG] CMake configure FAILED with code {e.returncode}")
-            raise
-
-        try:
-            subprocess.check_call(
-                ["cmake", "--build", ".", *build_args],
-                cwd=build_temp,
-            )
-            print(f"[DEBUG] CMake build succeeded")
-        except subprocess.CalledProcessError as e:
-            print(f"[DEBUG] CMake build FAILED with code {e.returncode}")
-            raise
-
-        # Search for .pyd files in the build directory
-        print(f"[DEBUG] Searching for .pyd files in build directory...")
-        build_root = Path(self.build_temp).parent
-        pyd_files = list(build_root.glob("**/*.pyd"))
-        print(f"[DEBUG] Found .pyd files: {pyd_files}")
-        
-        for pyd_file in pyd_files:
-            print(f"[DEBUG]   - {pyd_file}")
-            if "MoleKing" in pyd_file.name:
-                print(f"[DEBUG] Copying {pyd_file} to {ext_path}")
-                extdir.mkdir(parents=True, exist_ok=True)
-                import shutil
-                shutil.copy2(pyd_file, ext_path)
-                print(f"[DEBUG] Copied successfully")
-
-        # Check if the extension file was created
-        if ext_path.exists():
-            print(f"[DEBUG] SUCCESS: Extension file created at {ext_path}")
-            print(f"[DEBUG] File size: {ext_path.stat().st_size} bytes")
-        else:
-            print(f"[DEBUG] ERROR: Extension file NOT found at {ext_path}")
-            # List contents of the output directory
-            print(f"[DEBUG] Contents of {extdir}:")
-            if extdir.exists():
-                for item in extdir.iterdir():
-                    print(f"[DEBUG]   - {item.name}")
-            else:
-                print(f"[DEBUG] Directory does not exist!")
+        subprocess.check_call(
+            ["cmake", ext.sourcedir, *cmake_args],
+            cwd=build_temp,
+        )
+        subprocess.check_call(
+            ["cmake", "--build", ".", *build_args],
+            cwd=build_temp,
+        )
 
 
 def get_version_from_cmakelists(path: Path) -> str:
