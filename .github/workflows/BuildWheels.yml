@@ -48,7 +48,8 @@ jobs:
 
       - name: Build wheels
         env:
-          CIBW_TEST_COMMAND: python -c "import sys; print('Python:', sys.executable); import MoleKing; print('MoleKing loaded from:', MoleKing.__file__)" && python -m pytest {project}/tests
+          CIBW_TEST_COMMAND: "pytest {project}/tests"
+          CIBW_BUILD: ${{ env.CIBW_VERSION }}
           CIBW_TEST_EXTRAS: test
           CIBW_BUILD_VERBOSITY: 3
         run: |
