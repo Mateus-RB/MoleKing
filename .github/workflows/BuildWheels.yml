@@ -41,6 +41,9 @@ jobs:
           CIBW_VERSION="cp${PYTHON_VERSION//.}"
           echo "CIBW_VERSION=${CIBW_VERSION}-*" >> $GITHUB_ENV
 
+      - name: Set PYTHONPATH
+        run: echo "PYTHONPATH=$PWD" >> $GITHUB_ENV
+
       - name: Clean previous builds
         run: |
           rm -rf build/ dist/ *.egg-info wheelhouse/
