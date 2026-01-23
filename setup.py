@@ -36,12 +36,6 @@ class CMakeBuild(build_ext):
     def build_extension(self, ext: CMakeExtension) -> None:
         ext_path = Path(self.get_ext_fullpath(ext.name))
         extdir = ext_path.parent.resolve()
-
-        print(f"\n[DEBUG] Building extension: {ext.name}")
-        print(f"[DEBUG] Expected output path: {ext_path}")
-        print(f"[DEBUG] Output directory: {extdir}")
-        print(f"[DEBUG] Platform: {self.plat_name}")
-
         debug = bool(self.debug or int(os.environ.get("DEBUG", 0)))
         cfg = "Debug" if debug else "Release"
 
