@@ -63,7 +63,7 @@ testpaths = ["tests"]
 test-command = "pytest {project}/tests"
 test-extras = ["test"]
 before-build = "rm -rf {project}/build"
-before-all = "pip install -y python3.12-devel
+before-all = "pip install -y python3.12-devel"
 
 [tool.cibuildwheel.windows]
 test-skip = "*"
