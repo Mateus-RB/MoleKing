@@ -102,6 +102,7 @@ class CMakeBuild(build_ext):
 
 
 def get_version_from_cmakelists(path: Path) -> str:
+    path = Path(path)
     pattern = re.compile(r"project\s*\(\s*MoleKing\s+VERSION\s+([^\s)]+)", re.IGNORECASE)
     with path.open(encoding="utf-8") as cmake_file:
         for line in cmake_file:
@@ -112,7 +113,7 @@ def get_version_from_cmakelists(path: Path) -> str:
 
 setup(
     name="MoleKing",
-    version = get_version_from_cmakelists('CMakeLists.txt'),
+    version = get_version_from_cmakelists("CMakeLists.txt"),
     author="LEEDMOL Research Group",
     author_email="mateus_barbosa@ufg.br",
     description="MoleKing is a python module for chemists aiming to add common principles to python. This module adds new types of python variables, MoleKing_Molecule; MoleKing_Atom; MoleKing_SupraMolecule, and MoleKing_Output, alongside many features considered common knowledge among chemists.",
