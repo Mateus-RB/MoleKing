@@ -7,39 +7,12 @@ requires = [
 ]
 build-backend = "setuptools.build_meta"
 
-[project]
-name = "MoleKing"
-dynamic = ["version"]
-description = "A pybind11-powered toolkit that brings theoretical chemistry constructs (molecules, atoms, Gaussian/Psi4 IO) into Python."
-readme = { file = "README.md", content-type = "text/markdown" }
-requires-python = ">=3.9"
-license = { file = "LICENSE.txt" }
-authors = [
-    { name = "LEEDMOL Research Group", email = "mateus_barbosa@ufg.br" },
-]
-keywords = ["chemistry", "pybind11", "gaussian", "psi4", "molecules"]
-classifiers = [
-    "License :: OSI Approved :: MIT License",
-    "Programming Language :: C++",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3 :: Only",
-    "Operating System :: OS Independent",
-    "Development Status :: 5 - Production/Stable",
-    "Intended Audience :: Science/Research",
-    "Topic :: Scientific/Engineering :: Chemistry",
-]
-
 [project.optional-dependencies]
 test = ["pytest>=6.0"]
 
-[tool.setuptools]
-packages = []
-py-modules = []
-include-package-data = false
-
 [tool.mypy]
 files = "setup.py"
-python_version = "3.9"
+python_version = "3.7"
 strict = true
 show_error_codes = true
 enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
@@ -57,10 +30,13 @@ filterwarnings = ["error"]
 testpaths = ["tests"]
 
 [tool.cibuildwheel]
-build = "cp39-* cp310-* cp311-* cp312-* cp313-* cp314-*"
+# Configurações globais (aplicam-se a todas as plataformas)
 test-command = "pytest {project}/tests"
 test-extras = ["test"]
 before-build = "rm -rf {project}/build"
+
+[tool.cibuildwheel.windows]
+before-build = "if exist {project}\\build rmdir /s /q {project}\\build"
 
 [tool.ruff]
 extend-select = [
@@ -74,4 +50,3 @@ extend-select = [
 extend-ignore = [
   "E501",   # Line too long
 ]
-target-version = "py37"
