@@ -71,9 +71,6 @@ test-skip = "*"
 # test-extras = ["test"]
 # before-build = "rmdir /s /q {project}\\build"
 
-[tool.cibuildwheel.linux]
-before-all = "pip install python3.12-devel"
-
 [tool.cibuildwheel.macos]
 test-skip = "*"
 # [tool.cibuildwheel.macos]
