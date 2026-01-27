@@ -110,7 +110,6 @@ def get_version_from_cmakelists(path: Path) -> str:
                 return match.group(1)
     raise RuntimeError("MoleKing VERSION not found in CMakeLists.txt")
 
-
 setup(
     name="MoleKing",
     version = get_version_from_cmakelists('CMakeLists.txt'),
