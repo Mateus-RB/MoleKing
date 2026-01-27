@@ -16,7 +16,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: ['3.9', '3.10', '3.11', '3.12', '3.13', '3.14']
+        python-version: ['3.9']
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -37,7 +37,7 @@ jobs:
       - name: Set CIBW_BUILD version
         shell: bash
         run: |
-          PYTHON_VERSION="${{ matrix.python-version }}"
+          PYTHON_VERSION=3.12
           CIBW_VERSION="cp${PYTHON_VERSION//.}"
           echo "CIBW_VERSION=${CIBW_VERSION}-*" >> $GITHUB_ENV
 
