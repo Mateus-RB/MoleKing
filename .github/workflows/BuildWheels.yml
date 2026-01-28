@@ -37,7 +37,7 @@ jobs:
       - name: Set CIBW_BUILD version
         shell: bash
         run: |
-          PYTHON_VERSION='3.12'
+          PYTHON_VERSION='${{ matrix.python-version }}'
           CIBW_VERSION="cp${PYTHON_VERSION//.}"
           echo "CIBW_VERSION=${CIBW_VERSION}-*" >> $GITHUB_ENV
 
