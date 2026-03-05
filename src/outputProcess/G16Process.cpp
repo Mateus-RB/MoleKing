@@ -1444,6 +1444,13 @@ void G16LOGfile::setPrincipalAxesInertia()
 double G16LOGfile::getZPE()
 {   
     // hartree
+
+    // if ZPE is zero, or if ZPE is not set, throw an error
+    if (this->ZPE == 0.0)
+    {
+        throw runtime_error("ERROR in G16LOGfile::getZPE(): No ZPE found in the log file.");
+    }
+
     return this->ZPE;
 };
 
