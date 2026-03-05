@@ -28,6 +28,7 @@
 #include "myMath/Vectors.hpp"
 #include "outputProcess/G16Process.hpp"
 #include "outputProcess/Psi4Process.hpp"
+#include "outputProcess/OrcaProcess.hpp"
 #include "chemicalUnits/pov.cpp"
 #include "chemicalUnits/pov.hpp"
 using namespace std;
@@ -74,8 +75,7 @@ PYBIND11_MODULE(MoleKing, m) {
         .def("getPos", &Atom::getPos)
         .def("translation", &Atom::translation)
         .def("rotationAxis", &Atom::rotationAxis);
-    
-    
+        
     py::class_<ChargePoint>(m, "ChargePoint", "This class creates a charge point variable type allowing for the usage in python like a primitive type.")
         .def(py::init<double, double, double, double>(), py::arg("xPos"), py::arg("yPos"), py::arg("zPos"), py::arg("charge"))
         .def("getX", &ChargePoint::getX)
@@ -230,7 +230,23 @@ PYBIND11_MODULE(MoleKing, m) {
 
     py::class_<PovRay>(m, "PovRay", "This class creates a PovRay file.")
         .def(py::init<const Molecule&>(), py::arg("mol"));
-        
+    
+    py::class_<ORCALOGfile>(m, "ORCALOGfile", "This class is experimental and under development.")
+        .def(py::init< string, bool>(), py::arg("filePath"), py::arg("thermoAsw") = 0)
+        .def("getMolecule", &ORCALOGfile::getMolecule)
+        .def("getEnergy", &ORCALOGfile::getEnergy)
+        .def("getZPE", &ORCALOGfile::getZPE)
+        .def("getH", &ORCALOGfile::getH)
+        .def("getG", &ORCALOGfile::getG)
+        .def("getS", &ORCALOGfile::getS)
+        .def("get_sigmaR", &ORCALOGfile::get_sigmaR)
+        .def("get_qEle", &ORCALOGfile::get_qEle)
+        .def("get_qVib", &ORCALOGfile::get_qVib, py::arg("Temperature") = 298.15)
+        .def("get_qRot", &ORCALOGfile::get_qRot, py::arg("Temperature") = 298.15)
+        .def("get_qTrans", &ORCALOGfile::get_qTrans, py::arg("Temperature") = 298.15)
+        .def("get_qTot", &ORCALOGfile::get_qTot, py::arg("Temperature") = 298.15)
+        .def("getVibFrequencies", &ORCALOGfile::getVibFrequencies);
+
     py::class_<G16LOGfile>(m, "G16LOGfile", "This class is experimental and under development.")
         .def(py::init< string, bool, bool, bool, bool, int>(), py::arg("filePath"), py::arg("polarAsw") = 0, py::arg("tdAsw") = 0, py::arg("thermoAsw") = 0,  py::arg("cpAsw") = 0, py::arg("link") = -1)
         .def("getDate", &G16LOGfile::getDate)

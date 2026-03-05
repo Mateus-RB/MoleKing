@@ -520,7 +520,7 @@ PeriodicTable::PeriodicTable(){
     this->ConversionMap.insert(pair<string, double>("bar_to_Pa", 100000)); // bar to Pa conversion
     this->ConversionMap.insert(pair<string, double>("amu_to_kg", 1.660538921E-27)); // AMU to Kg conversion
     this->ConversionMap.insert(pair<string, double>("amu_to_kg_m2", 4.65082513926e-48)); // AMU to Kg/m^2 conversion
-
+    this->ConversionMap.insert(pair<string, double>("cm1_to_K", 1.4387769599838156)); // cm^-1 to K conversion
 };
 
 PeriodicTable::~PeriodicTable(){

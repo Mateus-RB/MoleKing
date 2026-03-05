@@ -113,6 +113,7 @@ moleking_apply_warnings(chemicalUnits)
 add_library(outputProcess STATIC
   "${MOLEKING_SRC_DIR}/outputProcess/G16Process.cpp"
   "${MOLEKING_SRC_DIR}/outputProcess/Psi4Process.cpp"
+  "${MOLEKING_SRC_DIR}/outputProcess/OrcaProcess.cpp"
 )
 target_include_directories(outputProcess PUBLIC ${MOLEKING_INTERFACE_INCLUDE_DIRS})
 target_link_libraries(outputProcess PUBLIC myMath chemicalUnits)
