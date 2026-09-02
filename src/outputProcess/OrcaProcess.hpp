@@ -45,8 +45,8 @@ private:
 
     //* int
 
-    int charge;
-    int multiplicity;
+    int charge = 0;
+    int multiplicity = 1;
 
     //* size_t
 
@@ -58,18 +58,20 @@ private:
 
     //* double
 
-    double scfValue;
-    double ZPE;
-    double H;
-    double G;
-    double S;
-    double sigma_r;
-    double thetha_r;
-    double qVib;
-    double qRot;
-    double qTrans;
-    double qTot;
-    double qEle;
+    // Safe defaults prevent getters from reading indeterminate C++ values when
+    // an optional section is absent from the ORCA output.
+    double scfValue = 0.0;
+    double ZPE = 0.0;
+    double H = 0.0;
+    double G = 0.0;
+    double S = 0.0;
+    double sigma_r = 1.0;
+    double thetha_r = 0.0;
+    double qVib = 1.0;
+    double qRot = 1.0;
+    double qTrans = 0.0;
+    double qTot = 0.0;
+    double qEle = 1.0;
 
     //* molecule
 
@@ -78,7 +80,7 @@ private:
     //* bool
 
     bool thermoAsw;
-    bool isLinear;
+    bool isLinear = false;
 
     //* map and vectors
 

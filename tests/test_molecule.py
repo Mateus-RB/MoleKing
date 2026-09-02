@@ -1,4 +1,5 @@
 from MoleKing import Molecule
+import pytest
 
 class TestMolecule():
 
@@ -59,3 +60,63 @@ class TestMolecule():
         mol = Molecule()
         mol.setVDWRatio(2)
         assert mol.getVDWRatio() == 2
+
+    @pytest.mark.parametrize(
+        ("hf_percent", "expected_iop"),
+        [
+            (0, "IOP(3/76=1000000000)"),
+            (5, "IOP(3/76=0950000500)"),
+            (20, "IOP(3/76=0800002000)"),
+            (100, "IOP(3/76=0000010000)"),
+        ],
+    )
+    def test_toGJF_modHF(self, tmp_path, hf_percent, expected_iop):
+        mol = Molecule()
+        mol.addAtom("H", 0, 0, 0)
+        output = tmp_path / f"modhf_{hf_percent}.gjf"
+
+        mol.toGJF(fileName=str(output), method="M06HF", modHF=hf_percent)
+
+        gjf = output.read_text()
+        assert expected_iop in gjf
+        assert "IOP(3/77=" not in gjf
+
+    @pytest.mark.parametrize("method", ["B3LYP", "b3lyp", "RB3LYP", "UB3LYP"])
+    def test_toGJF_modHF_preserves_b3lyp_exchange_ratio(
+        self, tmp_path, method
+    ):
+        mol = Molecule()
+        mol.addAtom("H", 0, 0, 0)
+        output = tmp_path / f"{method}_modhf.gjf"
+
+        mol.toGJF(
+            fileName=str(output),
+            method=method,
+            modHF=20,
+        )
+
+        gjf = output.read_text()
+        assert "IOP(3/76=0800002000)" in gjf
+        assert "IOP(3/77=0900010000)" in gjf
+
+    def test_toGJF_default_b3lyp_uses_b3lyp_exchange_ratio(self, tmp_path):
+        mol = Molecule()
+        mol.addAtom("H", 0, 0, 0)
+        output = tmp_path / "default_b3lyp_modhf.gjf"
+
+        mol.toGJF(fileName=str(output), modHF=20)
+
+        gjf = output.read_text()
+        assert "IOP(3/76=0800002000)" in gjf
+        assert "IOP(3/77=0900010000)" in gjf
+
+    @pytest.mark.parametrize("hf_percent", [-2, 101])
+    def test_toGJF_rejects_invalid_modHF(self, tmp_path, hf_percent):
+        mol = Molecule()
+        mol.addAtom("H", 0, 0, 0)
+
+        with pytest.raises(ValueError, match="modHF must be between 0 and 100"):
+            mol.toGJF(
+                fileName=str(tmp_path / f"invalid_{hf_percent}.gjf"),
+                modHF=hf_percent,
+            )

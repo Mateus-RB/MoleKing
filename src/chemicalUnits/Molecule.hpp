@@ -20,6 +20,7 @@
 #include <string>
 #include <fstream>
 #include <iomanip>
+#include <sstream>
 #include "../myMath/MassCenter.hpp"
 #include "AtomicScale.hpp"
 #include "OPLSff.hpp"

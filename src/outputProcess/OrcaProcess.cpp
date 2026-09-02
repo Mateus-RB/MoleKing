@@ -30,11 +30,11 @@ ORCALOGfile::ORCALOGfile(string filePath, bool thermoAsw)
     {
         setVibFrequencies();
         setIsLinear();
-    //     setPrincipalAxesInertia();
-    //     // set_qVib();
-    //     // set_qRot();
-    //     // set_qTrans();
-    //     // set_qTot();
+
+        // ORCA already prints rotational constants in cm^-1. Unlike the
+        // Gaussian parser, no principal-moment parsing is needed here.
+        // Partition functions remain lazy because their values depend on the
+        // temperature supplied to each getter.
     };
 }
 
@@ -170,20 +170,54 @@ void ORCALOGfile::readLOGFile()
                 vector<string> tokens((istream_iterator<string>(iss)), istream_iterator<string>());
                 // Rotational constants in cm-1:             1.165006             0.304730             0.265422 
                 // or
-                // Rotational constants in cm-1:             0.000000             0.000000             0.000000 
+                // Rotational constants in cm-1:             0.000000            18.774324            18.774324
 
-                if (stod(tokens[4]) != 0.0)
+                if (tokens.size() < 7)
                 {
-                    double temp_thethar_x = stod(tokens[4]) * this->pt.getConversion("cm1_to_K"); // Convert from cm^-1 to K
-                    double temp_thethar_y = stod(tokens[5]) * this->pt.getConversion("cm1_to_K"); // Convert from cm^-1 to K
-                    double temp_thethar_z = stod(tokens[6]) * this->pt.getConversion("cm1_to_K"); // Convert from cm^-1 to K
-                    this->vecThetha_r.push_back(temp_thethar_x);
-                    this->vecThetha_r.push_back(temp_thethar_y);
-                    this->vecThetha_r.push_back(temp_thethar_z);
+                    throw runtime_error("ERROR in ORCALOGfile::readLOGFile(): Invalid rotational constants line.");
+                }
+
+                const vector<double> rotationalConstants = {
+                    stod(tokens[4]), stod(tokens[5]), stod(tokens[6])
+                };
+                const double cm1ToK = this->pt.getConversion("cm1_to_K");
+                const double zeroTolerance = 1.0e-12;
+                vector<double> nonZeroConstants;
+
+                for (double rotationalConstant : rotationalConstants)
+                {
+                    if (abs(rotationalConstant) > zeroTolerance)
+                    {
+                        nonZeroConstants.push_back(rotationalConstant);
+                    }
+                }
+
+                // Ochterski, Thermochemistry in Gaussian, section 2.3:
+                // a linear rotor has one rotational temperature, whereas a
+                // nonlinear rotor has three. ORCA represents a linear rotor as
+                // (0, B, B); the zero axis must be omitted, not replaced by 1 K.
+                if (nonZeroConstants.size() == 2)
+                {
+                    const double linearRotationalConstant =
+                        0.5 * (nonZeroConstants[0] + nonZeroConstants[1]);
+                    this->thetha_r = linearRotationalConstant * cm1ToK;
+                    this->vecThetha_r.clear();
+                }
+                else if (nonZeroConstants.size() == 3)
+                {
+                    this->thetha_r = 0.0;
+                    this->vecThetha_r = {
+                        rotationalConstants[0] * cm1ToK,
+                        rotationalConstants[1] * cm1ToK,
+                        rotationalConstants[2] * cm1ToK
+                    };
                 }
                 else
                 {
-                    this->thetha_r = 1.0; // If the rotational constant is zero, it means that the molecule is linear and the rotational partition function should be divided by the symmetry number only, without the sqrt(pi*thetha_r) term.
+                    // Keep state invalid so setIsLinear/set_qRot can report a
+                    // controlled error instead of producing an arbitrary value.
+                    this->thetha_r = 0.0;
+                    this->vecThetha_r.clear();
                 }
             }
         }
@@ -217,23 +251,28 @@ void ORCALOGfile::setMolecule()
 
 void ORCALOGfile::setIsLinear()
 {
-    int count = 0;
-    for (int i = 0; i < this->vibFrequencies.size(); i++)
-        {
-            if (this->vibFrequencies[i] > 0)
-            {
-                count++;
-            }
-        }
-    
-    if (count > 1)
+    // Frequency count cannot identify linearity: a linear polyatomic molecule
+    // has 3N-5 vibrational modes and therefore usually has more than one
+    // frequency. Rotational constants provide the direct classification.
+    if (this->mol.getSize() == 1)
     {
         this->isLinear = false;
+        return;
     }
-    else
+
+    if (this->thetha_r > 0.0 && this->vecThetha_r.empty())
     {
         this->isLinear = true;
+        return;
     }
+
+    if (this->vecThetha_r.size() == 3)
+    {
+        this->isLinear = false;
+        return;
+    }
+
+    throw runtime_error("ERROR in ORCALOGfile::setIsLinear(): Rotational constants were not found or are invalid.");
 };
 
 void ORCALOGfile::setVibFrequencies()
@@ -297,30 +336,64 @@ void ORCALOGfile::set_qVib(double Temperature)
 
 void ORCALOGfile::set_qRot(double Temperature)
 {
+    if (!this->thermoAsw)
+    {
+        throw runtime_error("ERROR in ORCALOGfile::set_qRot(): Thermochemistry data were not loaded. Construct ORCALOGfile with thermoAsw=True.");
+    }
+
+    if (Temperature <= 0.0)
+    {
+        throw runtime_error("ERROR in ORCALOGfile::set_qRot(): Temperature must be greater than zero.");
+    }
+
+    if (this->sigma_r <= 0.0)
+    {
+        throw runtime_error("ERROR in ORCALOGfile::set_qRot(): Rotational symmetry number must be greater than zero.");
+    }
+
+    // An atom has no rotational degrees of freedom, so q_rot = 1.
     if (this->mol.getSize() == 1)
     {
         this->qRot = 1.0;
+        return;
     }
 
-    else
+    if (this->isLinear)
+    {
+        if (this->thetha_r <= 0.0)
         {
-        if (this->isLinear)
-        {
-            {   
-                //this->qRot = (Temperature)/(this->thetha_r);
-                this->qRot = (Temperature)/(this->sigma_r * this->thetha_r);
-            }
+            throw runtime_error("ERROR in ORCALOGfile::set_qRot(): A positive rotational temperature is required for a linear molecule.");
         }
-        else
-        {
-            double f1 = pow(this->pt.getConstant("PI"), 0.5)/this->sigma_r;
-            //double f1 = sqrt(pow(this->PI, 0.5));
-            double f2 = pow(Temperature, 1.5);
-            double f3 = pow((this->vecThetha_r[0]*this->vecThetha_r[1]*this->vecThetha_r[2]), 0.5);
 
-            this->qRot = f1 * (f2/f3);
+        // Linear rotor, Ochterski section 2.3:
+        // q_rot = T / (sigma_r * Theta_r).
+        this->qRot = Temperature / (this->sigma_r * this->thetha_r);
+        return;
+    }
+
+    if (this->vecThetha_r.size() != 3)
+    {
+        throw runtime_error("ERROR in ORCALOGfile::set_qRot(): Three rotational temperatures are required for a nonlinear molecule.");
+    }
+
+    for (double rotationalTemperature : this->vecThetha_r)
+    {
+        if (rotationalTemperature <= 0.0)
+        {
+            throw runtime_error("ERROR in ORCALOGfile::set_qRot(): Rotational temperatures must be greater than zero.");
         }
     }
+
+    // Nonlinear rotor, Ochterski section 2.3:
+    // q_rot = sqrt(pi) * T^(3/2) /
+    //         (sigma_r * sqrt(Theta_x * Theta_y * Theta_z)).
+    const double numerator =
+        sqrt(this->pt.getConstant("PI")) * pow(Temperature, 1.5);
+    const double denominator =
+        this->sigma_r * sqrt(this->vecThetha_r[0] *
+                             this->vecThetha_r[1] *
+                             this->vecThetha_r[2]);
+    this->qRot = numerator / denominator;
 };
 
 void ORCALOGfile::set_qTrans(double Temperature)

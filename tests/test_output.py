@@ -1,6 +1,9 @@
-from MoleKing import G16LOGfile, Psi4OUTfile
+from MoleKing import G16LOGfile, ORCALOGfile, Psi4OUTfile
+import math
 import os
 import platform
+
+import pytest
 
 class TestG16Output:
     @classmethod
@@ -111,6 +114,95 @@ class TestG16Output:
         assert vib < 0.05
         assert rot < 0.05
         assert trans < 0.05
+
+
+class TestORCAOutput:
+    @staticmethod
+    def write_thermo_log(path, atoms, rotational_constants, symmetry_number=1):
+        """Write the minimum ORCA sections required by the output parser."""
+        geometry = "\n".join(
+            f"{symbol} {x:.6f} {y:.6f} {z:.6f}"
+            for symbol, x, y, z in atoms
+        )
+        bx, by, bz = rotational_constants
+        path.write_text(
+            f"""CARTESIAN COORDINATES (ANGSTROEM)
+----------------------------
+{geometry}
+----------------------------
+CARTESIAN COORDINATES (A.U.)
+ Total Charge           Charge          ....    0
+ Multiplicity           Mult            ....    1
+ FINAL SINGLE POINT ENERGY                 -75.000000
+Scaling factor for frequencies =  1.000000000  (already applied!)
+----------------------------
+0 1000.000000
+
+Point Group:  C1, Symmetry Number:   {symmetry_number}
+Rotational constants in cm-1:     {bx:.6f}     {by:.6f}     {bz:.6f}
+""",
+            encoding="utf-8",
+        )
+
+    def test_linear_rotational_partition_function(self, tmp_path):
+        log_path = tmp_path / "linear_orca.log"
+        self.write_thermo_log(
+            log_path,
+            [("O", 0.0, 0.0, 0.0), ("H", 0.0, 0.0, 0.97)],
+            (0.0, 18.774324, 18.774324),
+        )
+
+        output = ORCALOGfile(str(log_path), thermoAsw=True)
+        theta_r = 18.774324 * 1.4387769599838156
+        expected = 298.15 / theta_r
+
+        # Linear formula from Thermochemistry in Gaussian, section 2.3:
+        # q_rot = T / (sigma_r * Theta_r).
+        assert math.isclose(output.get_qRot(), expected, rel_tol=1.0e-12)
+
+    def test_nonlinear_rotational_partition_function(self, tmp_path):
+        log_path = tmp_path / "nonlinear_orca.log"
+        constants = (1.165006, 0.304730, 0.265422)
+        self.write_thermo_log(
+            log_path,
+            [
+                ("O", 0.0, 0.0, 0.0),
+                ("H", 0.8, 0.0, 0.6),
+                ("H", -0.8, 0.0, 0.6),
+            ],
+            constants,
+            symmetry_number=2,
+        )
+
+        output = ORCALOGfile(str(log_path), thermoAsw=True)
+        theta_x, theta_y, theta_z = [
+            value * 1.4387769599838156 for value in constants
+        ]
+        expected = (
+            math.sqrt(math.pi)
+            * 298.15 ** 1.5
+            / (2.0 * math.sqrt(theta_x * theta_y * theta_z))
+        )
+
+        # Nonlinear formula from the same manual section uses all three
+        # rotational temperatures and the rotational symmetry number.
+        assert math.isclose(output.get_qRot(), expected, rel_tol=1.0e-12)
+
+    def test_qrot_requires_thermochemistry_data(self, tmp_path):
+        log_path = tmp_path / "orca_without_thermo_flag.log"
+        self.write_thermo_log(
+            log_path,
+            [("O", 0.0, 0.0, 0.0), ("H", 0.0, 0.0, 0.97)],
+            (0.0, 18.774324, 18.774324),
+        )
+
+        output = ORCALOGfile(str(log_path))
+
+        # Missing optional parsing must become a Python exception, never a
+        # C++ out-of-bounds access/segmentation fault.
+        with pytest.raises(RuntimeError, match="thermoAsw=True"):
+            output.get_qRot()
+
 
 class TestPSI4Output():
 

@@ -450,35 +450,30 @@ void Molecule::toGJF(string fileName, string method, string basis, string addKey
         fileName = fileName.substr(0, fileName.find_last_of(".")) + ".gjf";
     }
 
-    if ( modHF != -1 )
-    {
-        int p1 = 100 - modHF;
-
-        if (modHF == 0)
-        {
-            addKeywords += " IOP(3/76=0" + to_string(p1) + "000" + to_string(modHF) + "00) IOP(3/77=0900010000)";
-        }
-        else if (modHF > 0 && modHF < 10)
-        {
-            addKeywords += " IOP(3/76=00" + to_string(modHF) + "000" + to_string(p1) + "00) IOP(3/77=0900010000)";
-        }
-        else if (modHF >= 10 && modHF <= 100)
-        {
-            addKeywords += " IOP(3/76=0" + to_string(p1) + "000" + to_string(modHF) + "00) IOP(3/77=0900010000)";
-        }
-        else
-        {
-            addKeywords += " IOP(3/76=" + to_string(modHF) + "000" + to_string(p1) + "00) IOP(3/77=0900010000)";
-        }
-    }
-    else if (modHF == -1)
-    {
-        // Do nothing, modHF is not set
-        // This is the default behavior, no modification to the keywords
-    }
-    else if (modHF > 100 || modHF < -1)
+    if (modHF < -1 || modHF > 100)
     {
         throw invalid_argument("modHF must be between 0 and 100.");
+    }
+    else if (modHF >= 0)
+    {
+        const int dftExchange = (100 - modHF) * 100;
+        const int hfExchange = modHF * 100;
+
+        ostringstream iop;
+        iop << " IOP(3/76="
+            << setfill('0') << setw(5) << dftExchange
+            << setfill('0') << setw(5) << hfExchange
+            << ")";
+
+        const string normalizedMethod = toLower(method);
+        if (normalizedMethod == "b3lyp"
+            || normalizedMethod == "rb3lyp"
+            || normalizedMethod == "ub3lyp")
+        {
+            iop << " IOP(3/77=0900010000)";
+        }
+
+        addKeywords += iop.str();
     }
 
 

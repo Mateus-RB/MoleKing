@@ -92,8 +92,8 @@ G16LOGfile::G16LOGfile(string filePath, bool polarAsw, bool tdAsw, bool thermoAs
         setIsLinear();
         setPrincipalAxesInertia();
         set_thetha_r();
-        // set_qVib();
-        // set_qRot();
+        //set_qVib();
+        //set_qRot();
         // set_qTrans();
         // set_qTot();
     };
