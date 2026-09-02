@@ -114,14 +114,32 @@ void ORCALOGfile::readLOGFile()
         {
             if (line.find("Scaling factor for frequencies = ") != string::npos)
             {
+                vector<string> currentFrequencyBlock;
+                bool completeFrequencyBlock = false;
+
+                // ORCA can print more than one Hessian in a single output,
+                // e.g. the initial Calc_Hess used by OptTS and the final Freq
+                // Hessian. Skip the blank line after the scaling-factor line,
+                // then collect this frequency table independently.
                 getline(this->logfile, line);
                 while (getline(this->logfile, line))
                 {
                     if (line.empty())
                     {
+                        completeFrequencyBlock = true;
                         break;
                     };
-                    this->vibFrequenciesStorage.emplace_back(line); // cm**-1
+                    currentFrequencyBlock.emplace_back(line); // cm**-1
+                }
+
+                // Thermochemistry and kinetics must describe the final
+                // stationary geometry. Therefore, replace an earlier complete
+                // Hessian only after a later frequency table was read fully.
+                // If the output ends midway through a table, retain the last
+                // complete block rather than mixing or accepting partial data.
+                if (completeFrequencyBlock && !currentFrequencyBlock.empty())
+                {
+                    this->vibFrequenciesStorage = currentFrequencyBlock;
                 }
             }
             if (line.find("Zero point energy") != string::npos)
@@ -277,6 +295,10 @@ void ORCALOGfile::setIsLinear()
 
 void ORCALOGfile::setVibFrequencies()
 {
+    // This method may be called again while reusing the parser. Rebuild the
+    // public frequency vector from the selected final block without duplicates.
+    this->vibFrequencies.clear();
+
     if (this->vibFrequenciesStorage.size() == 0 )
     {
         this->vibFrequencies.emplace_back(0.0);

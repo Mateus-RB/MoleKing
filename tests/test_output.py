@@ -118,11 +118,27 @@ class TestG16Output:
 
 class TestORCAOutput:
     @staticmethod
-    def write_thermo_log(path, atoms, rotational_constants, symmetry_number=1):
+    def write_thermo_log(
+        path,
+        atoms,
+        rotational_constants,
+        symmetry_number=1,
+        frequency_blocks=((1000.0,),),
+    ):
         """Write the minimum ORCA sections required by the output parser."""
         geometry = "\n".join(
             f"{symbol} {x:.6f} {y:.6f} {z:.6f}"
             for symbol, x, y, z in atoms
+        )
+        frequencies = "".join(
+            "Scaling factor for frequencies =  1.000000000  (already applied!)\n"
+            "----------------------------\n"
+            + "\n".join(
+                f"{index}: {frequency:.6f}"
+                for index, frequency in enumerate(block)
+            )
+            + "\n\n"
+            for block in frequency_blocks
         )
         bx, by, bz = rotational_constants
         path.write_text(
@@ -134,10 +150,7 @@ CARTESIAN COORDINATES (A.U.)
  Total Charge           Charge          ....    0
  Multiplicity           Mult            ....    1
  FINAL SINGLE POINT ENERGY                 -75.000000
-Scaling factor for frequencies =  1.000000000  (already applied!)
-----------------------------
-0 1000.000000
-
+{frequencies}
 Point Group:  C1, Symmetry Number:   {symmetry_number}
 Rotational constants in cm-1:     {bx:.6f}     {by:.6f}     {bz:.6f}
 """,
@@ -202,6 +215,24 @@ Rotational constants in cm-1:     {bx:.6f}     {by:.6f}     {bz:.6f}
         # C++ out-of-bounds access/segmentation fault.
         with pytest.raises(RuntimeError, match="thermoAsw=True"):
             output.get_qRot()
+
+    def test_uses_only_last_complete_frequency_block(self, tmp_path):
+        log_path = tmp_path / "opt_ts_with_initial_and_final_hessians.log"
+        self.write_thermo_log(
+            log_path,
+            [("O", 0.0, 0.0, 0.0), ("H", 0.0, 0.0, 0.97)],
+            (0.0, 18.774324, 18.774324),
+            frequency_blocks=(
+                (-1690.70, 900.0),   # Initial Calc_Hess at the TS guess.
+                (-1754.88, 1000.0),  # Final Freq at the optimized TS.
+            ),
+        )
+
+        output = ORCALOGfile(str(log_path), thermoAsw=True)
+
+        # Rate calculations must use the Hessian of the final optimized
+        # geometry, never concatenate it with the initial OptTS Hessian.
+        assert output.getVibFrequencies() == [-1754.88, 1000.0]
 
 
 class TestPSI4Output():
