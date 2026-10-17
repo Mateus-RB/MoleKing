@@ -139,7 +139,7 @@ private:
     double dipoleY;
     double dipoleZ;
     double FreqDouble;   
-    double sigma_r;
+    double sigma_r = 1.0;                // Gaussian prints no "Rotational symmetry number" for atoms
     double H;
     double S;
     double G;
